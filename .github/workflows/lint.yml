@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────
+# GitHub Actions — Validation automatique
+# Se déclenche à chaque push ou Pull Request sur la branche main
+# ─────────────────────────────────────────────────────────────────
+name: Lint & Validate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Valider les fichiers HTML & JS
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code source
+      - name: 📥 Checkout du dépôt
+        uses: actions/checkout@v4
+
+      # 2. Installer Node.js (nécessaire pour les outils de validation)
+      - name: ⚙️ Configurer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Valider la syntaxe HTML
+      - name: ✅ Valider HTML
+        run: |
+          npm install -g html-validate
+          html-validate "src/**/*.html" "index.html" || echo "⚠️ Avertissements HTML détectés (non bloquant)"
+
+      # 4. Vérifier la syntaxe JavaScript
+      - name: ✅ Vérifier JavaScript
+        run: |
+          npm install -g jshint
+          jshint src/shared/utils.js --esversion=6 || echo "⚠️ Avertissements JS détectés (non bloquant)"
+
+      # 5. Résumé final
+      - name: 📋 Résumé
+        run: |
+          echo "✅ Validation terminée"
+          echo "📁 Fichiers HTML : $(find src -name '*.html' | wc -l)"
+          echo "📁 Fichiers CSS  : $(find src -name '*.css' | wc -l)"
+          echo "📁 Fichiers JS   : $(find src -name '*.js' | wc -l)"

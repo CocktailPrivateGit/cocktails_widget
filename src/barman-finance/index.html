@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BarMan Finance Pro — Cocktail Privé</title>
+  <!-- Phase 3 : CSS externalisé -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="logo-mark">CP</div>
+    <div class="brand-text">
+      <div class="brand-name">Cocktail Privé</div>
+      <div class="brand-sub">Barman Finance Pro</div>
+    </div>
+  </div>
+  <div class="header-title">Gestion Financière</div>
+  <div class="header-actions">
+    <button class="btn btn-outline btn-sm" onclick="exportData()">↑ Export</button>
+    <button class="btn btn-outline btn-sm" onclick="importData()">↓ Import</button>
+  </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="switchTab(&#39;dashboard&#39;)" id="tab-dashboard">
+    <span class="tab-icon">◈</span> Tableau de Bord
+  </div>
+  <div class="nav-tab" onclick="switchTab(&#39;revenus&#39;)" id="tab-revenus">
+    <span class="tab-icon">◆</span> Revenus
+  </div>
+  <div class="nav-tab" onclick="switchTab(&#39;depenses&#39;)" id="tab-depenses">
+    <span class="tab-icon">◇</span> Dépenses
+  </div>
+  <div class="nav-tab" onclick="switchTab(&#39;amortissement&#39;)" id="tab-amortissement">
+    <span class="tab-icon">◉</span> Amortissement
+  </div>
+  <div class="nav-tab" onclick="switchTab(&#39;lancement&#39;)" id="tab-lancement">
+    <span class="tab-icon">✦</span> Plan de Lancement
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- DASHBOARD                                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-dashboard" class="section active">
+
+    <div class="filter-bar">
+      <label>Année</label>
+      <select id="dash-year" onchange="renderDashboard()"><option value="2026" selected="">2026</option></select>
+      <label style="margin-left:12px">Mois</label>
+      <select id="dash-month" onchange="renderDashboard()">
+        <option value="all">Tous</option>
+        <option value="1">Janvier</option><option value="2">Février</option>
+        <option value="3">Mars</option><option value="4">Avril</option>
+        <option value="5">Mai</option><option value="6">Juin</option>
+        <option value="7">Juillet</option><option value="8">Août</option>
+        <option value="9">Septembre</option><option value="10">Octobre</option>
+        <option value="11">Novembre</option><option value="12">Décembre</option>
+      </select>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid-4" id="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Chiffre d'Affaires</div>
+      <div class="kpi-value">0&nbsp;€</div>
+      <div class="kpi-sub">0 prestation</div>
+      <div class="kpi-bar-wrap"><div class="kpi-bar gold" style="width:0%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Bénéfice Net Est.</div>
+      <div class="kpi-value" style="color:var(--green)">0&nbsp;€</div>
+      <div class="kpi-sub">après charges &amp; URSSAF</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">URSSAF Estimé (21,1%)</div>
+      <div class="kpi-value" style="color:var(--red)">0&nbsp;€</div>
+      <div class="kpi-sub">à provisionner</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Panier Moyen</div>
+      <div class="kpi-value">0&nbsp;€</div>
+      <div class="kpi-sub">par prestation</div>
+    </div></div>
+
+    <div class="ornament">◆ · · · ◆</div>
+
+    <!-- Charts row -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Revenus par Mois</div>
+        <div id="chart-revenus" class="mini-chart" style="height:100px"><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Jan</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Fév</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:var(--gold); width:100%;"></div>
+      <div class="chart-label">Mar</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Avr</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Mai</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Jun</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Jul</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Aoû</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Sep</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Oct</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Nov</div>
+    </div><div class="chart-bar-wrap">
+      <div class="chart-bar-inner" style="height:0px; background:rgba(218,171,45,0.35); width:100%;"></div>
+      <div class="chart-label">Déc</div>
+    </div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Répartition par Type</div>
+        <div id="chart-types" style="padding: 8px 0;"><div class="empty-state" style="padding:16px">Aucune donnée</div></div>
+      </div>
+    </div>
+
+    <!-- Seuils fiscaux -->
+    <div class="card">
+      <div class="card-title">Seuils Réglementaires</div>
+      <div class="grid-2">
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-header">
+              <span style="font-size:11px; color:rgba(244,241,235,0.6)">Plafond Micro-BIC</span>
+              <span id="pct-microbic" style="font-size:11px; color:var(--gold)">0.0 %</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar green" id="bar-microbic" style="width:0%; background: linear-gradient(90deg, var(--bronze), var(--gold));"></div>
+            </div>
+            <div style="font-size:10px; color:rgba(244,241,235,0.35); margin-top:4px">Seuil : 77 700 €</div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-header">
+              <span style="font-size:11px; color:rgba(244,241,235,0.6)">Franchise TVA</span>
+              <span id="pct-tva" style="font-size:11px; color:var(--blue)">0.0 %</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar blue" id="bar-tva" style="width:0%; background: linear-gradient(90deg, #1A5F7A, var(--blue));"></div>
+            </div>
+            <div style="font-size:10px; color:rgba(244,241,235,0.35); margin-top:4px">Seuil franchise : 37 500 €</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dernières opérations -->
+    <div class="card">
+      <div class="card-title">Dernières Opérations</div>
+      <div class="table-wrap">
+        <table id="table-recent">
+          <thead>
+            <tr>
+              <th>Date</th><th>Type</th><th>Description</th><th>Catégorie</th><th>Montant</th><th>Formule</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-recent"><tr><td colspan="6"><div class="empty-state">Aucune opération</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Drive Sync Panel -->
+    <div class="drive-panel">
+      <div class="drive-icon">☁</div>
+      <div class="drive-info">
+        <div class="drive-title">Sync Google Drive</div>
+        <div class="drive-desc">Exportez vos données en JSON pour les stocker dans Google Drive. Importez pour restaurer ou synchroniser depuis un autre appareil.</div>
+      </div>
+      <div class="drive-actions">
+        <button class="btn btn-outline btn-sm" onclick="exportData()">Exporter JSON</button>
+        <button class="btn btn-ghost btn-sm" onclick="importData()">Importer JSON</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- REVENUS                                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-revenus" class="section">
+
+    <div class="grid-2">
+      <!-- Form -->
+      <div class="card">
+        <div class="card-title">Saisir une Prestation</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" id="rev-date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">N° Facture</label>
+            <input type="text" id="rev-facture" class="form-control" placeholder="F-2026-001">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client *</label>
+          <input type="text" id="rev-client" class="form-control" placeholder="Nom ou société">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Type d'Événement</label>
+            <select id="rev-type" class="form-control">
+              <option value="">— Choisir —</option>
+              <option>Soirée Privée</option>
+              <option>Mariage</option>
+              <option>Entreprise</option>
+              <option>Anniversaire</option>
+              <option>Cours Cocktail</option>
+              <option>Rooftop</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Formule</label>
+            <select id="rev-formule" class="form-control" onchange="updateFormulaPrice()">
+              <option value="">— Choisir —</option>
+              <option value="18">Découverte — 18 €/pers</option>
+              <option value="28">Signature — 28 €/pers</option>
+              <option value="42">Prestige — 42 €/pers</option>
+              <option value="0">Sur Mesure (devis)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nb. Personnes</label>
+            <input type="number" id="rev-personnes" class="form-control" placeholder="0" oninput="updateFormulaPrice()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Montant HT (€) *</label>
+            <input type="number" id="rev-montant" class="form-control" placeholder="0.00" step="0.01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lieu</label>
+          <input type="text" id="rev-lieu" class="form-control" placeholder="Paris, 75001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea id="rev-notes" class="form-control" rows="2" placeholder="Supplements, remarques…" style="resize:vertical;"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost btn-sm" onclick="clearRevForm()">Effacer</button>
+          <button class="btn btn-gold" onclick="saveRevenu()">+ Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Summary right -->
+      <div>
+        <div class="card">
+          <div class="card-title">Cette Année</div>
+          <div id="rev-summary-year">
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:11px;color:rgba(244,241,235,0.5)">CA 2026</span>
+        <span style="font-size:20px;color:var(--gold)">0&nbsp;€</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">Prestations</span><span>0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">Panier moyen</span><span>0&nbsp;€</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">URSSAF estimé (21,1%)</span>
+        <span style="color:var(--red)">0&nbsp;€</span>
+      </div>
+    </div></div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div class="card-title">Revenus par Formule</div>
+          <div id="rev-by-formule"><div class="empty-state" style="padding:20px">Aucune donnée</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-title">Historique des Revenus</div>
+      <div class="filter-bar">
+        <label>Année</label>
+        <select id="rev-filter-year" onchange="renderRevenus()"><option value="2026" selected="">2026</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Facture</th><th>Client</th><th>Type</th><th>Formule</th><th>Pers.</th><th>Lieu</th><th>Montant</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-revenus"><tr><td colspan="9"><div class="empty-state"><div class="empty-icon">◇</div>Aucun revenu pour 2026</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- DÉPENSES                                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-depenses" class="section">
+
+    <div class="grid-2">
+      <!-- Form -->
+      <div class="card">
+        <div class="card-title">Saisir une Dépense</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" id="dep-date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Montant TTC (€) *</label>
+            <input type="number" id="dep-montant" class="form-control" placeholder="0.00" step="0.01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catégorie *</label>
+          <select id="dep-categorie" class="form-control">
+            <option value="">— Choisir —</option>
+            <option>Matériel &amp; Équipement</option>
+            <option>Consommables &amp; Produits</option>
+            <option>Transport &amp; Déplacement</option>
+            <option>Marketing &amp; Communication</option>
+            <option>Assurance Professionnelle</option>
+            <option>Formation &amp; Cours</option>
+            <option>Cotisations URSSAF</option>
+            <option>Frais Bancaires</option>
+            <option>Sous-traitance</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          <input type="text" id="dep-description" class="form-control" placeholder="Ex : shaker Cobbler x6, essence…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Fournisseur</label>
+            <input type="text" id="dep-fournisseur" class="form-control" placeholder="Nom ou enseigne">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Justificatif</label>
+            <input type="text" id="dep-justificatif" class="form-control" placeholder="N° facture fournisseur">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Déductible</label>
+          <select id="dep-deductible" class="form-control">
+            <option value="oui">Oui (charge professionnelle)</option>
+            <option value="non">Non</option>
+            <option value="partiel">Partiel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea id="dep-notes" class="form-control" rows="2" placeholder="Remarques…" style="resize:vertical;"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost btn-sm" onclick="clearDepForm()">Effacer</button>
+          <button class="btn btn-gold" onclick="saveDepense()">+ Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Summary right -->
+      <div>
+        <div class="card">
+          <div class="card-title">Cette Année</div>
+          <div id="dep-summary-year">
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:11px;color:rgba(244,241,235,0.5)">Total 2026</span>
+        <span style="font-size:20px;color:var(--red)">0&nbsp;€</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">Déductibles</span>
+        <span style="color:var(--green)">0&nbsp;€</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">Nb opérations</span><span>0</span>
+      </div>
+    </div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Dépenses par Catégorie</div>
+          <div id="dep-by-cat"><div class="empty-state" style="padding:20px">Aucune donnée</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-title">Historique des Dépenses</div>
+      <div class="filter-bar">
+        <label>Année</label>
+        <select id="dep-filter-year" onchange="renderDepenses()"><option value="2026" selected="">2026</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Catégorie</th><th>Description</th><th>Fournisseur</th><th>Déductible</th><th>Montant</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-depenses"><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◇</div>Aucune dépense pour 2026</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- AMORTISSEMENT                                          -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-amortissement" class="section">
+
+    <div class="grid-2">
+      <!-- Form -->
+      <div class="card">
+        <div class="card-title">Ajouter un Équipement</div>
+        <div class="form-group">
+          <label class="form-label">Nom de l'Équipement *</label>
+          <input type="text" id="am-nom" class="form-control" placeholder="Ex : Cave à Cocktails, Machine à glaçons…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Valeur d'Achat (€) *</label>
+            <input type="number" id="am-valeur" class="form-control" placeholder="0.00" step="0.01" oninput="previewAmort()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Valeur Résiduelle (€)</label>
+            <input type="number" id="am-residuel" class="form-control" placeholder="0.00" step="0.01" value="0" oninput="previewAmort()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date d'Achat *</label>
+            <input type="date" id="am-date" class="form-control" oninput="previewAmort()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durée (années) *</label>
+            <input type="number" id="am-duree" class="form-control" placeholder="3" min="1" max="20" oninput="previewAmort()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mode d'Amortissement</label>
+          <select id="am-mode" class="form-control" onchange="previewAmort()">
+            <option value="lineaire">Linéaire</option>
+            <option value="degressif">Dégressif (coeff. fiscal)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catégorie</label>
+          <select id="am-categorie" class="form-control">
+            <option>Matériel de Bar</option>
+            <option>Électroménager Professionnel</option>
+            <option>Mobilier</option>
+            <option>Informatique &amp; Téléphonie</option>
+            <option>Transport</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div id="amort-preview" style="display:none" class="card">
+          <div class="card-title" style="margin-bottom:10px">Aperçu</div>
+          <div id="amort-preview-content"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost btn-sm" onclick="clearAmortForm()">Effacer</button>
+          <button class="btn btn-gold" onclick="saveEquipement()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="card">
+        <div class="card-title">Récapitulatif Annuel</div>
+        <div id="amort-annual-summary"><div class="empty-state" style="padding:20px">Aucun équipement enregistré</div></div>
+      </div>
+    </div>
+
+    <!-- Equipment list -->
+    <div id="amort-list"><div class="empty-state"><div class="empty-icon">◉</div>Ajoutez votre premier équipement via le formulaire</div></div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- PLAN DE LANCEMENT                                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-lancement" class="section">
+
+    <!-- KPIs -->
+    <div class="grid-4" id="launch-kpi-grid" style="margin-bottom:24px">
+    <div class="kpi-card">
+      <div class="kpi-label">Budget Estimé Total</div>
+      <div class="kpi-value">102&nbsp;€</div>
+      <div class="kpi-sub">9 articles</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Déjà Acheté</div>
+      <div class="kpi-value" style="color:var(--green)">42&nbsp;€</div>
+      <div class="kpi-sub">2 articles · 22% complété</div>
+      <div class="kpi-bar-wrap"><div class="kpi-bar green" style="width:22%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Commandé</div>
+      <div class="kpi-value" style="color:var(--blue)">0&nbsp;€</div>
+      <div class="kpi-sub">0 articles en attente</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Reste à Financer</div>
+      <div class="kpi-value" style="color:var(--red)">80&nbsp;€</div>
+      <div class="kpi-sub">Essentiels: 40&nbsp;€</div>
+    </div></div>
+
+    <div class="grid-2">
+      <!-- Formulaire ajout -->
+      <div class="card">
+        <div class="card-title">Ajouter un Achat</div>
+        <div class="form-group">
+          <label class="form-label">Désignation *</label>
+          <input type="text" id="lc-nom" class="form-control" placeholder="Ex : Shakers Boston x4, Blender pro…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Catégorie</label>
+            <select id="lc-categorie" class="form-control">
+              <option>Matériel de Bar</option>
+              <option>Verrerie</option>
+              <option>Mobilier &amp; Bar Mobile</option>
+              <option>Réfrigération &amp; Glaçons</option>
+              <option>Consommables &amp; Stocks</option>
+              <option>Communication &amp; Marketing</option>
+              <option>Tenue Professionnelle</option>
+              <option>Administratif &amp; Légal</option>
+              <option>Numérique &amp; Logiciels</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priorité</label>
+            <select id="lc-priorite" class="form-control">
+              <option value="essentiel">🔴 Essentiel</option>
+              <option value="important">🟡 Important</option>
+              <option value="optionnel">🟢 Optionnel</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prix Estimé (€)</label>
+            <input type="number" id="lc-prix-estime" class="form-control" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prix Réel (€)</label>
+            <input type="number" id="lc-prix-reel" class="form-control" placeholder="0.00" step="0.01">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Fournisseur Suggéré</label>
+            <input type="text" id="lc-fournisseur" class="form-control" placeholder="Amazon, Lacor, Metro…">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Statut</label>
+            <select id="lc-statut" class="form-control">
+              <option value="a_acheter">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes / Lien</label>
+          <input type="text" id="lc-notes" class="form-control" placeholder="Lien produit, quantité, remarques…">
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px">
+          <input type="checkbox" id="lc-amortissable" style="accent-color:var(--gold);width:16px;height:16px;cursor:pointer">
+          <label for="lc-amortissable" class="form-label" style="margin-bottom:0;cursor:pointer">Équipement amortissable (&gt;500 €)</label>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost btn-sm" onclick="clearLcForm()">Effacer</button>
+          <button class="btn btn-gold" onclick="saveAchat()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- Résumé par catégorie -->
+      <div>
+        <div class="card">
+          <div class="card-title">Avancement par Catégorie</div>
+          <div id="launch-by-cat"><div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:rgba(244,241,235,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">Matériel de Bar</span>
+        <span style="color:var(--gold)">60&nbsp;€ <span style="color:rgba(244,241,235,0.35)">(0%)</span></span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
+        <div style="height:100%;width:0%;background:linear-gradient(90deg,#2E7D5B,var(--green));border-radius:2px;transition:width 0.5s"></div>
+      </div>
+    </div><div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:rgba(244,241,235,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">Numérique &amp; Logiciels</span>
+        <span style="color:var(--gold)">42&nbsp;€ <span style="color:rgba(244,241,235,0.35)">(100%)</span></span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
+        <div style="height:100%;width:100%;background:linear-gradient(90deg,#2E7D5B,var(--green));border-radius:2px;transition:width 0.5s"></div>
+      </div>
+    </div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Répartition Budget</div>
+          <div id="launch-budget-chart"><div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:rgba(244,241,235,0.7)">🔴 Essentiel</span>
+        <span style="color:var(--red)">80.3%  82&nbsp;€</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
+        <div style="height:100%;width:80.3%;background:var(--red);border-radius:2px;transition:width 0.5s"></div>
+      </div>
+    </div><div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:rgba(244,241,235,0.7)">🟡 Important</span>
+        <span style="color:var(--gold)">19.7%  20&nbsp;€</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
+        <div style="height:100%;width:19.7%;background:var(--gold);border-radius:2px;transition:width 0.5s"></div>
+      </div>
+    </div><div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:rgba(244,241,235,0.7)">🟢 Optionnel</span>
+        <span style="color:var(--green)">0.0%  0&nbsp;€</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
+        <div style="height:100%;width:0.0%;background:var(--green);border-radius:2px;transition:width 0.5s"></div>
+      </div>
+    </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filter-bar">
+      <label>Statut</label>
+      <select id="lc-filter-statut" onchange="renderAchats()">
+        <option value="all">Tous</option>
+        <option value="a_acheter">À acheter</option>
+        <option value="commande">Commandé</option>
+        <option value="achete">Acheté</option>
+      </select>
+      <label style="margin-left:12px">Priorité</label>
+      <select id="lc-filter-priorite" onchange="renderAchats()">
+        <option value="all">Toutes</option>
+        <option value="essentiel">Essentiel</option>
+        <option value="important">Important</option>
+        <option value="optionnel">Optionnel</option>
+      </select>
+      <label style="margin-left:12px">Catégorie</label>
+      <select id="lc-filter-cat" onchange="renderAchats()"><option value="all">Toutes</option><option value="Matériel de Bar">Matériel de Bar</option><option value="Numérique &amp; Logiciels">Numérique &amp; Logiciels</option></select>
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="resetDefaultAchats()">↺ Réinitialiser défauts</button>
+    </div>
+
+    <!-- Liste -->
+    <div id="launch-list"><div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0;flex:1">Numérique &amp; Logiciels</div>
+        <span style="font-size:11px;color:rgba(244,241,235,0.4);margin-right:16px">2/2 achetés</span>
+        <span style="font-size:13px;color:var(--gold)">42&nbsp;€</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(76,175,130,0.05);border:1px solid rgba(76,175,130,0.15);border-radius:4px">
+            <select onchange="updateAchatStatut(1774622038374, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete" selected="">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:rgba(244,241,235,0.45);text-decoration:line-through;;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Claude Pro</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · Anthropic</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">22&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622038374)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774622038374)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(76,175,130,0.05);border:1px solid rgba(76,175,130,0.15);border-radius:4px">
+            <select onchange="updateAchatStatut(1774622059635, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete" selected="">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:rgba(244,241,235,0.45);text-decoration:line-through;;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gemini Pro</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · Google</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">20&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622059635)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774622059635)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div>
+      </div>
+    </div><div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0;flex:1">Matériel de Bar</div>
+        <span style="font-size:11px;color:rgba(244,241,235,0.4);margin-right:16px">0/7 achetés</span>
+        <span style="font-size:13px;color:var(--gold)">80&nbsp;€</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774622486271, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">verre a mélange Inox</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32846562182.html?spm=a2g0o.productlist.main.6.19c1zO1vzO1vXG&amp;algo_pvid=bcea3f27-a234-4371-854b-9310ec02a71f&amp;pdp_ext_f=%7B%22order%22%3A%2231%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&amp;utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32846562182%7C_p_origin_prod%3A</div>
+            </div>
+            <span style="font-size:13px;color:var(--gold);white-space:nowrap;min-width:70px;text-align:right">~14&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622486271)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774622486271)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774622573639, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Spoon 20cm noire</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress² · https://fr.aliexpress.com/item/32824941157.html?spm=a2g0o.productlist.main.40.19c1zO1vzO1vXG&amp;algo_pvid=bcea3f27-a234-4371-854b-9310ec02a71f&amp;pdp_ext_f=%7B%22order%22%3A%22370%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&amp;utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32824941157%7C_p_origin_prod%3A</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">4&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622573639)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774622573639)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774623382041, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">pince Fruits 22cm noire</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32888160972.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32888160972&amp;gatewayAdapt=glo2fra</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">5&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623382041)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774623382041)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774623441250, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Flacon Bitter Skull Noire 30ml</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32882652256.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32882652256&amp;gatewayAdapt=glo2fra</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">4&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623441250)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774623441250)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774623476411, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bitter Bottle Skull Noire 60ml</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32882652256.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32882652256&amp;gatewayAdapt=glo2fra</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">5&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623476411)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774623476411)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774623551174, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bitter Bottle Skull 120ml</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32882652256.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32882652256&amp;gatewayAdapt=glo2fra</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">8&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623551174)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774623551174)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
+            <select onchange="updateAchatStatut(1774622435824, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
+              <option value="a_acheter" selected="">⬜ À acheter</option>
+              <option value="commande">🔵 Commandé</option>
+              <option value="achete">✅ Acheté</option>
+            </select>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shaker Boston</div>
+              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🟡 Important · AliExpress · AliExpress · https://fr.aliexpress.com/item/1005002625190659.html?spm=a2g0o.productlist.main.7.19c1zO1vzO1vXG&amp;algo_pvid=bcea3f27-a234-4371-854b-9310ec02a71f&amp;pdp_ext_f=%7B%22order%22%3A%2214%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&amp;utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A1005002625190659%7C_p_origin_prod%3A</div>
+            </div>
+            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">40&nbsp;€</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622435824)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
+              <button class="btn btn-danger" onclick="deleteAchat(1774622435824)" style="padding:4px 8px;font-size:10px">✕</button>
+            </div>
+          </div>
+      </div>
+    </div></div>
+
+  </section>
+
+</main>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- IMPORT INPUT (hidden) -->
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(event)">
+
+
+<!-- Phase 3 : JS externalisé -->
+<script src="app.js"></script>
+
+</body>
+</html>

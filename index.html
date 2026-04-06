@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cocktail Privé — Widgets Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noir:    #080808;
+      --noir2:   #111111;
+      --noir3:   #1a1a1a;
+      --or:      #c8a96e;
+      --or-light:#e2c98a;
+      --or-dark: #a07840;
+      --creme:   #f5f0e8;
+      --creme2:  #ddd6c4;
+      --gris:    #888;
+      --border:  #2a2a2a;
+      --vert:    #4ade80;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--noir);
+      color: var(--creme);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .logo {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--or-dark), var(--or));
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 4px 24px rgba(200,169,110,0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 300;
+      letter-spacing: 3px;
+      color: var(--creme);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title span { color: var(--or); }
+
+    .hero-sub {
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 2px;
+      color: var(--gris);
+      text-transform: uppercase;
+    }
+
+    /* ── WIDGET CARDS ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 720px;
+      width: 100%;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: var(--noir2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.1s; }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--or-dark), transparent);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .card:hover {
+      border-color: #3a3a3a;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-emoji {
+      font-size: 36px;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      color: var(--creme);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--gris);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 1.5rem;
+    }
+
+    .tag {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(200,169,110,0.1);
+      color: var(--or-dark);
+      border: 1px solid rgba(200,169,110,0.2);
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--or);
+      transition: gap 0.2s;
+    }
+
+    .card:hover .card-cta { gap: 12px; }
+
+    .card-cta-arrow {
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+
+    .card:hover .card-cta-arrow { transform: translateX(4px); }
+
+    /* ── STATUS DOT ── */
+    .status-dot {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: var(--vert);
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--vert);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 300;
+      color: #444;
+      letter-spacing: 0.5px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .footer a {
+      color: var(--or-dark);
+      text-decoration: none;
+    }
+
+    .footer a:hover { color: var(--or); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="logo">🍸</div>
+    <h1 class="hero-title"><span>Cocktail</span> Privé</h1>
+    <p class="hero-sub">Widgets professionnels · @cocktail_prive60</p>
+  </div>
+
+  <div class="cards">
+
+    <!-- BarComm Pro -->
+    <a class="card" href="./src/barcomm-pro/index.html">
+      <div class="status-dot"><div class="dot"></div>Live</div>
+      <span class="card-emoji">📊</span>
+      <div class="card-title">BarComm Pro</div>
+      <p class="card-desc">
+        Dashboard commercial complet — suivi réseaux sociaux,
+        devis, contrats et veille concurrentielle en temps réel.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Instagram</span>
+        <span class="tag">TikTok</span>
+        <span class="tag">LinkedIn</span>
+        <span class="tag">Devis</span>
+        <span class="tag">Veille</span>
+      </div>
+      <div class="card-cta">
+        Ouvrir le widget
+        <span class="card-cta-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- BarMan Finance -->
+    <a class="card" href="./src/barman-finance/index.html">
+      <div class="status-dot"><div class="dot"></div>Live</div>
+      <span class="card-emoji">💰</span>
+      <div class="card-title">BarMan Finance</div>
+      <p class="card-desc">
+        Gestion financière professionnelle — revenus, dépenses,
+        amortissements et plan de lancement avec 35+ articles.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Revenus</span>
+        <span class="tag">URSSAF</span>
+        <span class="tag">Amortissement</span>
+        <span class="tag">Lancement</span>
+      </div>
+      <div class="card-cta">
+        Ouvrir le widget
+        <span class="card-cta-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="footer">
+    <p>
+      Hébergé sur <a href="https://github.com/cocktailprivategit/widgets" target="_blank">GitHub Pages</a>
+      · Données stockées localement dans votre navigateur
+      · <a href="./docs/README.md" target="_blank">Documentation</a>
+    </p>
+    <p style="margin-top: 8px; font-size: 10px; color: #333;">
+      v1.0.0 · MIT License · 2026
+    </p>
+  </div>
+
+</body>
+</html>

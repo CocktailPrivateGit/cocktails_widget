@@ -1,0 +1,20 @@
+{
+  "name": "cocktail-prive-widgets",
+  "version": "1.0.0",
+  "description": "Dashboards web professionnels pour la gestion commerciale et financière — Cocktail Privé",
+  "main": "src/index.html",
+  "scripts": {
+    "validate": "echo 'Validation HTML/CSS en cours...'",
+    "lint": "echo 'Linting en cours...'"
+  },
+  "keywords": [
+    "cocktail",
+    "dashboard",
+    "barcomm",
+    "finance",
+    "github-pages"
+  ],
+  "author": "Cocktail Privé <@cocktail_prive60>",
+  "license": "MIT",
+  "homepage": "https://cocktailprivategit.github.io"
+}

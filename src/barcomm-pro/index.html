@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BarComm Pro — @cocktail_prive60</title>
+  <!-- Phase 3 : CSS externalisé -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">🍸</div>
+      <div>
+        <div class="brand-name">BarComm Pro</div>
+        <div class="brand-sub">@cocktail_prive60 · Oise + Île-de-France</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="live-pill"><div class="live-dot"></div>Live</div>
+      <div class="save-indicator" id="save-time">—</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- SIDEBAR NAV -->
+    <nav class="sidebar">
+      <div class="nav-section-label">Principal</div>
+      <div class="nav-item active" onclick="nav(&#39;dashboard&#39;)" data-p="dashboard">
+        <span class="nav-icon">⬡</span><span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;situation&#39;)" data-p="situation">
+        <span class="nav-icon">📊</span><span>Ma Situation</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Stratégie</div>
+      <div class="nav-item" onclick="nav(&#39;veille&#39;)" data-p="veille">
+        <span class="nav-icon">🔍</span><span>Veille Live</span><span class="nav-badge">Live</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;opportunites&#39;)" data-p="opportunites">
+        <span class="nav-icon">💡</span><span>Opportunités</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;hashtags&#39;)" data-p="hashtags">
+        <span class="nav-icon">🏷️</span><span>Hashtags</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Contenu</div>
+      <div class="nav-item" onclick="nav(&#39;planning&#39;)" data-p="planning">
+        <span class="nav-icon">📅</span><span>Planning</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;contenu&#39;)" data-p="contenu">
+        <span class="nav-icon">✍️</span><span>Banque Posts</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;tendances&#39;)" data-p="tendances">
+        <span class="nav-icon">📈</span><span>Tendances</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Suivi</div>
+      <div class="nav-item" onclick="nav(&#39;actions&#39;)" data-p="actions">
+        <span class="nav-icon">✅</span><span>Actions</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;journal&#39;)" data-p="journal">
+        <span class="nav-icon">📓</span><span>Journal</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;bios&#39;)" data-p="bios">
+        <span class="nav-icon">👤</span><span>Bios Rédigées</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-item" onclick="nav(&#39;sync&#39;)" data-p="sync">
+        <span class="nav-icon">☁️</span><span>Sync Drive</span><span class="nav-badge" style="background:#4ade80;color:#0a0a0a;">New</span>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="dash-hero">
+          <div class="dash-hero-title">Bonjour, <span>@cocktail_prive60</span> 🥂</div>
+          <div class="dash-hero-sub">Barman à domicile &amp; corporate · Oise (60) · Île-de-France · Lancement actif</div>
+        </div>
+
+        <div class="label">Métriques en direct</div>
+        <div class="grid-4" style="margin-bottom:1.25rem;">
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-ig">—</div>
+            <div class="kpi-label">Abonnés Instagram</div>
+            <div class="kpi-delta" id="d-ig" style="color:var(--gris)"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-tt">—</div>
+            <div class="kpi-label">Abonnés TikTok</div>
+            <div class="kpi-delta" id="d-tt" style="color:var(--gris)"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-li">—</div>
+            <div class="kpi-label">Relations LinkedIn</div>
+            <div class="kpi-delta" id="d-li" style="color:var(--gris)"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-devis">—</div>
+            <div class="kpi-label">Devis reçus</div>
+            <div class="kpi-delta" id="d-devis" style="color:var(--gris)"></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:1.25rem;">
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-contrats">—</div>
+            <div class="kpi-label">Contrats signés</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-posts">—</div>
+            <div class="kpi-label">Posts publiés (total)</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="label">Accès rapide</div>
+        <div class="grid-3">
+          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav(&#39;veille&#39;)">
+            <div style="font-size:28px;margin-bottom:8px;">🔍</div>
+            <div style="font-size:13px;font-weight:400;color:var(--creme);">Analyser concurrents</div>
+            <div style="font-size:10px;color:var(--gris);margin-top:3px;">Recherche web live</div>
+          </div>
+          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav(&#39;planning&#39;)">
+            <div style="font-size:28px;margin-bottom:8px;">📅</div>
+            <div style="font-size:13px;font-weight:400;color:var(--creme);">Voir le planning</div>
+            <div style="font-size:10px;color:var(--gris);margin-top:3px;">Calendrier éditorial</div>
+          </div>
+          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav(&#39;actions&#39;)">
+            <div style="font-size:28px;margin-bottom:8px;">✅</div>
+            <div style="font-size:13px;font-weight:400;color:var(--creme);">Mes actions</div>
+            <div style="font-size:10px;color:var(--gris);margin-top:3px;">Checklist J1→J30</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="alert"><strong>Objectif J30 :</strong> 100 abonnés IG · 200 TikTok · 20 posts · 3 demandes de devis · 1er contrat</div>
+
+        <div class="label">Prochain événement</div>
+        <div class="card">
+          <div id="next-event" style="font-size:13px;font-weight:300;color:var(--gris);">Aucun événement renseigné — va dans "Ma Situation" pour l'ajouter</div>
+        </div>
+      </div>
+
+      <!-- ═══ MA SITUATION ═══ -->
+      <div class="panel" id="panel-situation">
+        <div class="section-header">
+          <div><div class="section-title">Ma Situation</div><div class="section-sub">Renseigne tes données — sauvegardées automatiquement</div></div>
+          <button class="btn btn-gold" onclick="saveSituation()">💾 Sauvegarder</button>
+        </div>
+
+        <div class="label">Réseaux sociaux</div>
+        <div class="card">
+          <div class="metric-row"><span class="metric-icon">📸</span><span class="metric-label">Abonnés Instagram</span><input class="metric-input" id="s-ig" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">🎵</span><span class="metric-label">Abonnés TikTok</span><input class="metric-input" id="s-tt" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">💼</span><span class="metric-label">Relations LinkedIn</span><input class="metric-input" id="s-li" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">📝</span><span class="metric-label">Posts publiés (total)</span><input class="metric-input" id="s-posts" type="number" placeholder="0" oninput="autoSave()"></div>
+        </div>
+
+        <div class="label">Business</div>
+        <div class="card">
+          <div class="metric-row"><span class="metric-icon">📨</span><span class="metric-label">Devis reçus</span><input class="metric-input" id="s-devis" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">✍️</span><span class="metric-label">Contrats signés</span><input class="metric-input" id="s-contrats" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">🎉</span><span class="metric-label">Événements réalisés</span><input class="metric-input" id="s-events" type="number" placeholder="0" oninput="autoSave()"></div>
+        </div>
+
+        <div class="label">Prochain événement</div>
+        <div class="card">
+          <input class="input" id="s-next-event" placeholder="Ex: Mariage - Compiègne - 15 mai" oninput="autoSave()" style="margin-bottom:8px;">
+        </div>
+
+        <div class="label">Meilleur post (lien ou description)</div>
+        <div class="card">
+          <input class="input" id="s-bestpost" placeholder="Ex: Reel Spritz - 1200 vues - Semaine 2" oninput="autoSave()">
+        </div>
+
+        <div class="label">Objectif principal actuel</div>
+        <div class="card">
+          <input class="input" id="s-objectif" placeholder="Ex: Atteindre 100 abonnés IG avant fin mars" oninput="autoSave()">
+        </div>
+
+        <div class="label">Note libre</div>
+        <div class="card">
+          <textarea class="input" id="s-note" placeholder="Idées, remarques, observations..." oninput="autoSave()"></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="saveSituation()">💾 Sauvegarder tout</button>
+          <button class="btn btn-outline btn-sm" onclick="exportData()">📤 Exporter JSON</button>
+          <button class="btn btn-outline btn-sm" onclick="resetData()">🗑 Réinitialiser</button>
+        </div>
+      </div>
+
+      <!-- ═══ VEILLE LIVE ═══ -->
+      <div class="panel" id="panel-veille">
+        <div class="section-header">
+          <div><div class="section-title">Veille Concurrentielle</div><div class="section-sub">Analyse en temps réel via recherche web</div></div>
+          <div class="live-pill"><div class="live-dot"></div>Web Live</div>
+        </div>
+
+        <div class="label">Recherche personnalisée</div>
+        <div class="card">
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <input class="input" id="veille-input" placeholder="Ex: @barmanparis_events, barman corporate IDF, cocktail domicile Oise..." style="flex:1;">
+            <button class="btn btn-gold" onclick="launchVeille()">⟳ Analyser</button>
+          </div>
+          <div class="label" style="margin-bottom:6px;">Recherches rapides</div>
+          <div class="pill-bar">
+            <div class="pill" onclick="setVeille(&#39;barman à domicile Île-de-France Instagram&#39;)">Barman IDF</div>
+            <div class="pill" onclick="setVeille(&#39;cocktail domicile Oise concurrents 2026&#39;)">Barman Oise</div>
+            <div class="pill" onclick="setVeille(&#39;barman corporate événement Paris TikTok Instagram&#39;)">Corporate Paris</div>
+            <div class="pill" onclick="setVeille(&#39;barman mariage Hauts-de-France&#39;)">Mariage HdF</div>
+            <div class="pill" onclick="setVeille(&#39;tendances cocktail TikTok France mars 2026&#39;)">Tendances TikTok</div>
+            <div class="pill" onclick="setVeille(&#39;animation bar cocktail séminaire entreprise France 2026&#39;)">Séminaire France</div>
+          </div>
+        </div>
+
+        <div class="label">Analyses prêtes à lancer</div>
+        <div class="quick-search-cards">
+          <div class="qs-card" onclick="qlaunch(&#39;Analyse en détail les concurrents barman à domicile et barman corporate dans l\&#39;Île-de-France et l\&#39;Oise : trouve leurs comptes Instagram et TikTok, évalue leur engagement, leur fréquence de publication, leurs formats de contenu qui performent le mieux, et identifie les 5 opportunités de positionnement pour @cocktail_prive60&#39;)">
+            <div class="qs-left"><div class="qs-icon">🗺️</div><div><div class="qs-title">Analyse bi-zones complète</div><div class="qs-sub">Oise + IDF · Tous concurrents · Opportunités</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Lancer</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Recherche et analyse les 8 principaux comptes Instagram de barman à domicile en France. Pour chacun : abonnés, engagement, formats dominants, fréquence de publication, angle de communication, et ce que @cocktail_prive60 peut copier ou faire mieux&#39;)">
+            <div class="qs-left"><div class="qs-icon">📸</div><div><div class="qs-title">Top comptes Instagram barman France</div><div class="qs-sub">Classement · Engagement · Formats gagnants</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Lancer</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Analyse les comptes TikTok de barman et cocktail en France qui cartonnent en 2026. Identifie : formats vidéo les plus vus, sons tendances, hooks efficaces, durée optimale, et donne 5 idées de vidéos TikTok concrètes pour @cocktail_prive60&#39;)">
+            <div class="qs-left"><div class="qs-icon">🎵</div><div><div class="qs-title">Analyse TikTok barman France 2026</div><div class="qs-sub">Formats viraux · Sons tendance · Hooks</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Lancer</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Analyse la concurrence barman corporate sur LinkedIn en France. Cherche les profils LinkedIn de barman privé et agences, évalue leur stratégie de contenu, et donne un plan de prospection LinkedIn sur 4 semaines pour @cocktail_prive60 ciblant les RH et event managers IDF&#39;)">
+            <div class="qs-left"><div class="qs-icon">💼</div><div><div class="qs-title">Veille LinkedIn + prospection corporate</div><div class="qs-sub">B2B IDF · RH / event managers · Plan 4 sem.</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Lancer</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Analyse le marché du barman à domicile et bar mobile événementiel en Île-de-France : acteurs principaux, tarifs, offres, positionnement. Identifie un angle différenciant que @cocktail_prive60 peut occuper pour se démarquer sur le marché parisien&#39;)">
+            <div class="qs-left"><div class="qs-icon">🏙️</div><div><div class="qs-title">Marché Paris — tarifs &amp; positionnement</div><div class="qs-sub">Prix marché · Acteurs IDF · Différenciation</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Lancer</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Génère un rapport de veille hebdomadaire complet pour @cocktail_prive60 : état du marché barman Oise + IDF, nouveaux acteurs, tendances réseaux sociaux, et 5 actions prioritaires à mener cette semaine&#39;)">
+            <div class="qs-left"><div class="qs-icon">📋</div><div><div class="qs-title">Rapport veille hebdomadaire</div><div class="qs-sub">État du marché · Nouvelles opportunités · Actions</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Lancer</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="label">Concurrents de référence</div>
+        <div class="card">
+          <div class="collapsible-header" onclick="toggle(this)">
+            <div class="comp-info"><div class="comp-emoji">🥂</div><div><div class="comp-name">Homy Bartenders</div><div class="comp-handle">homybartenders.fr · IDF · Corporate fort</div></div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="threat-tag t-high">Menace forte</span><span class="collapsible-arrow">▼</span></div>
+          </div>
+          <div class="collapsible-body">
+            <div class="bar-wrap"><div class="bar-label">Contenu IG</div><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><div class="bar-val">82%</div></div>
+            <div class="bar-wrap"><div class="bar-label">Corporate</div><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><div class="bar-val">90%</div></div>
+            <div class="bar-wrap"><div class="bar-label">TikTok</div><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-val">22%</div></div>
+            <div style="margin-top:10px;font-size:12px;font-weight:300;color:var(--gris);line-height:1.7;">
+              ✅ Format "before/after installation" très engageant · 💡 Faible TikTok = ton terrain · 🎯 Toi tu couvres AUSSI le 60, eux seulement IDF
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Analyse en détail Homy Bartenders (homybartenders.fr) : stratégie social media, forces, faiblesses, et comment @cocktail_prive60 peut se différencier sur IDF et Oise&#39;)">⟳ Analyser maintenant</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="collapsible-header" onclick="toggle(this)">
+            <div class="comp-info"><div class="comp-emoji">🍹</div><div><div class="comp-name">South Mixology Events</div><div class="comp-handle">southmixologyevents.com · National · Moléculaire</div></div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="threat-tag t-mid">À surveiller</span><span class="collapsible-arrow">▼</span></div>
+          </div>
+          <div class="collapsible-body">
+            <div style="font-size:12px;font-weight:300;color:var(--gris);line-height:1.7;">
+              💡 Offre corporate très développée (cocktails moléculaires, impression logo) · 🎯 Social media faible — tu peux les dépasser en 3 mois de contenus réguliers
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Analyse South Mixology Events (southmixologyevents.com) : offre, stratégie digitale, faiblesses que @cocktail_prive60 peut exploiter&#39;)">⟳ Analyser maintenant</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="collapsible-header" onclick="toggle(this)">
+            <div class="comp-info"><div class="comp-emoji">🟢</div><div><div class="comp-name">Concurrents Oise (60)</div><div class="comp-handle">Terrain quasi vierge · Pas de présence digitale établie</div></div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="threat-tag t-low">Terrain libre</span><span class="collapsible-arrow">▼</span></div>
+          </div>
+          <div class="collapsible-body">
+            <div style="font-size:12px;font-weight:300;color:var(--gris);line-height:1.7;">
+              🔥 Aucun barman local avec présence digitale établie dans le 60 — first mover advantage · 🎯 30 jours de posts réguliers = tu deviens LA référence barman Oise
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Recherche s\&#39;il existe des comptes Instagram ou TikTok actifs de barman à domicile dans l\&#39;Oise (60), Compiègne, Senlis, Creil, Beauvais. Évalue le potentiel de @cocktail_prive60 à devenir la référence locale&#39;)">⟳ Scanner le 60 maintenant</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ OPPORTUNITÉS ═══ -->
+      <div class="panel" id="panel-opportunites">
+        <div class="section-header">
+          <div><div class="section-title">Opportunités</div><div class="section-sub">Angles identifiés · Actualisables en temps réel</div></div>
+        </div>
+
+        <div class="label">Matrice d'opportunités</div>
+        <div class="grid-2" style="margin-bottom:1rem;">
+          <div class="card" style="border-left:2px solid var(--vert);">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--vert);margin-bottom:6px;">🔥 PRIORITÉ HAUTE</div>
+            <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">TikTok barman Oise — territoire vierge. Aucun concurrent local actif. 1er compte = référence garantie.</div>
+            <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Donne-moi un plan détaillé pour devenir la référence TikTok barman dans l\&#39;Oise en 30 jours : sujets des 10 premières vidéos, hooks, sons tendances à utiliser, fréquence de publication&#39;)">Approfondir ⟳</button>
+          </div>
+          <div class="card" style="border-left:2px solid var(--vert);">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--vert);margin-bottom:6px;">🔥 PRIORITÉ HAUTE</div>
+            <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Corporate IDF via LinkedIn. Concurrents peu actifs sur LinkedIn. Prospection directe des RH.</div>
+            <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Crée un plan de prospection LinkedIn sur 4 semaines pour @cocktail_prive60 ciblant les RH et event managers d\&#39;entreprises en Île-de-France. Inclus les messages types à envoyer&#39;)">Approfondir ⟳</button>
+          </div>
+          <div class="card" style="border-left:2px solid var(--or-dark);">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--or);margin-bottom:6px;">⚡ PRIORITÉ MOYENNE</div>
+            <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Format "behind the scenes" Instagram — sous-exploité localement. Fort potentiel d'engagement authentique.</div>
+            <button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Donne-moi 5 idées concrètes de contenus " behind="" the="" scenes"="" pour="" @cocktail_prive60="" sur="" instagram="" avec="" les="" formats,="" légendes,="" et="" horaires="" optimaux')"="">Approfondir ⟳</button>
+          </div>
+          <div class="card" style="border-left:2px solid var(--or-dark);">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--or);margin-bottom:6px;">⚡ PRIORITÉ MOYENNE</div>
+            <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Mocktails &amp; sobriété — tendance montante, peu couverte par les concurrents. Angle inclusif fort.</div>
+            <button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Comment @cocktail_prive60 peut exploiter la tendance mocktails et sobriété choisie sur ses réseaux ? Donne 3 idées de posts et comment valoriser cette offre&#39;)">Approfondir ⟳</button>
+          </div>
+          <div class="card" style="border-left:2px solid var(--vert);">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--vert);margin-bottom:6px;">🔥 PRIORITÉ HAUTE</div>
+            <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Partenariats traiteurs Oise — aucun acteur n'a formalisé ce réseau dans le 60. Lead source gratuite.</div>
+            <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Donne-moi un script d\&#39;approche pour contacter des traiteurs de l\&#39;Oise (60) en vue de partenariats de recommandation mutuelle pour @cocktail_prive60&#39;)">Approfondir ⟳</button>
+          </div>
+          <div class="card" style="border-left:2px solid var(--or-dark);">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--or);margin-bottom:6px;">⚡ PRIORITÉ MOYENNE</div>
+            <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Cocktail signature entreprise — logo imprimé sur mousse. Seuls les grands acteurs nationaux le proposent.</div>
+            <button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Comment @cocktail_prive60 peut-il proposer et marketer l\&#39;offre \" cocktail="" signature="" avec="" logo="" entreprise\"="" sur="" ses="" réseaux="" et="" en="" prospection="" b2b="" ?')"="">Approfondir ⟳</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="qlaunch(&#39;Quelles sont les nouvelles opportunités émergentes en mars 2026 dans la niche barman à domicile et événementiel en France que @cocktail_prive60 pourrait exploiter en premier ?&#39;)">⟳ Chercher nouvelles opportunités</button>
+        </div>
+      </div>
+
+      <!-- ═══ HASHTAGS ═══ -->
+      <div class="panel" id="panel-hashtags">
+        <div class="section-header">
+          <div><div class="section-title">Stratégie Hashtags</div><div class="section-sub">Oise + Île-de-France · Mix optimal</div></div>
+          <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Analyse les hashtags barman et cocktail les plus performants sur Instagram et TikTok en France en mars 2026. Donne les 20 hashtags optimaux pour @cocktail_prive60 organisés en 3 groupes : local Oise, IDF, national niche&#39;)">⟳ Actualiser live</button>
+        </div>
+
+        <div class="alert"><strong>Règle d'or :</strong> 30% hashtags larges (portée) + 50% hashtags niche (engagement qualifié) + 20% hashtags locaux (clients potentiels)</div>
+
+        <div class="label">Hashtags Oise &amp; locaux</div>
+        <div class="htag-grid" style="margin-bottom:1rem;">
+          <div class="htag-card"><div class="htag-name">#barmanoise</div><div class="htag-vol">Faible volume</div><div class="htag-trend">↑ Peu de concurrence</div></div>
+          <div class="htag-card"><div class="htag-name">#cocktail60</div><div class="htag-vol">Très faible</div><div class="htag-trend">↑ First mover</div></div>
+          <div class="htag-card"><div class="htag-name">#evenementoise</div><div class="htag-vol">Faible</div><div class="htag-trend">↑ Ciblé local</div></div>
+          <div class="htag-card"><div class="htag-name">#barmancompiègne</div><div class="htag-vol">Quasi vide</div><div class="htag-trend">↑ Référence facile</div></div>
+          <div class="htag-card"><div class="htag-name">#cocktailsenlis</div><div class="htag-vol">Vide</div><div class="htag-trend">↑ Niche pure</div></div>
+          <div class="htag-card"><div class="htag-name">#mariageoise</div><div class="htag-vol">Moyen</div><div class="htag-trend">↑ Clients mariage</div></div>
+        </div>
+
+        <div class="label">Hashtags Île-de-France</div>
+        <div class="htag-grid" style="margin-bottom:1rem;">
+          <div class="htag-card"><div class="htag-name">#barmanparis</div><div class="htag-vol">Moyen-fort</div><div class="htag-trend">↑ Concurrentiel</div></div>
+          <div class="htag-card"><div class="htag-name">#cocktailparis</div><div class="htag-vol">Fort</div><div class="htag-trend">↑ Grand volume</div></div>
+          <div class="htag-card"><div class="htag-name">#bartenderparis</div><div class="htag-vol">Moyen</div><div class="htag-trend">→ Stable</div></div>
+          <div class="htag-card"><div class="htag-name">#soireecorporate</div><div class="htag-vol">Moyen</div><div class="htag-trend">↑ B2B qualifié</div></div>
+          <div class="htag-card"><div class="htag-name">#afterworkparis</div><div class="htag-vol">Fort</div><div class="htag-trend">↑ Corporate</div></div>
+          <div class="htag-card"><div class="htag-name">#evenementparis</div><div class="htag-vol">Très fort</div><div class="htag-trend">→ Compétitif</div></div>
+        </div>
+
+        <div class="label">Hashtags niche nationale</div>
+        <div class="htag-grid">
+          <div class="htag-card"><div class="htag-name">#barmanprive</div><div class="htag-vol">Moyen</div><div class="htag-trend">↑ Cœur cible</div></div>
+          <div class="htag-card"><div class="htag-name">#cocktailmaison</div><div class="htag-vol">Fort</div><div class="htag-trend">↑ Viral potentiel</div></div>
+          <div class="htag-card"><div class="htag-name">#baramobile</div><div class="htag-vol">Moyen</div><div class="htag-trend">↑ Niche claire</div></div>
+          <div class="htag-card"><div class="htag-name">#bartenderlife</div><div class="htag-vol">Très fort</div><div class="htag-trend">→ Communauté</div></div>
+          <div class="htag-card"><div class="htag-name">#mixologie</div><div class="htag-vol">Fort</div><div class="htag-trend">↑ Expertise</div></div>
+          <div class="htag-card"><div class="htag-name">#cocktailprive60</div><div class="htag-vol">Ton branding</div><div class="htag-trend">↑ Marque propre</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ PLANNING ═══ -->
+      <div class="panel" id="panel-planning">
+        <div class="section-header">
+          <div><div class="section-title">Planning Éditorial</div><div class="section-sub">Calendrier J1–J14 + Posts rédigés</div></div>
+          <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Génère un planning éditorial complet pour @cocktail_prive60 pour les 2 prochaines semaines : un post par jour sur Instagram, TikTok, LinkedIn et Facebook avec texte rédigé, hashtags et horaire optimal&#39;)">⟳ Générer planning IA</button>
+        </div>
+
+        <div class="label">Calendrier — Semaine 1 (exemple)</div>
+        <div class="calendar-grid">
+          <div class="cal-day-header">Lun</div><div class="cal-day-header">Mar</div><div class="cal-day-header">Mer</div>
+          <div class="cal-day-header">Jeu</div><div class="cal-day-header">Ven</div><div class="cal-day-header">Sam</div><div class="cal-day-header">Dim</div>
+          <div class="cal-day has-post"><div class="cal-date">J1</div><div class="cal-post-dot dot-ig">📸 Lancement</div><div class="cal-post-dot dot-fb">🔵 FB post</div></div>
+          <div class="cal-day"><div class="cal-date">J2</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J3</div><div class="cal-post-dot dot-tt">🎵 Reel cocktail</div></div>
+          <div class="cal-day"><div class="cal-date">J4</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J5</div><div class="cal-post-dot dot-ig">📸 Carrousel</div></div>
+          <div class="cal-day"><div class="cal-date">J6</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J7</div><div class="cal-post-dot dot-ig">📸 Story tips</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J8</div><div class="cal-post-dot dot-li">💼 LinkedIn</div></div>
+          <div class="cal-day"><div class="cal-date">J9</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J10</div><div class="cal-post-dot dot-tt">🎵 BTS install</div></div>
+          <div class="cal-day"><div class="cal-date">J11</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J12</div><div class="cal-post-dot dot-ig">📸 Recette</div></div>
+          <div class="cal-day"><div class="cal-date">J13</div></div>
+          <div class="cal-day has-post"><div class="cal-date">J14</div><div class="cal-post-dot dot-tt">🎵 Tendance</div></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="label">Posts rédigés</div>
+
+        <div class="post-card">
+          <div class="post-card-head">
+            <div class="post-platform">📸 Instagram + 🔵 Facebook<span class="badge badge-gold" style="margin-left:8px;">J1</span></div>
+            <span class="badge badge-green">Prêt à publier</span>
+          </div>
+          <div class="post-body">On est là. 🍸<br><br>@cocktail_prive60, c'est ton nouveau barman privé dans l'Oise et l'Île-de-France.<br>Cocktails sur mesure. Bar mobile. Ambiance garantie.<br><br>Mariage, soirée privée, séminaire d'entreprise — je me déplace chez toi avec tout le matériel.<br><br>📍 Oise (60) • Compiègne • Senlis • et toute l'IDF<br><br>Première prestation ? Commente 👇 ou envoie-moi un message privé pour un devis gratuit.</div>
+          <div class="post-footer"><div class="post-time">⏰ J1 · 18h-19h</div><div class="post-hashtags">#barmanoise #cocktaildomicile #barmanprive #evenementoise #cocktail60</div></div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-card-head">
+            <div class="post-platform">🎵 TikTok + 📸 Reel IG<span class="badge badge-gold" style="margin-left:8px;">J3</span></div>
+            <span class="badge badge-green">Prêt à publier</span>
+          </div>
+          <div class="post-body">POV : ton barman privé prépare le cocktail de ta soirée 🍹<br><br>[Vidéo : shaker → verser → garnir en 30s]<br><br>Spritz signature · 3 ingrédients · 30 secondes.<br>Et toi t'as juste à tendre la main. ✨<br><br>Commente "RECETTE" pour avoir ma recette secrète 👇</div>
+          <div class="post-footer"><div class="post-time">⏰ J3 · 19h-20h</div><div class="post-hashtags">#cocktailmaison #bartenderlife #spritz #barman #cocktailprive60</div></div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-card-head">
+            <div class="post-platform">💼 LinkedIn<span class="badge badge-gold" style="margin-left:8px;">J8</span></div>
+            <span class="badge badge-green">Prêt à publier</span>
+          </div>
+          <div class="post-body">Votre prochain afterwork d'entreprise mérite mieux qu'une bouteille de rosé sur la table de réunion.<br><br>Je suis barman événementiel basé dans l'Oise, disponible en Île-de-France.<br><br>Ce que je propose :<br>→ Bar mobile clé en main<br>→ Cocktails personnalisés aux couleurs de votre entreprise<br>→ Animation et service pour 20 à 200 personnes<br><br>Vous organisez un séminaire, un afterwork ou un lancement produit ?<br>Discutons-en en DM. 📩</div>
+          <div class="post-footer"><div class="post-time">⏰ J8 · 8h-9h</div><div class="post-hashtags">#barmanevénementiel #corporateevent #afterwork #teambuilding #cocktailentreprise</div></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="qlaunch(&#39;Rédige 5 nouveaux posts complets pour @cocktail_prive60 : 2 pour Instagram/Reels, 1 TikTok, 1 LinkedIn corporate, 1 Facebook. Inclus le texte complet, les hashtags et l\&#39;horaire optimal pour chaque plateforme&#39;)">⟳ Générer 5 nouveaux posts</button>
+          <button class="btn btn-outline" onclick="qlaunch(&#39;Génère un planning éditorial pour le mois d\&#39;avril 2026 pour @cocktail_prive60 avec un mix IG, TikTok, LinkedIn, Facebook — 3-4 posts par semaine, tous rédigés&#39;)">Planning avril complet</button>
+        </div>
+      </div>
+
+      <!-- ═══ BANQUE CONTENU ═══ -->
+      <div class="panel" id="panel-contenu">
+        <div class="section-header">
+          <div><div class="section-title">Banque de Posts</div><div class="section-sub">Bi-zones Oise + IDF · Tous formats</div></div>
+          <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Crée une banque de 10 posts prêts à l\&#39;emploi pour @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. 5 posts axés Oise/local et 5 posts axés IDF/corporate. Texte complet + hashtags&#39;)">⟳ Générer banque IA</button>
+        </div>
+
+        <div class="pill-bar" style="margin-bottom:1rem;">
+          <div class="pill active">Tous</div>
+          <div class="pill">Instagram</div>
+          <div class="pill">TikTok</div>
+          <div class="pill">LinkedIn</div>
+          <div class="pill">Oise</div>
+          <div class="pill">IDF</div>
+          <div class="pill">Corporate</div>
+          <div class="pill">Mariage</div>
+        </div>
+
+        <div class="content-card">
+          <div class="content-head">
+            <div style="display:flex;align-items:center;gap:8px;"><span>📸</span><span style="font-size:12px;font-weight:400;">Instagram · Reel</span><span class="badge badge-gold">Oise</span></div>
+            <span class="badge badge-green">Éprouvé</span>
+          </div>
+          <div class="content-body">✨ Quand tu commandes un cocktail… et qu'il arrive à la maison 🍸<br><br>Barman privé dans l'Oise. Je viens chez toi. Tu kiffes.<br><br>📍 Compiègne · Senlis · Creil · et tout le 60<br>DM pour devis gratuit 👇</div>
+          <div class="content-footer"><div class="hashtag-text">#barmanoise #cocktaildomicile #barmanprive #cocktail60</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Améliore et décline ce post pour @cocktail_prive60 en 3 versions : une version IG carrousel, une version TikTok hook, une version story&#39;)">Décliner ↗</button></div>
+        </div>
+
+        <div class="content-card">
+          <div class="content-head">
+            <div style="display:flex;align-items:center;gap:8px;"><span>💼</span><span style="font-size:12px;font-weight:400;">LinkedIn · Article</span><span class="badge badge-blue">IDF Corporate</span></div>
+            <span class="badge badge-grey">Prospection</span>
+          </div>
+          <div class="content-body">L'afterwork de votre équipe, c'est aussi votre marque employeur.<br><br>Un barman professionnel, des cocktails à vos couleurs, une animation soignée — vos collaborateurs s'en souviennent.<br><br>Je sers 20 à 200 personnes. Je me déplace en IDF et dans l'Oise.<br>Intéressé(e) ? Je réponds sous 2h. 📩</div>
+          <div class="content-footer"><div class="hashtag-text">#marqueemployeur #afterwork #barmanevénementiel #teambuilding</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Rédige 3 variations de ce post LinkedIn corporate pour @cocktail_prive60, ciblant respectivement : les RH, les office managers, et les event managers&#39;)">Décliner ↗</button></div>
+        </div>
+
+        <div class="content-card">
+          <div class="content-head">
+            <div style="display:flex;align-items:center;gap:8px;"><span>🎵</span><span style="font-size:12px;font-weight:400;">TikTok · Hook vidéo</span><span class="badge badge-gold">Viral</span></div>
+            <span class="badge badge-green">Fort potentiel</span>
+          </div>
+          <div class="content-body">[Texte à l'écran] : "Ce barman fait des cocktails à domicile dans l'Oise 👀"<br><br>[Voix off / sous-titres] : "POV tu passes commande et il débarque chez toi avec tout le bar. Oui. Vraiment."<br><br>[CTA] : "Le bar, c'est toi qui l'appelles. Link en bio 🍸"</div>
+          <div class="content-footer"><div class="hashtag-text">#barman #cocktail #oise #france #barmanaparis #bartenderlife</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Donne-moi 5 autres idées de vidéos TikTok virales dans le même style pour @cocktail_prive60, avec le texte à l\&#39;écran et la description&#39;)">Décliner ↗</button></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="qlaunch(&#39;Génère 8 nouveaux posts originaux pour la banque de contenu de @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. Couvre les thèmes : mariage, corporate, cocktails signature, mocktails, behind the scenes, témoignage, tips barman, promo découverte&#39;)">⟳ Générer 8 posts</button>
+        </div>
+      </div>
+
+      <!-- ═══ TENDANCES ═══ -->
+      <div class="panel" id="panel-tendances">
+        <div class="section-header">
+          <div><div class="section-title">Tendances</div><div class="section-sub">Veille en temps réel · Mars 2026</div></div>
+        </div>
+
+        <div class="quick-search-cards">
+          <div class="qs-card" onclick="qlaunch(&#39;Quelles sont les tendances cocktail virales sur TikTok et Instagram en France en mars 2026 ? Donne les 5 cocktails ou formats qui cartonnent en ce moment et comment @cocktail_prive60 peut les utiliser&#39;)">
+            <div class="qs-left"><div class="qs-icon">🔥</div><div><div class="qs-title">Cocktails viraux du moment</div><div class="qs-sub">TikTok + Instagram France · Maintenant</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Actualiser</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Quelles sont les tendances événementielles corporate en France en 2026 ? Team building, afterworks, séminaires — qu\&#39;est-ce qui monte ? Comment @cocktail_prive60 peut se positionner sur ces nouvelles attentes ?&#39;)">
+            <div class="qs-left"><div class="qs-icon">🏢</div><div><div class="qs-title">Tendances corporate 2026</div><div class="qs-sub">Team building · Afterworks · Séminaires</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Actualiser</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Analyse la tendance mocktails et sobriété choisie en France en 2026. Est-ce un marché en croissance ? Comment @cocktail_prive60 peut valoriser cette offre sur ses réseaux et en événementiel ?&#39;)">
+            <div class="qs-left"><div class="qs-icon">🫧</div><div><div class="qs-title">Tendance mocktails &amp; sobriété</div><div class="qs-sub">Marché sans alcool · Opportunité inclusive</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Actualiser</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Quelles sont les tendances mariage 2026 concernant le bar et les cocktails ? Quelles attentes ont les futurs mariés ? Comment @cocktail_prive60 peut capter ce marché dans l\&#39;Oise et l\&#39;IDF ?&#39;)">
+            <div class="qs-left"><div class="qs-icon">💍</div><div><div class="qs-title">Tendances mariage &amp; bar 2026</div><div class="qs-sub">Mariages Oise + IDF · Nouvelles attentes</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Actualiser</button>
+          </div>
+          <div class="qs-card" onclick="qlaunch(&#39;Génère un rapport de tendances complet pour @cocktail_prive60 en mars 2026 : 5 tendances à exploiter immédiatement, 3 formats de contenu qui vont cartonner ce mois-ci, et 2 angles de différenciation&#39;)">
+            <div class="qs-left"><div class="qs-icon">📋</div><div><div class="qs-title">Rapport tendances complet</div><div class="qs-sub">Synthèse · Actions immédiates · Mars 2026</div></div></div>
+            <button class="btn btn-gold btn-sm">⟳ Générer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ACTIONS (Checklist) ═══ -->
+      <div class="panel" id="panel-actions">
+        <div class="section-header">
+          <div><div class="section-title">Plan d'actions J1–J30</div><div class="section-sub">Clique pour cocher · Sauvegarde automatique</div></div>
+          <button class="btn btn-outline btn-sm" onclick="addCustomAction()">+ Ajouter</button>
+        </div>
+
+        <div class="label">Phase 1 — Fondation (J1–J10)</div>
+        <div class="checklist" id="phase1">
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_0"><div class="check-box">✓</div><div><div class="check-text">Optimiser bio IG + LinkedIn avec mentions Oise + IDF</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_1"><div class="check-box">✓</div><div><div class="check-text">Photo profil pro (visage en action, fond neutre)</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_2"><div class="check-box">✓</div><div><div class="check-text">Créer comptes TikTok + LinkedIn + Facebook @cocktail_prive60</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_3"><div class="check-box">✓</div><div><div class="check-text">Publier post de lancement IG + FB (Post 1)</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_4"><div class="check-box">✓</div><div><div class="check-text">Filmer 3 Reels stock (cocktail, setup, prestation)</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_5"><div class="check-box">✓</div><div><div class="check-text">Suivre 30 comptes niche + commenter activement</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_6"><div class="check-box">✓</div><div><div class="check-text">Rejoindre groupes Facebook événements Oise + IDF</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p1_7"><div class="check-box">✓</div><div><div class="check-text">6 posts publiés d'ici J10 (signal algorithme)</div><div class="check-phase check-phase-1">PHASE 1</div></div></div>
+        </div>
+
+        <div class="label" style="margin-top:1.25rem;">Phase 2 — Visibilité (J11–J20)</div>
+        <div class="checklist" id="phase2">
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p2_0"><div class="check-box">✓</div><div><div class="check-text">Contacter 5 traiteurs Oise pour partenariat</div><div class="check-phase check-phase-2">PHASE 2</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p2_1"><div class="check-box">✓</div><div><div class="check-text">Contacter 3 agences événementielles IDF via LinkedIn</div><div class="check-phase check-phase-2">PHASE 2</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p2_2"><div class="check-box">✓</div><div><div class="check-text">1er TikTok "cocktail en 60s" avec son tendance</div><div class="check-phase check-phase-2">PHASE 2</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p2_3"><div class="check-box">✓</div><div><div class="check-text">Prestation découverte prix réduit contre témoignage filmé</div><div class="check-phase check-phase-2">PHASE 2</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p2_4"><div class="check-box">✓</div><div><div class="check-text">Article LinkedIn angle corporate + partager dans groupes</div><div class="check-phase check-phase-2">PHASE 2</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p2_5"><div class="check-box">✓</div><div><div class="check-text">Activer hashtags Paris sur IG (IDF expansion)</div><div class="check-phase check-phase-2">PHASE 2</div></div></div>
+        </div>
+
+        <div class="label" style="margin-top:1.25rem;">Phase 3 — Croissance (J21–J30)</div>
+        <div class="checklist" id="phase3">
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p3_0"><div class="check-box">✓</div><div><div class="check-text">Analyser 2-3 posts les plus performants → répliquer</div><div class="check-phase" style="color:var(--or-dark);">PHASE 3</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p3_1"><div class="check-box">✓</div><div><div class="check-text">Publier 1er témoignage client filmé</div><div class="check-phase" style="color:var(--or-dark);">PHASE 3</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p3_2"><div class="check-box">✓</div><div><div class="check-text">Créer cocktail signature nommé (@cocktail_prive60)</div><div class="check-phase" style="color:var(--or-dark);">PHASE 3</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p3_3"><div class="check-box">✓</div><div><div class="check-text">Objectif 100 abonnés IG → célébrer publiquement</div><div class="check-phase" style="color:var(--or-dark);">PHASE 3</div></div></div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="p3_4"><div class="check-box">✓</div><div><div class="check-text">Planifier avril avec l'agent BarComm</div><div class="check-phase" style="color:var(--or-dark);">PHASE 3</div></div></div>
+        </div>
+
+        <div class="label" style="margin-top:1.25rem;">Actions personnalisées</div>
+        <div class="checklist" id="custom-actions"></div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <input class="input" id="new-action-input" placeholder="Ajouter une action..." style="flex:1;">
+          <button class="btn btn-gold" onclick="addCustomAction()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- ═══ JOURNAL ═══ -->
+      <div class="panel" id="panel-journal">
+        <div class="section-header">
+          <div><div class="section-title">Journal de Bord</div><div class="section-sub">Trace ton évolution · Horodaté automatiquement</div></div>
+        </div>
+
+        <div class="card">
+          <div class="label">Nouvelle entrée</div>
+          <textarea class="input" id="journal-input" placeholder="Ex: Aujourd&#39;hui j&#39;ai publié mon 1er Reel. 340 vues en 2h. Le hook &#39;POV barman&#39; fonctionne très bien..."></textarea>
+          <div class="btn-row">
+            <button class="btn btn-gold" onclick="addJournalEntry()">📓 Ajouter au journal</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="label">Entrées récentes</div>
+        <div id="journal-list"><div data-empty="" style="text-align:center;padding:2rem;color:var(--gris);font-size:13px;font-weight:300;">Ton journal est vide pour l'instant.<br>Commence à tracer ton parcours ! 🚀</div></div>
+      </div>
+
+      <!-- ═══ BIOS ═══ -->
+      <div class="panel" id="panel-bios">
+        <div class="section-header">
+          <div><div class="section-title">Bios &amp; Profils Rédigés</div><div class="section-sub">Prêts à copier-coller</div></div>
+        </div>
+
+        <div class="label">Bio Instagram</div>
+        <div class="card card-dark">
+          <div style="font-size:13px;font-weight:300;line-height:2;color:var(--creme2);">
+            🍸 Barman à domicile &amp; événements corporate<br>
+            📍 Oise (60) · Hauts-de-France · Île-de-France<br>
+            ✨ Cocktails sur mesure · Bar mobile · Mariages, soirées, séminaires<br>
+            📩 Devis gratuit → lien en bio
+          </div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Optimise la bio Instagram de @cocktail_prive60 pour maximiser les conversions en 2026 : donne 3 versions alternatives avec emojis et call to action fort&#39;)">⟳ Optimiser</button></div>
+        </div>
+
+        <div class="label">Bio LinkedIn</div>
+        <div class="card card-dark">
+          <div style="font-size:13px;font-weight:300;line-height:2;color:var(--creme2);">
+            Barman privé &amp; mixologue événementiel | Oise (60)<br>
+            Je transforme vos événements professionnels et privés en expériences mémorables.<br>
+            Spécialiste : afterworks, séminaires, mariages, soirées privées.<br>
+            Bar mobile clé en main · Cocktails signature · Déplacement dans le 60 et toute l'IDF.<br>
+            📩 Contactez-moi pour un devis personnalisé
+          </div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Optimise le profil LinkedIn de @cocktail_prive60 : bio, résumé, titre de poste. Donne une version B2B orientée corporate et une version événementiel mariage/privé&#39;)">⟳ Optimiser</button></div>
+        </div>
+
+        <div class="label">Bio TikTok</div>
+        <div class="card card-dark">
+          <div style="font-size:13px;font-weight:300;line-height:2;color:var(--creme2);">
+            🍸 Ton barman privé dans l'Oise<br>
+            Cocktails à domicile &amp; événements 🎉<br>
+            📍 Compiègne · Senlis · IDF<br>
+            DM pour réserver 👇
+          </div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Rédige 3 versions de bio TikTok pour @cocktail_prive60 : une version fun, une version corporate, une version mariage. 150 caractères max chacune&#39;)">⟳ Variantes</button></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="qlaunch(&#39;Fais un audit complet des bios et profils de @cocktail_prive60 sur tous les réseaux (IG, TikTok, LinkedIn, FB) et donne les optimisations prioritaires pour maximiser les conversions en 2026&#39;)">⟳ Audit complet bios</button>
+        </div>
+      </div>
+
+      <!-- ═══ SYNC DRIVE ═══ -->
+      <div class="panel" id="panel-sync">
+        <div class="section-header">
+          <div><div class="section-title">Synchronisation Google Drive</div><div class="section-sub">Porte ta mémoire sur tous tes appareils · 100% gratuit</div></div>
+        </div>
+
+        <div class="alert"><strong>Comment ça marche :</strong> L'agent sauvegarde en local sur chaque appareil. Pour synchroniser, tu exportes un JSON → tu le déposes sur Drive → tu le réimportes sur l'autre appareil. Zéro API, zéro coût supplémentaire.</div>
+
+        <div class="label">Étape 1 — Exporter depuis cet appareil</div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:400;color:var(--creme);margin-bottom:6px">📤 Télécharger mes données</div>
+          <div style="font-size:12px;font-weight:300;color:var(--gris);line-height:1.7;margin-bottom:12px">Génère un fichier <code style="background:var(--noir4);padding:2px 6px;border-radius:4px;font-size:11px;color:var(--or)">barcomm_data.json</code> avec toutes tes données. Dépose-le ensuite dans ton Drive.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-gold" onclick="exportDrive()">📥 Télécharger barcomm_data.json</button>
+            <a href="https://drive.google.com/" target="_blank" rel="noopener" style="text-decoration:none"><button class="btn btn-outline">☁️ Ouvrir Google Drive ↗</button></a>
+          </div>
+          <div id="export-status" style="font-size:11px;color:var(--vert);margin-top:8px;display:none">✅ Fichier téléchargé ! Dépose-le dans ton dossier Drive "BarComm Pro".</div>
+        </div>
+
+        <div class="label">Étape 2 — Importer sur cet appareil</div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:400;color:var(--creme);margin-bottom:6px">📂 Charger depuis un fichier JSON</div>
+          <div style="font-size:12px;font-weight:300;color:var(--gris);line-height:1.7;margin-bottom:12px">Télécharge ton <code style="background:var(--noir4);padding:2px 6px;border-radius:4px;font-size:11px;color:var(--or)">barcomm_data.json</code> depuis Drive, puis sélectionne-le ici pour restaurer toutes tes données.</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <label class="btn btn-gold" style="cursor:pointer;margin:0">📂 Sélectionner le fichier JSON<input type="file" id="import-file" accept=".json" style="display:none" onchange="importDrive(this)"></label>
+            <a href="https://drive.google.com/" target="_blank" rel="noopener" style="text-decoration:none"><button class="btn btn-outline">☁️ Aller sur Drive ↗</button></a>
+          </div>
+          <div id="import-status" style="font-size:11px;margin-top:8px;display:none"></div>
+        </div>
+
+        <div class="label">Workflow multi-appareils</div>
+        <div class="card card-dark">
+          <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;text-align:center;padding:0.5rem 0">
+            <div><div style="font-size:22px;margin-bottom:5px">💻</div><div style="font-size:11px;font-weight:400;color:var(--creme)">PC / Mac</div><div style="font-size:10px;color:var(--gris);margin-top:2px">Exporter JSON</div></div>
+            <div style="color:var(--or);font-size:20px">→</div>
+            <div><div style="font-size:22px;margin-bottom:5px">☁️</div><div style="font-size:11px;font-weight:400;color:var(--creme)">Google Drive</div><div style="font-size:10px;color:var(--gris);margin-top:2px">Fichier JSON stocké</div></div>
+            <div style="color:var(--or);font-size:20px">→</div>
+            <div><div style="font-size:22px;margin-bottom:5px">📱</div><div style="font-size:11px;font-weight:400;color:var(--creme)">Téléphone</div><div style="font-size:10px;color:var(--gris);margin-top:2px">Importer JSON</div></div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--gris2);text-align:center">1 export · 1 fichier Drive · Import sur autant d'appareils que tu veux</div>
+        </div>
+
+        <div class="label">Ce qui est sauvegardé</div>
+        <div class="card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;font-weight:300;color:var(--gris);">
+            <div>✅ Métriques (IG, TikTok, LinkedIn, devis, contrats)</div>
+            <div>✅ Journal de bord complet</div>
+            <div>✅ Checklist J1-J30 (cases cochées)</div>
+            <div>✅ Actions personnalisées</div>
+            <div>✅ Prochain événement &amp; objectif</div>
+            <div>✅ Notes libres</div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--gris2)">❌ Non sauvegardé dans JSON : posts rédigés et hashtags (ils sont dans le code HTML, toujours présents)</div>
+        </div>
+
+        <div class="label">Aperçu de tes données actuelles</div>
+        <div class="card card-dark">
+          <pre id="json-preview" style="font-size:10px;color:var(--gris);line-height:1.6;white-space:pre-wrap;word-break:break-all;max-height:160px;overflow-y:auto">// Aucune donnée sauvegardée.</pre>
+        </div>
+
+        <div class="divider"></div>
+        <div class="label">Options avancées</div>
+        <div class="btn-row">
+          <button class="btn btn-outline btn-sm" onclick="copyJSON()">📋 Copier JSON (presse-papier)</button>
+          <button class="btn btn-outline btn-sm" onclick="pasteJSON()">📋 Coller JSON depuis presse-papier</button>
+          <button class="btn btn-outline btn-sm" onclick="resetData()">🗑 Réinitialiser tout</button>
+        </div>
+        <div id="paste-area" style="display:none;margin-top:10px">
+          <textarea class="input" id="paste-input" placeholder="Colle ton JSON ici..." style="height:100px;font-size:11px;font-family:monospace"></textarea>
+          <div class="btn-row"><button class="btn btn-gold btn-sm" onclick="loadFromPaste()">✅ Charger ce JSON</button><button class="btn btn-outline btn-sm" onclick="document.getElementById(&#39;paste-area&#39;).style.display=&#39;none&#39;">Annuler</button></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+
+<!-- Phase 3 : JS externalisé -->
+<script src="app.js"></script>
+
+</body>
+</html>
