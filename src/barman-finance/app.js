@@ -1045,3 +1045,33 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnLogout) btnLogout.addEventListener('click', logout);
 });
 
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPOSITION GLOBALE — requis pour type="module"
+// Les onclick="" et onchange="" du HTML ne voient pas
+// les fonctions de module. On les expose sur window.
+// ═══════════════════════════════════════════════════════════════════
+window.switchTab          = switchTab;
+window.saveRevenu         = saveRevenu;
+window.clearRevForm       = clearRevForm;
+window.saveDepense        = saveDepense;
+window.clearDepForm       = clearDepForm;
+window.saveEquipement     = saveEquipement;
+window.clearAmortForm     = clearAmortForm;
+window.previewAmort       = previewAmort;
+window.deleteEquipement   = deleteEquipement;
+window.saveAchat          = saveAchat;
+window.deleteAchat        = deleteAchat;
+window.updateAchatStatut  = updateAchatStatut;
+window.transferToDepense  = transferToDepense;
+window.clearLcForm        = clearLcForm;
+window.resetDefaultAchats = resetDefaultAchats;
+window.exportData         = exportData;
+window.importData         = importData;
+window.handleImport       = handleImport;
+window.renderDashboard    = renderDashboard;
+window.renderRevenus      = renderRevenus;
+window.renderDepenses     = renderDepenses;
+window.renderAchats       = renderAchats;
+window.updateAchatStatut  = updateAchatStatut;
+window.updateFormulaPrice = updateFormulaPrice;

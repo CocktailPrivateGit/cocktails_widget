@@ -365,3 +365,26 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnLogout) btnLogout.addEventListener('click', logout);
 });
 
+
+// ═══════════════════════════════════════
+// EXPOSITION GLOBALE — requis pour type="module"
+// Les onclick="" du HTML ne voient pas les fonctions
+// de module. On les expose explicitement sur window.
+// ═══════════════════════════════════════
+window.nav             = nav;
+window.toggle          = toggle;
+window.autoSave        = autoSave;
+window.saveSituation   = saveSituation;
+window.exportData      = exportData;
+window.exportDrive     = exportDrive;
+window.importDrive     = importDrive;
+window.resetData       = resetData;
+window.copyJSON        = copyJSON;
+window.pasteJSON       = pasteJSON;
+window.loadFromPaste   = loadFromPaste;
+window.toggleCheck     = toggleCheck;
+window.addCustomAction = addCustomAction;
+window.addJournalEntry = addJournalEntry;
+window.setVeille       = setVeille;
+window.launchVeille    = launchVeille;
+window.qlaunch         = qlaunch;
