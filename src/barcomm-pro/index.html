@@ -7,8 +7,42 @@
   <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BarComm Pro — @cocktail_prive60</title>
-  <!-- Phase 3 : CSS externalisé -->
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Firebase Auth UI ── */
+    .firebase-bar {
+      display: flex; align-items: center; gap: 10px;
+    }
+    #btn-firebase-login {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; font-size: 11px; font-weight: 500;
+      background: rgba(200,169,110,0.12); border: 1px solid rgba(200,169,110,0.3);
+      border-radius: 20px; color: var(--or); cursor: pointer;
+      font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px;
+      transition: all 0.15s;
+    }
+    #btn-firebase-login:hover { background: rgba(200,169,110,0.2); }
+    #btn-firebase-logout {
+      display: none; align-items: center; gap: 6px;
+      padding: 5px 12px; font-size: 11px;
+      background: transparent; border: 1px solid var(--border2);
+      border-radius: 20px; color: var(--gris); cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      transition: all 0.15s;
+    }
+    #btn-firebase-logout:hover { border-color: var(--rouge); color: var(--rouge); }
+    #firebase-avatar {
+      display: none; width: 24px; height: 24px;
+      border-radius: 50%; object-fit: cover;
+      border: 1px solid var(--or-dark);
+    }
+    #firebase-username { font-size: 10px; color: var(--or); letter-spacing: 0.5px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sync-status { font-size: 10px; letter-spacing: 0.5px; }
+    .sync-ok      { color: var(--vert); }
+    .sync-error   { color: var(--rouge); }
+    .sync-offline { color: var(--gris); }
+    .sync-syncing { color: var(--or); }
+  </style>
 </head>
 <body>
 
@@ -25,6 +59,13 @@
     </div>
     <div class="top-right">
       <div class="live-pill"><div class="live-dot"></div>Live</div>
+      <div class="firebase-bar">
+        <img id="firebase-avatar" src="" alt="avatar">
+        <span id="firebase-username"></span>
+        <span id="sync-status" class="sync-status sync-offline">Hors ligne</span>
+        <button id="btn-firebase-login">☁️ Sync Google</button>
+        <button id="btn-firebase-logout">Déconnexion</button>
+      </div>
       <div class="save-indicator" id="save-time">—</div>
     </div>
   </div>
@@ -722,8 +763,8 @@
 </div>
 
 
-<!-- Phase 3 : JS externalisé -->
-<script src="app.js"></script>
+<!-- Phase 4 : JS en module ES6 avec Firebase -->
+<script type="module" src="app.js"></script>
 
 </body>
 </html>

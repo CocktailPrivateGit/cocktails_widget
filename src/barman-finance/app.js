@@ -1,4 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════
+// FIREBASE SYNC
+// ═══════════════════════════════════════════════════════════════════
+import { loginWithGoogle, logout, initAuth, saveToCloud } from '../shared/firebase-sync.js';
+
+const COLLECTION = 'barmanfinance';
+
+// ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
 let state = {
@@ -612,6 +619,8 @@ function saveToStorage() {
   try {
     state.meta.lastSave = new Date().toISOString();
     localStorage.setItem('barman_finance_data', JSON.stringify(state));
+    // Sync cloud en parallèle (silencieux si non connecté)
+    saveToCloud(state, COLLECTION);
   } catch(e) { console.warn('LocalStorage error:', e); }
 }
 
@@ -1013,5 +1022,26 @@ function toast(msg, type='') {
 // ═══════════════════════════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+
+  // Démarrer l'authentification Firebase
+  // Quand les données cloud arrivent, on recharge l'état complet
+  initAuth('barman_finance_data', (cloudData) => {
+    state = { ...state, ...cloudData };
+    state.equipements = state.equipements.map(eq => ({
+      ...eq,
+      schedule: calcAmortSchedule(eq.valeur, eq.residuel||0, eq.duree, eq.mode||'lineaire', eq.date)
+    }));
+    localStorage.setItem('barman_finance_data', JSON.stringify(state));
+    populateYearFilters();
+    renderAll();
+  }, COLLECTION);
+
+  // Boutons connexion / déconnexion
+  const btnLogin  = document.getElementById('btn-firebase-login');
+  const btnLogout = document.getElementById('btn-firebase-logout');
+  if (btnLogin)  btnLogin.addEventListener('click', loginWithGoogle);
+  if (btnLogout) btnLogout.addEventListener('click', logout);
+});
 

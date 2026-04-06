@@ -1,4 +1,11 @@
 // ═══════════════════════════════════════
+// FIREBASE SYNC
+// ═══════════════════════════════════════
+import { loginWithGoogle, logout, initAuth, saveToCloud } from '../shared/firebase-sync.js';
+
+const COLLECTION = 'barcomm';
+
+// ═══════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════
 function nav(name) {
@@ -21,6 +28,8 @@ function getData() {
 function setData(d) {
   localStorage.setItem(KEY, JSON.stringify(d));
   updateSaveTime();
+  // Sync cloud en parallèle (silencieux si non connecté)
+  saveToCloud(d, COLLECTION);
 }
 function updateSaveTime() {
   const el = document.getElementById('save-time');
@@ -336,5 +345,23 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshJSONPreview();
   const d = getData();
   if (d.ig || d.tt) updateSaveTime();
+
+  // Démarrer l'authentification Firebase
+  // Quand les données cloud arrivent, on recharge tout
+  initAuth(KEY, (cloudData) => {
+    localStorage.setItem(KEY, JSON.stringify(cloudData));
+    loadSituation();
+    loadChecks();
+    loadCustomActions();
+    loadJournal();
+    refreshJSONPreview();
+    updateSaveTime();
+  }, COLLECTION);
+
+  // Boutons connexion / déconnexion
+  const btnLogin  = document.getElementById('btn-firebase-login');
+  const btnLogout = document.getElementById('btn-firebase-logout');
+  if (btnLogin)  btnLogin.addEventListener('click', loginWithGoogle);
+  if (btnLogout) btnLogout.addEventListener('click', logout);
 });
 
