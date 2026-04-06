@@ -135,25 +135,24 @@
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-ig">—</div>
             <div class="kpi-label">Abonnés Instagram</div>
-            <div class="kpi-delta" id="d-ig" style="color:var(--gris)"></div>
+            <div class="kpi-delta" id="d-ig"></div>
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-tt">—</div>
             <div class="kpi-label">Abonnés TikTok</div>
-            <div class="kpi-delta" id="d-tt" style="color:var(--gris)"></div>
+            <div class="kpi-delta" id="d-tt"></div>
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-li">—</div>
             <div class="kpi-label">Relations LinkedIn</div>
-            <div class="kpi-delta" id="d-li" style="color:var(--gris)"></div>
+            <div class="kpi-delta" id="d-li"></div>
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-devis">—</div>
             <div class="kpi-label">Devis reçus</div>
-            <div class="kpi-delta" id="d-devis" style="color:var(--gris)"></div>
+            <div class="kpi-delta" id="d-devis"></div>
           </div>
         </div>
-
         <div class="grid-2" style="margin-bottom:1.25rem;">
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-contrats">—</div>
@@ -165,20 +164,71 @@
           </div>
         </div>
 
+        <!-- ── OBJECTIFS ── -->
+        <div class="label">Progression vers les objectifs</div>
+        <div class="card" id="objectifs-card">
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+              <span style="color:var(--gris);">📸 Instagram</span>
+              <span id="obj-ig-txt" style="color:var(--or);font-size:11px;">— / —</span>
+            </div>
+            <div style="height:5px;background:var(--noir4);border-radius:3px;overflow:hidden;">
+              <div id="obj-ig-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--or-dark),var(--or));border-radius:3px;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+              <span style="color:var(--gris);">🎵 TikTok</span>
+              <span id="obj-tt-txt" style="color:var(--bleu);font-size:11px;">— / —</span>
+            </div>
+            <div style="height:5px;background:var(--noir4);border-radius:3px;overflow:hidden;">
+              <div id="obj-tt-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#2563eb,var(--bleu));border-radius:3px;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+              <span style="color:var(--gris);">💼 LinkedIn</span>
+              <span id="obj-li-txt" style="color:var(--vert);font-size:11px;">— / —</span>
+            </div>
+            <div style="height:5px;background:var(--noir4);border-radius:3px;overflow:hidden;">
+              <div id="obj-li-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#15803d,var(--vert));border-radius:3px;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--gris2);margin-top:12px;text-align:right;">
+            Modifiez vos objectifs dans <span style="color:var(--or);cursor:pointer;" onclick="nav('situation')">Ma Situation →</span>
+          </div>
+        </div>
+
+        <!-- ── GRAPHIQUES CROISSANCE ── -->
+        <div class="label" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Évolution sur 12 semaines</span>
+          <div style="display:flex;gap:8px;">
+            <div class="pill active" id="chart-btn-ig" onclick="switchChart('ig')" style="font-size:10px;padding:3px 10px;">📸 IG</div>
+            <div class="pill" id="chart-btn-tt" onclick="switchChart('tt')" style="font-size:10px;padding:3px 10px;">🎵 TT</div>
+            <div class="pill" id="chart-btn-li" onclick="switchChart('li')" style="font-size:10px;padding:3px 10px;">💼 LI</div>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem 1rem 0.5rem;">
+          <canvas id="growth-chart" height="140"></canvas>
+          <div id="chart-empty" style="text-align:center;padding:2rem 0;font-size:12px;color:var(--gris);display:none;">
+            Enregistrez vos métriques chaque semaine pour voir l'évolution apparaître ici.
+          </div>
+        </div>
+
         <div class="divider"></div>
         <div class="label">Accès rapide</div>
         <div class="grid-3">
-          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav(&#39;veille&#39;)">
+          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav('veille')">
             <div style="font-size:28px;margin-bottom:8px;">🔍</div>
             <div style="font-size:13px;font-weight:400;color:var(--creme);">Analyser concurrents</div>
             <div style="font-size:10px;color:var(--gris);margin-top:3px;">Recherche web live</div>
           </div>
-          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav(&#39;planning&#39;)">
+          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav('planning')">
             <div style="font-size:28px;margin-bottom:8px;">📅</div>
             <div style="font-size:13px;font-weight:400;color:var(--creme);">Voir le planning</div>
             <div style="font-size:10px;color:var(--gris);margin-top:3px;">Calendrier éditorial</div>
           </div>
-          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav(&#39;actions&#39;)">
+          <div class="card" style="cursor:pointer;text-align:center;padding:1.25rem;" onclick="nav('actions')">
             <div style="font-size:28px;margin-bottom:8px;">✅</div>
             <div style="font-size:13px;font-weight:400;color:var(--creme);">Mes actions</div>
             <div style="font-size:10px;color:var(--gris);margin-top:3px;">Checklist J1→J30</div>
@@ -187,7 +237,6 @@
 
         <div class="divider"></div>
         <div class="alert"><strong>Objectif J30 :</strong> 100 abonnés IG · 200 TikTok · 20 posts · 3 demandes de devis · 1er contrat</div>
-
         <div class="label">Prochain événement</div>
         <div class="card">
           <div id="next-event" style="font-size:13px;font-weight:300;color:var(--gris);">Aucun événement renseigné — va dans "Ma Situation" pour l'ajouter</div>
@@ -197,16 +246,37 @@
       <!-- ═══ MA SITUATION ═══ -->
       <div class="panel" id="panel-situation">
         <div class="section-header">
-          <div><div class="section-title">Ma Situation</div><div class="section-sub">Renseigne tes données — sauvegardées automatiquement</div></div>
-          <button class="btn btn-gold" onclick="saveSituation()">💾 Sauvegarder</button>
+          <div><div class="section-title">Ma Situation</div><div class="section-sub">Renseigne tes données — historique automatique chaque semaine</div></div>
+          <button class="btn btn-gold" onclick="saveSituation()">💾 Enregistrer</button>
         </div>
 
-        <div class="label">Réseaux sociaux</div>
+        <div class="label">Réseaux sociaux — chiffres actuels</div>
         <div class="card">
           <div class="metric-row"><span class="metric-icon">📸</span><span class="metric-label">Abonnés Instagram</span><input class="metric-input" id="s-ig" type="number" placeholder="0" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">🎵</span><span class="metric-label">Abonnés TikTok</span><input class="metric-input" id="s-tt" type="number" placeholder="0" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">💼</span><span class="metric-label">Relations LinkedIn</span><input class="metric-input" id="s-li" type="number" placeholder="0" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">📝</span><span class="metric-label">Posts publiés (total)</span><input class="metric-input" id="s-posts" type="number" placeholder="0" oninput="autoSave()"></div>
+        </div>
+
+        <!-- ── OBJECTIFS ── -->
+        <div class="label">Objectifs réseaux sociaux</div>
+        <div class="card">
+          <div style="font-size:11px;color:var(--gris);margin-bottom:10px;">Renseignez vos objectifs pour voir les barres de progression sur le Dashboard.</div>
+          <div class="metric-row"><span class="metric-icon">📸</span><span class="metric-label">Objectif Instagram</span><input class="metric-input" id="s-obj-ig" type="number" placeholder="ex: 500" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">🎵</span><span class="metric-label">Objectif TikTok</span><input class="metric-input" id="s-obj-tt" type="number" placeholder="ex: 1000" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">💼</span><span class="metric-label">Objectif LinkedIn</span><input class="metric-input" id="s-obj-li" type="number" placeholder="ex: 300" oninput="autoSave()"></div>
+        </div>
+
+        <!-- ── SNAPSHOT HEBDOMADAIRE ── -->
+        <div class="label" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Historique hebdomadaire</span>
+          <button class="btn btn-gold btn-sm" onclick="saveSnapshot()">📸 Enregistrer cette semaine</button>
+        </div>
+        <div class="card">
+          <div style="font-size:11px;color:var(--gris);margin-bottom:12px;">Cliquez sur "Enregistrer cette semaine" une fois par semaine pour construire votre graphique de croissance. Le widget garde les 12 dernières semaines automatiquement.</div>
+          <div id="snapshot-list">
+            <div style="text-align:center;padding:1rem;color:var(--gris);font-size:12px;">Aucun historique enregistré — cliquez sur le bouton ci-dessus pour commencer.</div>
+          </div>
         </div>
 
         <div class="label">Business</div>
@@ -218,7 +288,7 @@
 
         <div class="label">Prochain événement</div>
         <div class="card">
-          <input class="input" id="s-next-event" placeholder="Ex: Mariage - Compiègne - 15 mai" oninput="autoSave()" style="margin-bottom:8px;">
+          <input class="input" id="s-next-event" placeholder="Ex: Mariage - Compiègne - 15 mai" oninput="autoSave()">
         </div>
 
         <div class="label">Meilleur post (lien ou description)</div>

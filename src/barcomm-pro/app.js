@@ -47,17 +47,21 @@ function autoSave() {
 
 function saveSituation() {
   const d = getData();
-  d.ig = document.getElementById('s-ig').value;
-  d.tt = document.getElementById('s-tt').value;
-  d.li = document.getElementById('s-li').value;
-  d.posts = document.getElementById('s-posts').value;
-  d.devis = document.getElementById('s-devis').value;
-  d.contrats = document.getElementById('s-contrats').value;
-  d.events = document.getElementById('s-events').value;
+  d.ig        = document.getElementById('s-ig').value;
+  d.tt        = document.getElementById('s-tt').value;
+  d.li        = document.getElementById('s-li').value;
+  d.posts     = document.getElementById('s-posts').value;
+  d.devis     = document.getElementById('s-devis').value;
+  d.contrats  = document.getElementById('s-contrats').value;
+  d.events    = document.getElementById('s-events').value;
   d.nextEvent = document.getElementById('s-next-event').value;
-  d.bestpost = document.getElementById('s-bestpost').value;
-  d.objectif = document.getElementById('s-objectif').value;
-  d.note = document.getElementById('s-note').value;
+  d.bestpost  = document.getElementById('s-bestpost').value;
+  d.objectif  = document.getElementById('s-objectif').value;
+  d.note      = document.getElementById('s-note').value;
+  // Objectifs réseaux
+  d.objIg = document.getElementById('s-obj-ig').value;
+  d.objTt = document.getElementById('s-obj-tt').value;
+  d.objLi = document.getElementById('s-obj-li').value;
   setData(d);
   updateDashboard(d);
 }
@@ -72,17 +76,254 @@ function loadSituation() {
   set('s-bestpost', d.bestpost);
   set('s-objectif', d.objectif);
   set('s-note', d.note);
+  set('s-obj-ig', d.objIg);
+  set('s-obj-tt', d.objTt);
+  set('s-obj-li', d.objLi);
   updateDashboard(d);
+  renderSnapshotList(d.snapshots || []);
+  renderGrowthChart(d.snapshots || [], 'ig');
 }
 
 function updateDashboard(d) {
   const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val || '—'; };
-  set('kpi-ig', d.ig || '—'); set('kpi-tt', d.tt || '—');
-  set('kpi-li', d.li || '—'); set('kpi-devis', d.devis || '—');
-  set('kpi-contrats', d.contrats || '—'); set('kpi-posts', d.posts || '—');
+  set('kpi-ig', d.ig || '—');
+  set('kpi-tt', d.tt || '—');
+  set('kpi-li', d.li || '—');
+  set('kpi-devis', d.devis || '—');
+  set('kpi-contrats', d.contrats || '—');
+  set('kpi-posts', d.posts || '—');
+
+  // Deltas semaine/semaine
+  const snaps = d.snapshots || [];
+  updateDelta('d-ig', snaps, 'ig');
+  updateDelta('d-tt', snaps, 'tt');
+  updateDelta('d-li', snaps, 'li');
+
+  // Prochain événement
   const ne = document.getElementById('next-event');
-  if (ne) ne.textContent = d.nextEvent || 'Aucun événement renseigné — va dans "Ma Situation" pour l\'ajouter';
-  ne && ne.style && (ne.style.color = d.nextEvent ? 'var(--creme2)' : 'var(--gris)');
+  if (ne) {
+    ne.textContent = d.nextEvent || 'Aucun événement renseigné — va dans "Ma Situation" pour l\'ajouter';
+    ne.style.color = d.nextEvent ? 'var(--creme2)' : 'var(--gris)';
+  }
+
+  // Barres de progression objectifs
+  updateObjectifBar('obj-ig', d.ig, d.objIg, 'var(--or)');
+  updateObjectifBar('obj-tt', d.tt, d.objTt, 'var(--bleu)');
+  updateObjectifBar('obj-li', d.li, d.objLi, 'var(--vert)');
+}
+
+// ═══════════════════════════════════════
+// OBJECTIFS — BARRES DE PROGRESSION
+// ═══════════════════════════════════════
+function updateObjectifBar(prefix, current, target, color) {
+  const txt = document.getElementById(prefix + '-txt');
+  const bar = document.getElementById(prefix + '-bar');
+  if (!txt || !bar) return;
+  const c = parseInt(current) || 0;
+  const t = parseInt(target) || 0;
+  if (t === 0) {
+    txt.textContent = c + ' / — (pas d\'objectif)';
+    bar.style.width = '0%';
+    return;
+  }
+  const pct = Math.min(Math.round((c / t) * 100), 100);
+  txt.textContent = c.toLocaleString('fr-FR') + ' / ' + t.toLocaleString('fr-FR') + ' (' + pct + '%)';
+  bar.style.width = pct + '%';
+  bar.style.background = pct >= 100
+    ? 'linear-gradient(90deg,#15803d,var(--vert))'
+    : bar.style.background;
+}
+
+// ═══════════════════════════════════════
+// DELTA SEMAINE / SEMAINE
+// ═══════════════════════════════════════
+function updateDelta(elId, snaps, field) {
+  const el = document.getElementById(elId);
+  if (!el || snaps.length < 2) { if(el) el.textContent = ''; return; }
+  const last = parseInt(snaps[snaps.length - 1][field]) || 0;
+  const prev = parseInt(snaps[snaps.length - 2][field]) || 0;
+  const diff = last - prev;
+  if (diff === 0) { el.textContent = '→ stable'; el.style.color = 'var(--gris)'; return; }
+  el.textContent = (diff > 0 ? '▲ +' : '▼ ') + diff + ' vs sem. préc.';
+  el.style.color = diff > 0 ? 'var(--vert)' : 'var(--rouge)';
+}
+
+// ═══════════════════════════════════════
+// SNAPSHOTS HEBDOMADAIRES
+// ═══════════════════════════════════════
+function saveSnapshot() {
+  const d = getData();
+  if (!d.ig && !d.tt && !d.li) {
+    alert('Renseignez au moins une métrique réseau avant d\'enregistrer.');
+    return;
+  }
+  if (!d.snapshots) d.snapshots = [];
+
+  // Vérifier si un snapshot existe déjà cette semaine
+  const now     = new Date();
+  const weekKey = getWeekKey(now);
+  const exists  = d.snapshots.find(s => s.week === weekKey);
+  if (exists) {
+    if (!confirm('Un snapshot existe déjà pour cette semaine. Écraser ?')) return;
+    d.snapshots = d.snapshots.filter(s => s.week !== weekKey);
+  }
+
+  const snap = {
+    week:  weekKey,
+    label: formatWeekLabel(now),
+    ig:    parseInt(d.ig)  || 0,
+    tt:    parseInt(d.tt)  || 0,
+    li:    parseInt(d.li)  || 0,
+    posts: parseInt(d.posts) || 0,
+    date:  now.toISOString()
+  };
+
+  d.snapshots.push(snap);
+  // Garder uniquement les 12 dernières semaines
+  if (d.snapshots.length > 12) d.snapshots = d.snapshots.slice(-12);
+
+  setData(d);
+  renderSnapshotList(d.snapshots);
+  renderGrowthChart(d.snapshots, currentChartField);
+  updateDashboard(d);
+  alert('✅ Snapshot semaine ' + snap.label + ' enregistré !');
+}
+
+function getWeekKey(date) {
+  const d    = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - d.getDay() + 1); // Lundi
+  return d.toISOString().split('T')[0];
+}
+
+function formatWeekLabel(date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() - d.getDay() + 1);
+  return d.toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+}
+
+function renderSnapshotList(snaps) {
+  const el = document.getElementById('snapshot-list');
+  if (!el) return;
+  if (!snaps || snaps.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gris);font-size:12px;">Aucun historique enregistré — cliquez sur le bouton ci-dessus pour commencer.</div>';
+    return;
+  }
+  const rows = [...snaps].reverse().map(s => {
+    return `<div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:center;">
+      <span style="color:var(--or);font-weight:500;">Sem. ${s.label}</span>
+      <span style="color:var(--gris);">📸 ${(s.ig||0).toLocaleString('fr-FR')}</span>
+      <span style="color:var(--gris);">🎵 ${(s.tt||0).toLocaleString('fr-FR')}</span>
+      <span style="color:var(--gris);">💼 ${(s.li||0).toLocaleString('fr-FR')}</span>
+    </div>`;
+  }).join('');
+  el.innerHTML = rows;
+}
+
+// ═══════════════════════════════════════
+// GRAPHIQUE DE CROISSANCE (Canvas)
+// ═══════════════════════════════════════
+let currentChartField = 'ig';
+let chartInstance     = null;
+
+function switchChart(field) {
+  currentChartField = field;
+  ['ig','tt','li'].forEach(f => {
+    const btn = document.getElementById('chart-btn-' + f);
+    if (btn) btn.classList.toggle('active', f === field);
+  });
+  const d = getData();
+  renderGrowthChart(d.snapshots || [], field);
+}
+
+function renderGrowthChart(snaps, field) {
+  const canvas = document.getElementById('growth-chart');
+  const empty  = document.getElementById('chart-empty');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+
+  if (!snaps || snaps.length < 2) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (empty) { canvas.style.display = 'none'; empty.style.display = 'block'; }
+    return;
+  }
+  if (empty) { canvas.style.display = 'block'; empty.style.display = 'none'; }
+
+  const colors = { ig: '#c8a96e', tt: '#60a5fa', li: '#4ade80' };
+  const color  = colors[field] || '#c8a96e';
+  const values = snaps.map(s => parseInt(s[field]) || 0);
+  const labels = snaps.map(s => s.label);
+
+  const W    = canvas.offsetWidth || 600;
+  const H    = 140;
+  canvas.width  = W;
+  canvas.height = H;
+
+  const pad   = { top: 16, right: 16, bottom: 28, left: 44 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const range  = maxVal - minVal || 1;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grille horizontale
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth   = 1;
+  [0, 0.25, 0.5, 0.75, 1].forEach(t => {
+    const y = pad.top + chartH * (1 - t);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + chartW, y); ctx.stroke();
+    const val = Math.round(minVal + range * t);
+    ctx.fillStyle = 'rgba(136,136,136,0.7)';
+    ctx.font      = '10px Montserrat, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(val.toLocaleString('fr-FR'), pad.left - 4, y + 3);
+  });
+
+  // Points calculés
+  const pts = values.map((v, i) => ({
+    x: pad.left + (i / (values.length - 1)) * chartW,
+    y: pad.top  + chartH * (1 - (v - minVal) / range)
+  }));
+
+  // Remplissage dégradé
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+  grad.addColorStop(0,   color + '40');
+  grad.addColorStop(1,   color + '05');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.top + chartH);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, pad.top + chartH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Ligne principale
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth   = 2;
+  ctx.lineJoin    = 'round';
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+
+  // Points + labels X
+  pts.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle   = color;
+    ctx.fill();
+    ctx.strokeStyle = '#0a0a0a';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(136,136,136,0.8)';
+    ctx.font      = '9px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[i], p.x, H - 4);
+  });
 }
 
 function exportData() {
@@ -375,6 +616,8 @@ window.nav             = nav;
 window.toggle          = toggle;
 window.autoSave        = autoSave;
 window.saveSituation   = saveSituation;
+window.saveSnapshot    = saveSnapshot;
+window.switchChart     = switchChart;
 window.exportData      = exportData;
 window.exportDrive     = exportDrive;
 window.importDrive     = importDrive;
