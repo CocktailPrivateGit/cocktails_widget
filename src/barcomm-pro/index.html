@@ -435,7 +435,7 @@
           <div class="card" style="border-left:2px solid var(--or-dark);">
             <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--or);margin-bottom:6px;">⚡ PRIORITÉ MOYENNE</div>
             <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Format "behind the scenes" Instagram — sous-exploité localement. Fort potentiel d'engagement authentique.</div>
-            <button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Donne-moi 5 idées concrètes de contenus " behind="" the="" scenes"="" pour="" @cocktail_prive60="" sur="" instagram="" avec="" les="" formats,="" légendes,="" et="" horaires="" optimaux')"="">Approfondir ⟳</button>
+            <button class="btn btn-outline btn-sm" onclick="qlaunch('Donne-moi 5 idées concrètes de contenus behind the scenes pour @cocktail_prive60 sur Instagram avec les formats, légendes, et horaires optimaux')">Approfondir ⟳</button>
           </div>
           <div class="card" style="border-left:2px solid var(--or-dark);">
             <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--or);margin-bottom:6px;">⚡ PRIORITÉ MOYENNE</div>
@@ -450,7 +450,7 @@
           <div class="card" style="border-left:2px solid var(--or-dark);">
             <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--or);margin-bottom:6px;">⚡ PRIORITÉ MOYENNE</div>
             <div style="font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7;margin-bottom:10px;">Cocktail signature entreprise — logo imprimé sur mousse. Seuls les grands acteurs nationaux le proposent.</div>
-            <button class="btn btn-outline btn-sm" onclick="qlaunch(&#39;Comment @cocktail_prive60 peut-il proposer et marketer l\&#39;offre \" cocktail="" signature="" avec="" logo="" entreprise\"="" sur="" ses="" réseaux="" et="" en="" prospection="" b2b="" ?')"="">Approfondir ⟳</button>
+            <button class="btn btn-outline btn-sm" onclick="qlaunch('Comment @cocktail_prive60 peut-il proposer et marketer l\&#39;offre cocktail signature avec logo entreprise sur ses réseaux et en prospection B2B ?')">Approfondir ⟳</button>
           </div>
         </div>
 
@@ -569,18 +569,19 @@
           <button class="btn btn-gold btn-sm" onclick="qlaunch(&#39;Crée une banque de 10 posts prêts à l\&#39;emploi pour @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. 5 posts axés Oise/local et 5 posts axés IDF/corporate. Texte complet + hashtags&#39;)">⟳ Générer banque IA</button>
         </div>
 
-        <div class="pill-bar" style="margin-bottom:1rem;">
-          <div class="pill active">Tous</div>
-          <div class="pill">Instagram</div>
-          <div class="pill">TikTok</div>
-          <div class="pill">LinkedIn</div>
-          <div class="pill">Oise</div>
-          <div class="pill">IDF</div>
-          <div class="pill">Corporate</div>
-          <div class="pill">Mariage</div>
+        <div class="pill-bar" id="contenu-pills" style="margin-bottom:1rem;">
+          <div class="pill active" onclick="filterPosts('tous')">Tous</div>
+          <div class="pill" onclick="filterPosts('instagram')">Instagram</div>
+          <div class="pill" onclick="filterPosts('tiktok')">TikTok</div>
+          <div class="pill" onclick="filterPosts('linkedin')">LinkedIn</div>
+          <div class="pill" onclick="filterPosts('oise')">Oise</div>
+          <div class="pill" onclick="filterPosts('idf')">IDF</div>
+          <div class="pill" onclick="filterPosts('corporate')">Corporate</div>
+          <div class="pill" onclick="filterPosts('mariage')">Mariage</div>
         </div>
 
-        <div class="content-card">
+        <div id="contenu-cards">
+        <div class="content-card" data-tags="instagram oise">
           <div class="content-head">
             <div style="display:flex;align-items:center;gap:8px;"><span>📸</span><span style="font-size:12px;font-weight:400;">Instagram · Reel</span><span class="badge badge-gold">Oise</span></div>
             <span class="badge badge-green">Éprouvé</span>
@@ -589,7 +590,7 @@
           <div class="content-footer"><div class="hashtag-text">#barmanoise #cocktaildomicile #barmanprive #cocktail60</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Améliore et décline ce post pour @cocktail_prive60 en 3 versions : une version IG carrousel, une version TikTok hook, une version story&#39;)">Décliner ↗</button></div>
         </div>
 
-        <div class="content-card">
+        <div class="content-card" data-tags="linkedin idf corporate">
           <div class="content-head">
             <div style="display:flex;align-items:center;gap:8px;"><span>💼</span><span style="font-size:12px;font-weight:400;">LinkedIn · Article</span><span class="badge badge-blue">IDF Corporate</span></div>
             <span class="badge badge-grey">Prospection</span>
@@ -598,7 +599,7 @@
           <div class="content-footer"><div class="hashtag-text">#marqueemployeur #afterwork #barmanevénementiel #teambuilding</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Rédige 3 variations de ce post LinkedIn corporate pour @cocktail_prive60, ciblant respectivement : les RH, les office managers, et les event managers&#39;)">Décliner ↗</button></div>
         </div>
 
-        <div class="content-card">
+        <div class="content-card" data-tags="tiktok oise">
           <div class="content-head">
             <div style="display:flex;align-items:center;gap:8px;"><span>🎵</span><span style="font-size:12px;font-weight:400;">TikTok · Hook vidéo</span><span class="badge badge-gold">Viral</span></div>
             <span class="badge badge-green">Fort potentiel</span>
@@ -606,6 +607,7 @@
           <div class="content-body">[Texte à l'écran] : "Ce barman fait des cocktails à domicile dans l'Oise 👀"<br><br>[Voix off / sous-titres] : "POV tu passes commande et il débarque chez toi avec tout le bar. Oui. Vraiment."<br><br>[CTA] : "Le bar, c'est toi qui l'appelles. Link en bio 🍸"</div>
           <div class="content-footer"><div class="hashtag-text">#barman #cocktail #oise #france #barmanaparis #bartenderlife</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Donne-moi 5 autres idées de vidéos TikTok virales dans le même style pour @cocktail_prive60, avec le texte à l\&#39;écran et la description&#39;)">Décliner ↗</button></div>
         </div>
+        </div><!-- fin #contenu-cards -->
 
         <div class="btn-row">
           <button class="btn btn-gold" onclick="qlaunch(&#39;Génère 8 nouveaux posts originaux pour la banque de contenu de @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. Couvre les thèmes : mariage, corporate, cocktails signature, mocktails, behind the scenes, témoignage, tips barman, promo découverte&#39;)">⟳ Générer 8 posts</button>

@@ -4,41 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BarMan Finance Pro — Cocktail Privé</title>
+  <!-- Phase 3 : CSS externalisé -->
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* ── Firebase Auth UI ── */
-    .firebase-bar {
-      display: flex; align-items: center; gap: 10px;
-    }
-    #btn-firebase-login {
-      display: flex; align-items: center; gap: 6px;
-      padding: 5px 14px; font-size: 10px; font-weight: bold;
-      background: rgba(218,171,45,0.1); border: 1px solid rgba(218,171,45,0.3);
-      border-radius: 3px; color: var(--gold); cursor: pointer;
-      font-family: inherit; letter-spacing: 2px; text-transform: uppercase;
-      transition: all 0.2s;
-    }
-    #btn-firebase-login:hover { background: rgba(218,171,45,0.2); }
-    #btn-firebase-logout {
-      display: none; align-items: center; gap: 6px;
-      padding: 5px 14px; font-size: 10px;
-      background: transparent; border: 1px solid rgba(244,241,235,0.15);
-      border-radius: 3px; color: rgba(244,241,235,0.4); cursor: pointer;
-      font-family: inherit; letter-spacing: 2px; text-transform: uppercase;
-      transition: all 0.2s;
-    }
-    #btn-firebase-logout:hover { border-color: var(--red); color: var(--red); }
-    #firebase-avatar {
-      display: none; width: 26px; height: 26px;
-      border-radius: 50%; object-fit: cover;
-      border: 1px solid var(--gold2);
-    }
-    #firebase-username { font-size: 10px; color: var(--gold); letter-spacing: 1px; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .sync-status { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-    .sync-ok      { color: var(--green); }
-    .sync-error   { color: var(--red); }
-    .sync-offline { color: rgba(244,241,235,0.3); }
-    .sync-syncing { color: var(--gold); }
+    /* Firebase sync status */
+    .sync-status    { font-size: 10px; letter-spacing: 0.5px; }
+    .sync-ok        { color: var(--green); }
+    .sync-error     { color: var(--red); }
+    .sync-offline   { color: rgba(244,241,235,0.4); }
+    .sync-syncing   { color: var(--gold); }
   </style>
 </head>
 <body>
@@ -53,14 +27,14 @@
     </div>
   </div>
   <div class="header-title">Gestion Financière</div>
-  <div class="header-actions">
-    <div class="firebase-bar">
-      <img id="firebase-avatar" src="" alt="avatar">
-      <span id="firebase-username"></span>
-      <span id="sync-status" class="sync-status sync-offline">Hors ligne</span>
-      <button id="btn-firebase-login">☁ Sync Google</button>
-      <button id="btn-firebase-logout">Déconnexion</button>
-    </div>
+  <div class="header-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <!-- Firebase Sync -->
+    <img id="firebase-avatar" src="" alt="avatar" style="display:none;width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--gold);">
+    <span id="firebase-username" style="font-size:10px;color:var(--gold);letter-spacing:0.5px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <span id="sync-status" style="font-size:10px;letter-spacing:0.5px;color:rgba(244,241,235,0.4);">Hors ligne</span>
+    <button id="btn-firebase-login" style="display:flex;align-items:center;gap:6px;padding:5px 12px;font-size:11px;font-weight:500;background:rgba(218,171,45,0.12);border:1px solid rgba(218,171,45,0.3);border-radius:20px;color:var(--gold);cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.15s;">☁️ Sync Google</button>
+    <button id="btn-firebase-logout" style="display:none;align-items:center;gap:6px;padding:5px 12px;font-size:11px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:rgba(244,241,235,0.5);cursor:pointer;font-family:inherit;transition:all 0.15s;">Déconnexion</button>
+    <!-- Export / Import -->
     <button class="btn btn-outline btn-sm" onclick="exportData()">↑ Export</button>
     <button class="btn btn-outline btn-sm" onclick="importData()">↓ Import</button>
   </div>
@@ -891,8 +865,8 @@
 <input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(event)">
 
 
-<!-- Phase 4 : JS en module ES6 avec Firebase -->
-<script type="module" src="app.js"></script>
+<!-- Phase 3 : JS externalisé -->
+<script src="app.js"></script>
 
 </body>
 </html>

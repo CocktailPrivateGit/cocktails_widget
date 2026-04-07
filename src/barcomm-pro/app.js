@@ -565,6 +565,38 @@ function qlaunch(prompt) {
 }
 
 // ═══════════════════════════════════════
+// BANQUE DE POSTS — FILTRES
+// ═══════════════════════════════════════
+function filterPosts(tag) {
+  // Mettre à jour l'état actif des pills
+  document.querySelectorAll('#contenu-pills .pill').forEach(p => {
+    p.classList.toggle('active', p.textContent.trim().toLowerCase() === tag || (tag === 'tous' && p.textContent.trim() === 'Tous'));
+  });
+
+  // Afficher/masquer les cartes selon le tag
+  const cards = document.querySelectorAll('#contenu-cards .content-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+    const show = tag === 'tous' || tags.includes(tag.toLowerCase());
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  // Message si aucun résultat
+  const container = document.getElementById('contenu-cards');
+  const existing = container.querySelector('.contenu-empty');
+  if (existing) existing.remove();
+  if (visible === 0) {
+    const msg = document.createElement('div');
+    msg.className = 'contenu-empty';
+    msg.style.cssText = 'text-align:center;padding:2rem;color:var(--gris);font-size:13px;font-weight:300;';
+    msg.textContent = 'Aucun post pour ce filtre. Génère-en via le bouton "Générer banque IA" ci-dessus.';
+    container.appendChild(msg);
+  }
+}
+
+// ═══════════════════════════════════════
 // COLLAPSIBLES
 // ═══════════════════════════════════════
 function toggle(header) {
@@ -631,3 +663,4 @@ window.addJournalEntry = addJournalEntry;
 window.setVeille       = setVeille;
 window.launchVeille    = launchVeille;
 window.qlaunch         = qlaunch;
+window.filterPosts     = filterPosts;

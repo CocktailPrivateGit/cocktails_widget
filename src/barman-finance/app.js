@@ -1075,3 +1075,5 @@ window.renderDepenses     = renderDepenses;
 window.renderAchats       = renderAchats;
 window.updateAchatStatut  = updateAchatStatut;
 window.updateFormulaPrice = updateFormulaPrice;
+window.deleteRevenu       = deleteRevenu;
+window.deleteDepense      = deleteDepense;
