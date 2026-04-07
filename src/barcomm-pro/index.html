@@ -42,6 +42,28 @@
     .sync-error   { color: var(--rouge); }
     .sync-offline { color: var(--gris); }
     .sync-syncing { color: var(--or); }
+
+    /* ── Loi Évin ── */
+    .evin-badge { display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:0.6px;padding:2px 7px;border-radius:10px;text-transform:uppercase; }
+    .evin-badge.libre   { background:rgba(74,222,128,0.12);color:var(--vert);border:1px solid rgba(74,222,128,0.25); }
+    .evin-badge.service { background:rgba(96,165,250,0.12);color:var(--bleu);border:1px solid rgba(96,165,250,0.25); }
+    .evin-badge.educatif{ background:rgba(200,169,110,0.12);color:var(--or);border:1px solid rgba(200,169,110,0.25); }
+    .evin-badge.alcool  { background:rgba(248,113,113,0.12);color:var(--rouge);border:1px solid rgba(248,113,113,0.3); }
+    .evin-pillar { border-left:2px solid var(--or-dark);padding:10px 14px;margin-bottom:8px;background:rgba(200,169,110,0.04);border-radius:0 4px 4px 0; }
+    .evin-pillar-title { font-size:12px;font-weight:600;color:var(--or);margin-bottom:4px; }
+    .evin-pillar-body { font-size:12px;font-weight:300;color:var(--creme2);line-height:1.7; }
+    .evin-allowed { color:var(--vert);font-size:11px; }
+    .evin-forbidden { color:var(--rouge);font-size:11px; }
+    .evin-template-box { background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.15);border-radius:4px;padding:12px 14px;font-size:12px;font-weight:300;color:var(--creme2);line-height:1.8;margin-bottom:8px;white-space:pre-wrap; }
+    .evin-score-bar-bg { height:6px;background:rgba(255,255,255,0.07);border-radius:3px;margin:8px 0 6px; }
+    .evin-score-bar { height:100%;border-radius:3px;transition:width 0.4s,background 0.4s; }
+    .evin-fine-table { width:100%;border-collapse:collapse;font-size:11px; }
+    .evin-fine-table th { color:var(--gris);font-weight:600;letter-spacing:0.5px;padding:6px 10px;border-bottom:1px solid var(--border2);text-align:left; }
+    .evin-fine-table td { padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--creme2);font-weight:300; }
+    .evin-fine-table tr:last-child td { border-bottom:none; }
+    .evin-strat-label { display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px; }
+    .evin-strat-bar-bg { height:8px;background:rgba(255,255,255,0.07);border-radius:4px;margin-bottom:12px; }
+    .evin-banner { background:rgba(200,169,110,0.07);border:1px solid rgba(200,169,110,0.2);border-radius:4px;padding:10px 14px;font-size:12px;color:var(--or);margin-bottom:1rem;display:flex;align-items:center;gap:10px; }
   </style>
 </head>
 <body>
@@ -99,6 +121,9 @@
       </div>
       <div class="nav-item" onclick="nav(&#39;contenu&#39;)" data-p="contenu">
         <span class="nav-icon">✍️</span><span>Banque Posts</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;evin&#39;)" data-p="evin">
+        <span class="nav-icon">⚖️</span><span>Loi Évin</span>
       </div>
       <div class="nav-item" onclick="nav(&#39;tendances&#39;)" data-p="tendances">
         <span class="nav-icon">📈</span><span>Tendances</span>
@@ -580,29 +605,31 @@
           <div class="pill" onclick="filterPosts('mariage')">Mariage</div>
         </div>
 
+        <div class="evin-banner">⚖️ <span><strong>Loi Évin :</strong> tout post promouvant de l'alcool doit mentionner « L'abus d'alcool est dangereux pour la santé ». <a onclick="nav('evin')" style="color:var(--or);cursor:pointer;text-decoration:underline;">Voir la checklist complète →</a></span></div>
+
         <div id="contenu-cards">
-        <div class="content-card" data-tags="instagram oise">
+        <div class="content-card" data-tags="instagram oise" data-evin="service">
           <div class="content-head">
             <div style="display:flex;align-items:center;gap:8px;"><span>📸</span><span style="font-size:12px;font-weight:400;">Instagram · Reel</span><span class="badge badge-gold">Oise</span></div>
-            <span class="badge badge-green">Éprouvé</span>
+            <div style="display:flex;align-items:center;gap:6px;"><span class="evin-badge service">🟢 Service</span><span class="badge badge-green">Éprouvé</span></div>
           </div>
           <div class="content-body">✨ Quand tu commandes un cocktail… et qu'il arrive à la maison 🍸<br><br>Barman privé dans l'Oise. Je viens chez toi. Tu kiffes.<br><br>📍 Compiègne · Senlis · Creil · et tout le 60<br>DM pour devis gratuit 👇</div>
           <div class="content-footer"><div class="hashtag-text">#barmanoise #cocktaildomicile #barmanprive #cocktail60</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Améliore et décline ce post pour @cocktail_prive60 en 3 versions : une version IG carrousel, une version TikTok hook, une version story&#39;)">Décliner ↗</button></div>
         </div>
 
-        <div class="content-card" data-tags="linkedin idf corporate">
+        <div class="content-card" data-tags="linkedin idf corporate" data-evin="service">
           <div class="content-head">
             <div style="display:flex;align-items:center;gap:8px;"><span>💼</span><span style="font-size:12px;font-weight:400;">LinkedIn · Article</span><span class="badge badge-blue">IDF Corporate</span></div>
-            <span class="badge badge-grey">Prospection</span>
+            <div style="display:flex;align-items:center;gap:6px;"><span class="evin-badge service">🟢 Service</span><span class="badge badge-grey">Prospection</span></div>
           </div>
           <div class="content-body">L'afterwork de votre équipe, c'est aussi votre marque employeur.<br><br>Un barman professionnel, des cocktails à vos couleurs, une animation soignée — vos collaborateurs s'en souviennent.<br><br>Je sers 20 à 200 personnes. Je me déplace en IDF et dans l'Oise.<br>Intéressé(e) ? Je réponds sous 2h. 📩</div>
           <div class="content-footer"><div class="hashtag-text">#marqueemployeur #afterwork #barmanevénementiel #teambuilding</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Rédige 3 variations de ce post LinkedIn corporate pour @cocktail_prive60, ciblant respectivement : les RH, les office managers, et les event managers&#39;)">Décliner ↗</button></div>
         </div>
 
-        <div class="content-card" data-tags="tiktok oise">
+        <div class="content-card" data-tags="tiktok oise" data-evin="service">
           <div class="content-head">
             <div style="display:flex;align-items:center;gap:8px;"><span>🎵</span><span style="font-size:12px;font-weight:400;">TikTok · Hook vidéo</span><span class="badge badge-gold">Viral</span></div>
-            <span class="badge badge-green">Fort potentiel</span>
+            <div style="display:flex;align-items:center;gap:6px;"><span class="evin-badge service">🟢 Service</span><span class="badge badge-green">Fort potentiel</span></div>
           </div>
           <div class="content-body">[Texte à l'écran] : "Ce barman fait des cocktails à domicile dans l'Oise 👀"<br><br>[Voix off / sous-titres] : "POV tu passes commande et il débarque chez toi avec tout le bar. Oui. Vraiment."<br><br>[CTA] : "Le bar, c'est toi qui l'appelles. Link en bio 🍸"</div>
           <div class="content-footer"><div class="hashtag-text">#barman #cocktail #oise #france #barmanaparis #bartenderlife</div><button class="btn btn-dark btn-sm" onclick="qlaunch(&#39;Donne-moi 5 autres idées de vidéos TikTok virales dans le même style pour @cocktail_prive60, avec le texte à l\&#39;écran et la description&#39;)">Décliner ↗</button></div>
@@ -611,6 +638,151 @@
 
         <div class="btn-row">
           <button class="btn btn-gold" onclick="qlaunch(&#39;Génère 8 nouveaux posts originaux pour la banque de contenu de @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. Couvre les thèmes : mariage, corporate, cocktails signature, mocktails, behind the scenes, témoignage, tips barman, promo découverte&#39;)">⟳ Générer 8 posts</button>
+        </div>
+      </div>
+
+      <!-- ═══ LOI ÉVIN ═══ -->
+      <div class="panel" id="panel-evin">
+        <div class="section-header">
+          <div>
+            <div class="section-title">⚖️ Loi Évin — Conformité</div>
+            <div class="section-sub">Loi n°91-32 du 10 janvier 1991 · Communication alcool en France</div>
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="qlaunch('Audite mes derniers posts Instagram et TikTok @cocktail_prive60 au regard de la Loi Évin. Identifie les éventuelles non-conformités et propose les corrections.')">⟳ Auditer mes posts IA</button>
+        </div>
+
+        <!-- CHECKLIST DE CONFORMITÉ -->
+        <div class="label">Checklist avant publication</div>
+        <div class="alert" style="border-left-color:var(--or);margin-bottom:0.75rem;">⚠️ À valider pour chaque post promouvant de <strong>l'alcool</strong>. Pour les <strong>mocktails</strong> → zéro contrainte légale, publie librement.</div>
+        <div class="card">
+          <div class="checklist" id="evin-checklist">
+            <div class="check-item" onclick="toggleEvinCheck(this)" data-evin-key="ev_1"><div class="check-box">✓</div><div><div class="check-text">La mention <em>« L'abus d'alcool est dangereux pour la santé »</em> est visible et lisible (overlay, légende ou audio)</div></div></div>
+            <div class="check-item" onclick="toggleEvinCheck(this)" data-evin-key="ev_2"><div class="check-box">✓</div><div><div class="check-text">Audience ciblée 21+ — ton sophistiqué/professionnel, jamais « fun jeunesse »</div></div></div>
+            <div class="check-item" onclick="toggleEvinCheck(this)" data-evin-key="ev_3"><div class="check-box">✓</div><div><div class="check-text">Pas d'association alcool = séduction / succès / performance / solution émotionnelle</div></div></div>
+            <div class="check-item" onclick="toggleEvinCheck(this)" data-evin-key="ev_4"><div class="check-box">✓</div><div><div class="check-text">Pas de comparaison dénigrant des concurrents ou d'autres boissons</div></div></div>
+            <div class="check-item" onclick="toggleEvinCheck(this)" data-evin-key="ev_5"><div class="check-box">✓</div><div><div class="check-text">Aucun mineur visible dans le contenu ou en arrière-plan</div></div></div>
+            <div class="check-item" onclick="toggleEvinCheck(this)" data-evin-key="ev_6"><div class="check-box">✓</div><div><div class="check-text">Ton = expertise + service premium, jamais incitation directe à consommer</div></div></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div id="evin-score" style="font-size:12px;color:var(--gris);margin-bottom:2px;">0/6 critères validés (0%)</div>
+            <div class="evin-score-bar-bg"><div class="evin-score-bar" id="evin-score-bar" style="width:0%;background:var(--rouge);"></div></div>
+            <div id="evin-score-msg" style="font-size:12px;font-weight:600;color:var(--rouge);">❌ Non conforme — ne pas publier</div>
+          </div>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn btn-outline btn-sm" onclick="resetEvinChecks()">↺ Nouvelle publication</button>
+          </div>
+        </div>
+
+        <!-- 5 PILIERS -->
+        <div class="label" style="margin-top:1.25rem;">Les 5 piliers de la Loi Évin</div>
+        <div class="card" style="padding-top:12px;">
+          <div class="evin-pillar">
+            <div class="evin-pillar-title">1️⃣ Mention obligatoire</div>
+            <div class="evin-pillar-body">Tout contenu promotionnel avec alcool (post, Reel, story, email) <strong>doit</strong> inclure la mention : <em>« L'abus d'alcool est dangereux pour la santé »</em>. Elle peut être en texte overlay, sous-titre de vidéo, légende ou dite en audio.</div>
+          </div>
+          <div class="evin-pillar">
+            <div class="evin-pillar-title">2️⃣ Interdiction de ciblage des mineurs</div>
+            <div class="evin-pillar-body">Strictly 21+. Ton sophistiqué/professionnel obligatoire. Pas de collaboration avec influenceurs mineurs. Pas de TikTok avec sons ultra-jeunesse.</div>
+          </div>
+          <div class="evin-pillar">
+            <div class="evin-pillar-title">3️⃣ Alcool ≠ Succès / Séduction / Performance</div>
+            <div class="evin-pillar-body">
+              <span class="evin-forbidden">❌ Interdit : « Séduis au premier verre » · « Deviens irrésistible » · « Roi de la soirée »</span><br>
+              <span class="evin-allowed">✅ Accepté : « Cocktail sophistiqué » · « Pour célébrer vos moments » · « Service premium à domicile »</span>
+            </div>
+          </div>
+          <div class="evin-pillar">
+            <div class="evin-pillar-title">4️⃣ Pas de messages de modération normalisés</div>
+            <div class="evin-pillar-body">
+              <span class="evin-allowed">✅ OK : « Cocktail sans alcool » · « Recettes de mocktails »</span><br>
+              <span class="evin-forbidden">❌ Interdit : « Bois modérément, c'est bon pour la santé »</span>
+            </div>
+          </div>
+          <div class="evin-pillar" style="margin-bottom:0;">
+            <div class="evin-pillar-title">5️⃣ Pas de publicité comparée dénigrant</div>
+            <div class="evin-pillar-body">Tu peux mettre en avant ta différenciation (premium, artisanal, service à domicile) mais pas dénigrer directement des concurrents ou d'autres alcools.</div>
+          </div>
+        </div>
+
+        <!-- TABLEAU DES AMENDES -->
+        <div class="label" style="margin-top:1.25rem;">Risques légaux &amp; amendes</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="evin-fine-table">
+            <thead><tr><th>Violation</th><th>Amende</th><th>Conséquence</th></tr></thead>
+            <tbody>
+              <tr><td>Mention Évin absente</td><td style="color:var(--or);">300 € – 1 500 €</td><td>Suppression contenu</td></tr>
+              <tr><td>Ciblage mineur</td><td style="color:var(--rouge);">1 500 € – 3 750 €</td><td>Suppression compte possible</td></tr>
+              <tr><td>Alcool = séduction/succès</td><td style="color:var(--rouge);">1 500 € – 3 750 €</td><td>Interdiction pub temporaire</td></tr>
+              <tr><td>Récidive</td><td style="color:var(--rouge);font-weight:600;">Jusqu'à 30 000 €</td><td>Poursuites judiciaires</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:8px 14px;font-size:10px;color:var(--gris);">Contrôle par : Instagram/FB (algorithme + signalements), ARPP, DGCCRF, associations de santé.</div>
+        </div>
+
+        <!-- STRATÉGIE 2026 -->
+        <div class="label" style="margin-top:1.25rem;">Stratégie contenu 2026</div>
+        <div class="card">
+          <div class="evin-strat-label"><span style="color:var(--vert);">🟢 40% Mocktails</span><span style="color:var(--vert);font-size:11px;">Zéro risque légal · Maximum engagement</span></div>
+          <div class="evin-strat-bar-bg"><div style="height:100%;width:40%;background:var(--vert);border-radius:4px;"></div></div>
+          <div class="evin-strat-label"><span style="color:var(--bleu);">🔵 30% Éducation</span><span style="color:var(--bleu);font-size:11px;">Histoire · Technique · Mixologie</span></div>
+          <div class="evin-strat-bar-bg"><div style="height:100%;width:30%;background:var(--bleu);border-radius:4px;"></div></div>
+          <div class="evin-strat-label"><span style="color:var(--or);">🟡 20% Promo alcoolisée</span><span style="color:var(--or);font-size:11px;">Conforme + mention Évin obligatoire</span></div>
+          <div class="evin-strat-bar-bg"><div style="height:100%;width:20%;background:var(--or);border-radius:4px;"></div></div>
+          <div class="evin-strat-label"><span style="color:var(--gris);">⚪ 10% Coulisses/Service</span><span style="color:var(--gris);font-size:11px;">Making-of · Setup · Lifestyle</span></div>
+          <div class="evin-strat-bar-bg" style="margin-bottom:0;"><div style="height:100%;width:10%;background:var(--gris);border-radius:4px;"></div></div>
+        </div>
+
+        <!-- TEMPLATES PRÊTS À L'EMPLOI -->
+        <div class="label" style="margin-top:1.25rem;">Templates prêts à l'emploi</div>
+
+        <div class="card">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:var(--vert);margin-bottom:8px;">📱 Template 1 — Reel Mocktail <span class="evin-badge libre" style="margin-left:6px;">🟢 Libre</span></div>
+          <div class="evin-template-box" id="tpl-mocktail">Titre : « Comment faire un Mojito sans alcool en 30 secondes »
+
+[00:00–00:15] Préparation rapide : menthe fraîche, jus citron, sirop de canne, eau gazeuse, glaçons
+[00:15–00:30] Verser + garnir
+Texte final : « Cocktail Privé — Bar à domicile premium 🍹 Réserve ton événement → lien bio »
+
+⚠️ Mention Évin : NON REQUISE (mocktail)</div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="copyEvinTemplate('tpl-mocktail')">📋 Copier</button><button class="btn btn-dark btn-sm" onclick="qlaunch('Génère 5 variantes de Reels mocktail conformes Loi Évin pour @cocktail_prive60 avec les mêmes codes que ce template')">⟳ Décliner</button></div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:var(--bleu);margin-bottom:8px;">📱 Template 2 — Carousel Éducation <span class="evin-badge educatif" style="margin-left:6px;">🟡 Éducatif</span></div>
+          <div class="evin-template-box" id="tpl-educatif">Slide 1 : « 5 alcools à connaître pour briller en soirée »
+Slides 2–6 : Rhum, Vodka, Gin, Tequila, Whisky (Origine · Profil gustatif · Cocktail signature)
+Slide 7 (CTA) : « Laisse-moi créer TES cocktails signature pour ton événement »
+
+⚠️ Mention Évin slide 7 (recommandée si promotion d'alcools spécifiques)</div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="copyEvinTemplate('tpl-educatif')">📋 Copier</button><button class="btn btn-dark btn-sm" onclick="qlaunch('Génère un carousel éducatif complet sur la mixologie pour @cocktail_prive60 conforme Loi Évin : 6 slides avec textes, accroches et mention légale si nécessaire')">⟳ Décliner</button></div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:var(--or);margin-bottom:8px;">📱 Template 3 — Post Promo Alcoolisé <span class="evin-badge alcool" style="margin-left:6px;">🔴 Mention obligatoire</span></div>
+          <div class="evin-template-box" id="tpl-alcool">Visuel : cocktail premium éclairé
+
+Légende :
+✨ Notre Daiquiri Signature
+Rhum blanc vieilli · jus citron frais · sirop simple — équilibre parfait.
+Réserve ton événement → lien bio 🍸
+
+⚠️ L'abus d'alcool est dangereux pour la santé — #barmanprive #cocktaildomicile</div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="copyEvinTemplate('tpl-alcool')">📋 Copier</button><button class="btn btn-dark btn-sm" onclick="qlaunch('Génère 3 posts Instagram promouvant des cocktails alcoolisés pour @cocktail_prive60, conformes Loi Évin avec mention légale bien intégrée')">⟳ Décliner</button></div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:var(--creme2);margin-bottom:8px;">📱 Template 4 — Carousel Inclusif <span class="evin-badge service" style="margin-left:6px;">🟢 Service</span></div>
+          <div class="evin-template-box" id="tpl-inclusif">Slide 1 : « Pour TOUS vos invités : alcoolisés + mocktails »
+Slides 2–3 : Mojito version alcoolisée / version sans alcool (côte à côte)
+Slides 4–5 : Daiquiri version alcoolisée / version sans alcool
+Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
+
+⚠️ Mention Évin slide 6 recommandée car alcool présenté</div>
+          <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="copyEvinTemplate('tpl-inclusif')">📋 Copier</button><button class="btn btn-dark btn-sm" onclick="qlaunch('Génère un carousel inclusif alcool+mocktails pour @cocktail_prive60 avec textes pour chaque slide, conforme Loi Évin')">⟳ Décliner</button></div>
+        </div>
+
+        <div class="btn-row" style="margin-top:0.5rem;">
+          <button class="btn btn-gold" onclick="qlaunch('Crée un calendrier éditorial pour @cocktail_prive60 appliquant exactement la stratégie Loi Évin 2026 : 40% mocktails, 30% éducation, 20% promo alcool conforme, 10% coulisses. Planifie 4 semaines.')">⟳ Générer planning conforme IA</button>
         </div>
       </div>
 

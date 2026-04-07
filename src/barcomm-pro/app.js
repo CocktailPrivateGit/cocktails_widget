@@ -82,6 +82,7 @@ function loadSituation() {
   updateDashboard(d);
   renderSnapshotList(d.snapshots || []);
   renderGrowthChart(d.snapshots || [], 'ig');
+  loadEvinChecks();
 }
 
 function updateDashboard(d) {
@@ -456,6 +457,69 @@ function loadChecks() {
   });
 }
 
+// ═══════════════════════════════════════
+// LOI ÉVIN — CHECKLIST
+// ═══════════════════════════════════════
+function toggleEvinCheck(el) {
+  el.classList.toggle('done');
+  const key = el.getAttribute('data-evin-key');
+  const d = getData();
+  if (!d.evinChecks) d.evinChecks = {};
+  d.evinChecks[key] = el.classList.contains('done');
+  setData(d);
+  updateEvinScore();
+}
+
+function loadEvinChecks() {
+  const d = getData();
+  const checks = d.evinChecks || {};
+  document.querySelectorAll('[data-evin-key]').forEach(el => {
+    if (checks[el.getAttribute('data-evin-key')]) el.classList.add('done');
+    else el.classList.remove('done');
+  });
+  updateEvinScore();
+}
+
+function resetEvinChecks() {
+  document.querySelectorAll('[data-evin-key]').forEach(el => el.classList.remove('done'));
+  const d = getData();
+  d.evinChecks = {};
+  setData(d);
+  updateEvinScore();
+}
+
+function updateEvinScore() {
+  const items   = document.querySelectorAll('[data-evin-key]');
+  const done    = document.querySelectorAll('[data-evin-key].done');
+  const scoreEl = document.getElementById('evin-score');
+  const barEl   = document.getElementById('evin-score-bar');
+  const msgEl   = document.getElementById('evin-score-msg');
+  if (!scoreEl || !items.length) return;
+  const pct = Math.round((done.length / items.length) * 100);
+  scoreEl.textContent = done.length + '/' + items.length + ' critères validés (' + pct + '%)';
+  barEl.style.width   = pct + '%';
+  barEl.style.background = pct === 100 ? 'var(--vert)' : pct >= 60 ? 'var(--or)' : 'var(--rouge)';
+  msgEl.textContent   = pct === 100 ? '✅ Conforme — publie en confiance !' : pct >= 60 ? '⚠️ Vérification incomplète' : '❌ Non conforme — ne pas publier';
+  msgEl.style.color   = pct === 100 ? 'var(--vert)' : pct >= 60 ? 'var(--or)' : 'var(--rouge)';
+}
+
+function copyEvinTemplate(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const text = el.innerText || el.textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text.trim()).then(() => alert('Template copié dans le presse-papier ✅'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text.trim();
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Template copié dans le presse-papier ✅');
+  }
+}
+
 function addCustomAction() {
   const input = document.getElementById('new-action-input');
   const text = input ? input.value.trim() : '';
@@ -627,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadChecks();
     loadCustomActions();
     loadJournal();
+    loadEvinChecks();
     refreshJSONPreview();
     updateSaveTime();
   }, COLLECTION);
@@ -662,5 +727,8 @@ window.addCustomAction = addCustomAction;
 window.addJournalEntry = addJournalEntry;
 window.setVeille       = setVeille;
 window.launchVeille    = launchVeille;
-window.qlaunch         = qlaunch;
+window.qlaunch          = qlaunch;
+window.toggleEvinCheck  = toggleEvinCheck;
+window.resetEvinChecks  = resetEvinChecks;
+window.copyEvinTemplate = copyEvinTemplate;
 window.filterPosts     = filterPosts;
