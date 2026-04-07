@@ -141,6 +141,7 @@ function renderRevenus() {
   const tbody = document.getElementById('tbody-revenus');
   if(!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">◇</div>Aucun revenu pour ${year}</div></td></tr>`;
+    renderRevSummary();
     return;
   }
   tbody.innerHTML = filtered.map(r => `
@@ -155,10 +156,11 @@ function renderRevenus() {
       <td class="td-gold">${fmt(r.montant)}</td>
       <td><button class="btn btn-danger" onclick="deleteRevenu(${r.id})">✕</button></td>
     </tr>`).join('');
+  renderRevSummary();
 }
 
 function renderRevSummary() {
-  const year = new Date().getFullYear();
+  const year = parseInt(document.getElementById('rev-filter-year')?.value || new Date().getFullYear());
   const revYear = state.revenus.filter(r => r.date && new Date(r.date).getFullYear() === year);
   const total = revYear.reduce((s,r) => s+r.montant, 0);
   const nb = revYear.length;
@@ -248,6 +250,7 @@ function renderDepenses() {
   const tbody = document.getElementById('tbody-depenses');
   if(!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◇</div>Aucune dépense pour ${year}</div></td></tr>`;
+    renderDepSummary();
     return;
   }
   const deductBadge = { oui:'badge-green', non:'badge-red', partiel:'badge-gold' };
@@ -261,10 +264,11 @@ function renderDepenses() {
       <td class="td-red">${fmt(d.montant)}</td>
       <td><button class="btn btn-danger" onclick="deleteDepense(${d.id})">✕</button></td>
     </tr>`).join('');
+  renderDepSummary();
 }
 
 function renderDepSummary() {
-  const year = new Date().getFullYear();
+  const year = parseInt(document.getElementById('dep-filter-year')?.value || new Date().getFullYear());
   const depYear = state.depenses.filter(d => d.date && new Date(d.date).getFullYear() === year);
   const total = depYear.reduce((s,d) => s+d.montant, 0);
   const deductible = depYear.filter(d => d.deductible==='oui').reduce((s,d) => s+d.montant, 0);
@@ -839,13 +843,17 @@ function transferToDepense(id) {
     notes: 'Issu du Plan de Lancement'
   };
   state.depenses.unshift(dep);
+  a.statut = 'achete';
   saveToStorage();
-  toast(`"${a.nom}" transféré dans les Dépenses`, 'success');
+  renderAchats();
+  renderLaunchSummary();
+  toast(`"${a.nom}" transféré dans les Dépenses et marqué Acheté`, 'success');
 }
 
 function clearLcForm() {
   ['lc-nom','lc-fournisseur','lc-notes'].forEach(id => document.getElementById(id).value = '');
   ['lc-prix-estime','lc-prix-reel'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('lc-categorie').value = document.getElementById('lc-categorie').options[0].value;
   document.getElementById('lc-priorite').value = 'essentiel';
   document.getElementById('lc-statut').value = 'a_acheter';
   document.getElementById('lc-amortissable').checked = false;
@@ -1073,7 +1081,6 @@ window.renderDashboard    = renderDashboard;
 window.renderRevenus      = renderRevenus;
 window.renderDepenses     = renderDepenses;
 window.renderAchats       = renderAchats;
-window.updateAchatStatut  = updateAchatStatut;
 window.updateFormulaPrice = updateFormulaPrice;
 window.deleteRevenu       = deleteRevenu;
 window.deleteDepense      = deleteDepense;

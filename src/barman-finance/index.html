@@ -530,28 +530,7 @@
   <section id="section-lancement" class="section">
 
     <!-- KPIs -->
-    <div class="grid-4" id="launch-kpi-grid" style="margin-bottom:24px">
-    <div class="kpi-card">
-      <div class="kpi-label">Budget Estimé Total</div>
-      <div class="kpi-value">102&nbsp;€</div>
-      <div class="kpi-sub">9 articles</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Déjà Acheté</div>
-      <div class="kpi-value" style="color:var(--green)">42&nbsp;€</div>
-      <div class="kpi-sub">2 articles · 22% complété</div>
-      <div class="kpi-bar-wrap"><div class="kpi-bar green" style="width:22%"></div></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Commandé</div>
-      <div class="kpi-value" style="color:var(--blue)">0&nbsp;€</div>
-      <div class="kpi-sub">0 articles en attente</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Reste à Financer</div>
-      <div class="kpi-value" style="color:var(--red)">80&nbsp;€</div>
-      <div class="kpi-sub">Essentiels: 40&nbsp;€</div>
-    </div></div>
+    <div class="grid-4" id="launch-kpi-grid" style="margin-bottom:24px"></div>
 
     <div class="grid-2">
       <!-- Formulaire ajout -->
@@ -628,51 +607,11 @@
       <div>
         <div class="card">
           <div class="card-title">Avancement par Catégorie</div>
-          <div id="launch-by-cat"><div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-        <span style="color:rgba(244,241,235,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">Matériel de Bar</span>
-        <span style="color:var(--gold)">60&nbsp;€ <span style="color:rgba(244,241,235,0.35)">(0%)</span></span>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
-        <div style="height:100%;width:0%;background:linear-gradient(90deg,#2E7D5B,var(--green));border-radius:2px;transition:width 0.5s"></div>
-      </div>
-    </div><div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-        <span style="color:rgba(244,241,235,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">Numérique &amp; Logiciels</span>
-        <span style="color:var(--gold)">42&nbsp;€ <span style="color:rgba(244,241,235,0.35)">(100%)</span></span>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
-        <div style="height:100%;width:100%;background:linear-gradient(90deg,#2E7D5B,var(--green));border-radius:2px;transition:width 0.5s"></div>
-      </div>
-    </div></div>
+          <div id="launch-by-cat"></div>
         </div>
         <div class="card">
           <div class="card-title">Répartition Budget</div>
-          <div id="launch-budget-chart"><div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-        <span style="color:rgba(244,241,235,0.7)">🔴 Essentiel</span>
-        <span style="color:var(--red)">80.3%  82&nbsp;€</span>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
-        <div style="height:100%;width:80.3%;background:var(--red);border-radius:2px;transition:width 0.5s"></div>
-      </div>
-    </div><div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-        <span style="color:rgba(244,241,235,0.7)">🟡 Important</span>
-        <span style="color:var(--gold)">19.7%  20&nbsp;€</span>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
-        <div style="height:100%;width:19.7%;background:var(--gold);border-radius:2px;transition:width 0.5s"></div>
-      </div>
-    </div><div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-        <span style="color:rgba(244,241,235,0.7)">🟢 Optionnel</span>
-        <span style="color:var(--green)">0.0%  0&nbsp;€</span>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px">
-        <div style="height:100%;width:0.0%;background:var(--green);border-radius:2px;transition:width 0.5s"></div>
-      </div>
-    </div></div>
+          <div id="launch-budget-chart"></div>
         </div>
       </div>
     </div>
@@ -694,165 +633,12 @@
         <option value="optionnel">Optionnel</option>
       </select>
       <label style="margin-left:12px">Catégorie</label>
-      <select id="lc-filter-cat" onchange="renderAchats()"><option value="all">Toutes</option><option value="Matériel de Bar">Matériel de Bar</option><option value="Numérique &amp; Logiciels">Numérique &amp; Logiciels</option></select>
+      <select id="lc-filter-cat" onchange="renderAchats()"><option value="all">Toutes</option></select>
       <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="resetDefaultAchats()">↺ Réinitialiser défauts</button>
     </div>
 
     <!-- Liste -->
-    <div id="launch-list"><div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div class="card-title" style="margin-bottom:0;flex:1">Numérique &amp; Logiciels</div>
-        <span style="font-size:11px;color:rgba(244,241,235,0.4);margin-right:16px">2/2 achetés</span>
-        <span style="font-size:13px;color:var(--gold)">42&nbsp;€</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(76,175,130,0.05);border:1px solid rgba(76,175,130,0.15);border-radius:4px">
-            <select onchange="updateAchatStatut(1774622038374, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete" selected="">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:rgba(244,241,235,0.45);text-decoration:line-through;;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Claude Pro</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · Anthropic</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">22&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622038374)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774622038374)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(76,175,130,0.05);border:1px solid rgba(76,175,130,0.15);border-radius:4px">
-            <select onchange="updateAchatStatut(1774622059635, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete" selected="">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:rgba(244,241,235,0.45);text-decoration:line-through;;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gemini Pro</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · Google</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">20&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622059635)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774622059635)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div>
-      </div>
-    </div><div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div class="card-title" style="margin-bottom:0;flex:1">Matériel de Bar</div>
-        <span style="font-size:11px;color:rgba(244,241,235,0.4);margin-right:16px">0/7 achetés</span>
-        <span style="font-size:13px;color:var(--gold)">80&nbsp;€</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774622486271, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">verre a mélange Inox</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32846562182.html?spm=a2g0o.productlist.main.6.19c1zO1vzO1vXG&amp;algo_pvid=bcea3f27-a234-4371-854b-9310ec02a71f&amp;pdp_ext_f=%7B%22order%22%3A%2231%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&amp;utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32846562182%7C_p_origin_prod%3A</div>
-            </div>
-            <span style="font-size:13px;color:var(--gold);white-space:nowrap;min-width:70px;text-align:right">~14&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622486271)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774622486271)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774622573639, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Spoon 20cm noire</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress² · https://fr.aliexpress.com/item/32824941157.html?spm=a2g0o.productlist.main.40.19c1zO1vzO1vXG&amp;algo_pvid=bcea3f27-a234-4371-854b-9310ec02a71f&amp;pdp_ext_f=%7B%22order%22%3A%22370%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&amp;utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32824941157%7C_p_origin_prod%3A</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">4&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622573639)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774622573639)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774623382041, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">pince Fruits 22cm noire</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32888160972.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32888160972&amp;gatewayAdapt=glo2fra</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">5&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623382041)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774623382041)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774623441250, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Flacon Bitter Skull Noire 30ml</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32882652256.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32882652256&amp;gatewayAdapt=glo2fra</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">4&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623441250)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774623441250)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774623476411, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bitter Bottle Skull Noire 60ml</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32882652256.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32882652256&amp;gatewayAdapt=glo2fra</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">5&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623476411)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774623476411)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774623551174, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bitter Bottle Skull 120ml</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🔴 Essentiel · AliExpress · https://fr.aliexpress.com/item/32882652256.html?spm=a2g0o.store_pc_allItems_or_groupList.new_all_items_2007586029773.32882652256&amp;gatewayAdapt=glo2fra</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">8&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774623551174)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774623551174)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(218,171,45,0.03);border:1px solid rgba(218,171,45,0.08);border-radius:4px">
-            <select onchange="updateAchatStatut(1774622435824, this.value)" style="background:var(--black3);border:1px solid var(--border);color:var(--alabaster);padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer;outline:none;min-width:120px">
-              <option value="a_acheter" selected="">⬜ À acheter</option>
-              <option value="commande">🔵 Commandé</option>
-              <option value="achete">✅ Acheté</option>
-            </select>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;color:var(--alabaster);;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shaker Boston</div>
-              <div style="font-size:10px;color:rgba(244,241,235,0.35);margin-top:2px">🟡 Important · AliExpress · AliExpress · https://fr.aliexpress.com/item/1005002625190659.html?spm=a2g0o.productlist.main.7.19c1zO1vzO1vXG&amp;algo_pvid=bcea3f27-a234-4371-854b-9310ec02a71f&amp;pdp_ext_f=%7B%22order%22%3A%2214%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&amp;utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A1005002625190659%7C_p_origin_prod%3A</div>
-            </div>
-            <span style="font-size:13px;color:var(--green);white-space:nowrap;min-width:70px;text-align:right">40&nbsp;€</span>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" title="Transférer en Dépense" onclick="transferToDepense(1774622435824)" style="font-size:10px;padding:4px 8px">→ Dép.</button>
-              <button class="btn btn-danger" onclick="deleteAchat(1774622435824)" style="padding:4px 8px;font-size:10px">✕</button>
-            </div>
-          </div>
-      </div>
-    </div></div>
+    <div id="launch-list"></div>
 
   </section>
 
@@ -866,7 +652,7 @@
 
 
 <!-- Phase 3 : JS externalisé -->
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
