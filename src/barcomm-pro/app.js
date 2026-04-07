@@ -1175,6 +1175,98 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnLogout) btnLogout.addEventListener('click', logout);
 });
 
+// ═══════════════════════════════════════
+// SKILL TIER 2: COMPETITIVE ADS EXTRACTOR
+// ═══════════════════════════════════════
+function openCompetitiveAnalyzer() {
+  const modal = document.getElementById('modal-competitive-analysis');
+  if (modal) {
+    modal.classList.add('active');
+    document.getElementById('competitors-input').focus();
+  }
+}
+
+function closeCompetitiveModal() {
+  const modal = document.getElementById('modal-competitive-analysis');
+  if (modal) {
+    modal.classList.remove('active');
+    document.getElementById('competitors-input').value = '';
+    document.getElementById('competitive-focus').value = 'all';
+  }
+}
+
+function launchCompetitiveAnalysis() {
+  const competitorsList = document.getElementById('competitors-input').value.trim();
+  const focus = document.getElementById('competitive-focus').value;
+
+  if (!competitorsList) {
+    showToast('Veuillez entrer au moins un concurrent', 'error');
+    return;
+  }
+
+  const prompt = buildCompetitivePrompt(competitorsList, focus);
+  qlaunch(prompt);
+  closeCompetitiveModal();
+}
+
+function buildCompetitivePrompt(competitorsList, focus) {
+  const focusGuide = {
+    'all': 'analyse complète',
+    'messaging': 'analyse des messages et positionnement',
+    'creative': 'analyse des patterns créatifs et visuels',
+    'pain_points': 'analyse des problèmes et pain points soulevés',
+    'cta': 'analyse des call-to-action et stratégie d\'engagement'
+  };
+
+  const focusDesc = focusGuide[focus] || focusGuide['all'];
+
+  return `Tu es un expert Competitive Ads Extractor - spécialiste en analyse d'annonces concurrentes et stratégies marketing.
+
+**Concurrents à analyser:**
+${competitorsList}
+
+**Contexte:** Bars et événements dans la région Oise/Île-de-France (@cocktail_prive60)
+**Focus d'analyse:** ${focusDesc}
+
+**Instructions Competitive Ads Extractor:**
+
+1. **Extraction d'annonces:**
+   - Accède aux ad libraries publiques (Facebook, LinkedIn, Instagram, etc.)
+   - Extrait les annonces actuelles de chaque concurrent
+   - Identifie le type d'annonce (statique, vidéo, carousel, etc.)
+
+2. **Analyse des messages:**
+   - Quels problèmes soulevés? (solitaire, ambiance, expérience unique, etc.)
+   - Value propositions utilisées? (exclusivité, qualité, ambiance, événements, etc.)
+   - Target audience apparent? (jeunes adultes, professionnels, étudiants, etc.)
+   - CTAs utilisées? (Réserver, Découvrir, Rejoindre, etc.)
+
+3. **Patterns créatifs qui fonctionnent:**
+   - Visuels prédominants? (cocktails, ambiance, foule, faces, DJ, etc.)
+   - Palettes de couleurs utilisées?
+   - Styles de texte et ton? (fun, luxe, casual, professionnel, etc.)
+   - Longueur des copys? (short, medium, long)
+   - Éléments qui reviennent? (logos, hashtags, emojis, testimonials)
+
+4. **Insights stratégiques:**
+   - Qu'est-ce qui semble performer? (basé sur fréquence, placement, A/B variations)
+   - Angles non exploités dans le marché local?
+   - Gaps dans le messaging? (ce que personne ne dit)
+   - Positionnement de chaque concurrent?
+
+5. **Recommandations pour @cocktail_prive60:**
+   - Patterns à tester pour vos annonces
+   - Messaging à éviter (déjà saturé)
+   - Opportunités uniques de différenciation
+   - Audience segments à cibler différemment
+
+**Format de sortie:**
+- Tableau comparatif des 3 meilleurs ads par concurrent
+- Analyse des pain points soulevés
+- Top 3 patterns créatifs qui semblent marcher
+- Messaging à tester
+- Recommendations spécifiques pour @cocktail_prive60`;
+}
 
 // ═══════════════════════════════════════
 // EXPOSITION GLOBALE — requis pour type="module"
@@ -1215,3 +1307,6 @@ window.launchMultiPlatformAdapt = launchMultiPlatformAdapt;
 window.generateVideoPrompt    = generateVideoPrompt;
 window.closeVideoModal        = closeVideoModal;
 window.launchVideoPrompt      = launchVideoPrompt;
+window.openCompetitiveAnalyzer = openCompetitiveAnalyzer;
+window.closeCompetitiveModal  = closeCompetitiveModal;
+window.launchCompetitiveAnalysis = launchCompetitiveAnalysis;
