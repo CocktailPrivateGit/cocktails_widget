@@ -641,6 +641,7 @@
           <button class="btn btn-gold" onclick="adaptMultiPlatform()">🔄 Adapter tous réseaux</button>
           <button class="btn btn-gold" onclick="generateVideoPrompt()">📹 Générer vidéo IA</button>
           <button class="btn btn-gold" onclick="openCompetitiveAnalyzer()">🔍 Analyser concurrence</button>
+          <button class="btn btn-gold" onclick="openBrandDesigner()">🎨 Design Marque</button>
           <button class="btn btn-gold" onclick="qlaunch(&#39;Génère 8 nouveaux posts originaux pour la banque de contenu de @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. Couvre les thèmes : mariage, corporate, cocktails signature, mocktails, behind the scenes, témoignage, tips barman, promo découverte&#39;)">⟳ Générer 8 posts</button>
         </div>
       </div>
@@ -1232,6 +1233,45 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
 
         <div style="font-size:11px;color:var(--gris);margin-top:16px;padding-top:16px;border-top:1px solid var(--border2);line-height:1.7;">
           ℹ️ <strong>Competitive Ads Extractor :</strong> Analyse les annonces et stratégies marketing des concurrents locaux (bars, événements, venues dans Oise/IDF). Identifie les patterns efficaces, les messages qui résonnent, et les opportunités de différenciation.
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Brand Designer -->
+    <div id="modal-brand-designer" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.8);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+      <div style="background:var(--noir);border:1px solid var(--border2);border-radius:8px;padding:24px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto;color:var(--creme);font-family:'Montserrat', sans-serif;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--border2);padding-bottom:16px;">
+          <h2 style="margin:0;font-size:18px;font-weight:600;color:var(--or);">🎨 Design Marque & Identité</h2>
+          <button onclick="closeBrandModal()" style="background:transparent;border:none;color:var(--gris);font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">×</button>
+        </div>
+
+        <!-- Brand Request -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">📝 Votre Demande</label>
+          <textarea id="brand-request-input" placeholder="Ex: Créer un logo qui évoque l'élégance et l'intimité...&#10;ou: Concevoir templates Instagram cohérents avec notre identité...&#10;ou: Définir une palette de couleurs pour tous les événements..." style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;min-height:100px;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Brand Type -->
+        <div style="margin-bottom:24px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🎯 Type de Design</label>
+          <select id="brand-type" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;">
+            <option value="complete" selected>📋 Identité visuelle complète</option>
+            <option value="logo">🏷️ Design de logo et variations</option>
+            <option value="palette">🎨 Palette de couleurs et typographie</option>
+            <option value="templates">📱 Templates réseaux sociaux</option>
+            <option value="guidelines">📚 Charte graphique et guidelines</option>
+          </select>
+        </div>
+
+        <!-- Boutons action -->
+        <div style="display:flex;gap:10px;border-top:1px solid var(--border2);padding-top:16px;">
+          <button onclick="launchBrandDesign()" style="flex:1;padding:12px 16px;background:var(--or);color:var(--noir);border:none;border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">🎨 Générer Design</button>
+          <button onclick="closeBrandModal()" style="flex:1;padding:12px 16px;background:transparent;border:1px solid var(--border2);color:var(--gris);border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">Annuler</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--gris);margin-top:16px;padding-top:16px;border-top:1px solid var(--border2);line-height:1.7;">
+          ℹ️ <strong>Brand Designer :</strong> Expert en identité visuelle, logos, palettes de couleurs, typographie et brand guidelines. Crée une identité cohérente pour @cocktail_prive60 respectant l'élégance et la sophistication.
         </div>
       </div>
     </div>

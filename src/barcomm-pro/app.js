@@ -1269,6 +1269,121 @@ ${competitorsList}
 }
 
 // ═══════════════════════════════════════
+// SKILL TIER 3: BRAND DESIGNER
+// ═══════════════════════════════════════
+function openBrandDesigner() {
+  const modal = document.getElementById('modal-brand-designer');
+  if (modal) {
+    modal.classList.add('active');
+    document.getElementById('brand-request-input').focus();
+  }
+}
+
+function closeBrandModal() {
+  const modal = document.getElementById('modal-brand-designer');
+  if (modal) {
+    modal.classList.remove('active');
+    document.getElementById('brand-request-input').value = '';
+    document.getElementById('brand-type').value = 'complete';
+  }
+}
+
+function launchBrandDesign() {
+  const brandRequest = document.getElementById('brand-request-input').value.trim();
+  const brandType = document.getElementById('brand-type').value;
+
+  if (!brandRequest) {
+    showToast('Décrivez votre besoin en design/marque', 'error');
+    return;
+  }
+
+  const prompt = buildBrandDesignPrompt(brandRequest, brandType);
+  qlaunch(prompt);
+  closeBrandModal();
+}
+
+function buildBrandDesignPrompt(brandRequest, brandType) {
+  const typeGuide = {
+    'complete': 'Identité visuelle complète',
+    'logo': 'Design de logo et variations',
+    'palette': 'Palette de couleurs et typographie',
+    'templates': 'Templates réseaux sociaux',
+    'guidelines': 'Charte graphique et brand guidelines'
+  };
+
+  const typeDesc = typeGuide[brandType] || typeGuide['complete'];
+
+  return `Tu es un expert Brand Designer - spécialiste en identité visuelle et design de marque.
+
+**Contexte marque:** Cocktail Privé (@cocktail_prive60) — bar à événements dans Oise/Île-de-France
+**Couleurs marque existantes:** Noir (#080808), Or (#c8a96e), Crème (#f5f0e8), Vert (#4ade80), Rouge (#f87171), Bleu (#60a5fa)
+
+**Besoin:** ${brandRequest}
+**Type de design:** ${typeDesc}
+
+**Instructions Brand Designer:**
+
+1. **Brand Discovery:**
+   - Contexte: Bar à événements (mariages, corporate, soirées privées)
+   - Audience: Adults 25-55, événementiel, corporate
+   - Valeurs: Luxe, intimité, qualité, expérience unique
+   - Personnalité: Sophistiqué, accueillant, professionnel, memorable
+
+2. **Deliverables (selon le type demandé):**
+
+   **Si Logo:**
+   - 3 concepts de logo (wordmark, icon, full)
+   - Description détaillée de chaque variation
+   - Usage rules (scaling, monochrome, inversé)
+   - Couleurs primaires et alternatives
+
+   **Si Palette:**
+   - Palette de 7-10 couleurs cohérentes
+   - Hex codes et usages
+   - Combinaisons de contraste pour accessibilité
+   - Psychological impact de chaque couleur
+
+   **Si Templates Social:**
+   - Instagram post templates
+   - TikTok video templates
+   - LinkedIn post layouts
+   - Story/Reels formats
+   - Copy guidelines pour chaque plateforme
+
+   **Si Guidelines:**
+   - Logo usage rules
+   - Typography hierarchy
+   - Color applications
+   - Photography style
+   - Brand voice guidelines
+   - Tone & language
+   - Do's & Don'ts
+
+   **Si Complet:**
+   - Tous les éléments ci-dessus
+
+3. **Design Principles:**
+   - Luxe sophistiqué (pas flashy)
+   - Scalable (favicon à billboard)
+   - Modern mais intemporel
+   - Cohérent avec Cocktail Privé identity
+   - Respecte couleurs existantes
+
+4. **Output Format:**
+   - Descriptions visuelles détaillées
+   - Code couleur (hex)
+   - Instructions d'usage
+   - Exemples d'application
+   - Recommandations de déploiement
+
+5. **Bonnes pratiques:**
+   - Respect des WCAG contrast ratios
+   - Lisibilité sur mobile et desktop
+   - Compatibilité avec social media specs
+   - Professional, cohérent, memorable`;
+}
+
+// ═══════════════════════════════════════
 // EXPOSITION GLOBALE — requis pour type="module"
 // Les onclick="" du HTML ne voient pas les fonctions
 // de module. On les expose explicitement sur window.
@@ -1310,3 +1425,6 @@ window.launchVideoPrompt      = launchVideoPrompt;
 window.openCompetitiveAnalyzer = openCompetitiveAnalyzer;
 window.closeCompetitiveModal  = closeCompetitiveModal;
 window.launchCompetitiveAnalysis = launchCompetitiveAnalysis;
+window.openBrandDesigner      = openBrandDesigner;
+window.closeBrandModal        = closeBrandModal;
+window.launchBrandDesign      = launchBrandDesign;
