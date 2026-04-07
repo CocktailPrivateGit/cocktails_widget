@@ -637,6 +637,9 @@
         </div><!-- fin #contenu-cards -->
 
         <div class="btn-row">
+          <button class="btn btn-gold" onclick="generatePostsWithRS()">🚀 Générer avec PostsRS</button>
+          <button class="btn btn-gold" onclick="adaptMultiPlatform()">🔄 Adapter tous réseaux</button>
+          <button class="btn btn-gold" onclick="generateVideoPrompt()">📹 Générer vidéo IA</button>
           <button class="btn btn-gold" onclick="qlaunch(&#39;Génère 8 nouveaux posts originaux pour la banque de contenu de @cocktail_prive60 : mix Instagram, TikTok, LinkedIn, Facebook. Couvre les thèmes : mariage, corporate, cocktails signature, mocktails, behind the scenes, témoignage, tips barman, promo découverte&#39;)">⟳ Générer 8 posts</button>
         </div>
       </div>
@@ -1003,6 +1006,196 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
       </div>
 
     </main>
+
+    <!-- MODALE : GÉNÉRATEUR DE POSTS PostsRS -->
+    <div id="modal-generate-posts" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.8);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+      <div style="background:var(--noir);border:1px solid var(--border2);border-radius:8px;padding:24px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto;color:var(--creme);font-family:'Montserrat', sans-serif;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--border2);padding-bottom:16px;">
+          <h2 style="margin:0;font-size:18px;font-weight:600;color:var(--or);">🚀 Générer Posts PostsRS</h2>
+          <button onclick="closePostModal()" style="background:transparent;border:none;color:var(--gris);font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">×</button>
+        </div>
+
+        <!-- Sujet du post -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">📌 Sujet ou Idée du Post</label>
+          <textarea id="post-subject-input" placeholder="Ex: Générer un post sur les cocktails de mariage pour IDF... ou une promo pour découvrir le service en Oise..." style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;min-height:80px;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Style du post -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">✨ Style du Post</label>
+          <select id="post-style-select" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;">
+            <option value="short">📱 Court & Punchy (280 chars max)</option>
+            <option value="medium" selected>📝 Moyen (300-500 chars)</option>
+            <option value="long">📖 Long-form (800-1500 chars)</option>
+          </select>
+        </div>
+
+        <!-- Plateformes -->
+        <div style="margin-bottom:24px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">🎯 Plateformes Cibles</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="post-platforms" value="threads" checked style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">🔵 Threads</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="post-platforms" value="x" checked style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">𝕏 X (Twitter)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="post-platforms" value="linkedin" checked style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">💼 LinkedIn</span>
+            </label>
+          </div>
+          <div style="font-size:11px;color:var(--gris);margin-top:8px;line-height:1.6;">💡 <strong>PostsRS supporte :</strong> Threads (conversationnel), X (concis), LinkedIn (professionnel). Les 3 plateformes seront optimisées selon leurs algos respectifs.</div>
+        </div>
+
+        <!-- Boutons action -->
+        <div style="display:flex;gap:10px;border-top:1px solid var(--border2);padding-top:16px;">
+          <button onclick="launchPostGeneration()" style="flex:1;padding:12px 16px;background:var(--or);color:var(--noir);border:none;border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">🚀 Générer les Posts</button>
+          <button onclick="closePostModal()" style="flex:1;padding:12px 16px;background:transparent;border:1px solid var(--border2);color:var(--gris);border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">Annuler</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--gris);margin-top:16px;padding-top:16px;border-top:1px solid var(--border2);line-height:1.7;">
+          ℹ️ <strong>Workflow :</strong> Le prompt PostsRS sera copié dans ton presse-papiers. Colle-le dans Claude pour générer les posts. Une fois générés, tu pourras les ajouter à la banque via le bouton "Ajouter à la banque".
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALE : ADAPTER CONTENU MULTI-PLATEFORMES -->
+    <div id="modal-adapt-multi" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.8);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+      <div style="background:var(--noir);border:1px solid var(--border2);border-radius:8px;padding:24px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto;color:var(--creme);font-family:'Montserrat', sans-serif;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--border2);padding-bottom:16px;">
+          <h2 style="margin:0;font-size:18px;font-weight:600;color:var(--or);">🔄 Adapter sur tous les réseaux</h2>
+          <button onclick="closeAdaptModal()" style="background:transparent;border:none;color:var(--gris);font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">×</button>
+        </div>
+
+        <!-- Contenu à adapter -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">📄 Contenu à Adapter</label>
+          <textarea id="adapt-content-input" placeholder="Colle un post existant, une annonce, ou une idée à adapter..." style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;min-height:100px;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Objectif -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🎯 Objectif</label>
+          <select id="adapt-goal-select" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;">
+            <option value="awareness">📢 Sensibilisation / Brand Awareness</option>
+            <option value="engagement" selected>💬 Engagement / Discussions</option>
+            <option value="conversion">💰 Conversion / Appel client</option>
+            <option value="authority">🏆 Autorité / Expertise</option>
+            <option value="recruitment">👥 Recrutement / Partenaires</option>
+          </select>
+        </div>
+
+        <!-- Plateformes -->
+        <div style="margin-bottom:24px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">📱 Plateformes Cibles</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="adapt-platforms" value="x" checked style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">𝕏 X (Twitter)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="adapt-platforms" value="linkedin" checked style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">💼 LinkedIn</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="adapt-platforms" value="tiktok" checked style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">🎵 TikTok</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="adapt-platforms" value="youtube" style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">📺 YouTube</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="adapt-platforms" value="threads" style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">🔵 Threads</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border:1px solid var(--border2);border-radius:4px;background:rgba(200,169,110,0.05);transition:all 0.2s;">
+              <input type="checkbox" name="adapt-platforms" value="newsletter" style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-size:12px;">📧 Newsletter</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Boutons action -->
+        <div style="display:flex;gap:10px;border-top:1px solid var(--border2);padding-top:16px;">
+          <button onclick="launchMultiPlatformAdapt()" style="flex:1;padding:12px 16px;background:var(--or);color:var(--noir);border:none;border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">🔄 Adapter</button>
+          <button onclick="closeAdaptModal()" style="flex:1;padding:12px 16px;background:transparent;border:1px solid var(--border2);color:var(--gris);border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">Annuler</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--gris);margin-top:16px;padding-top:16px;border-top:1px solid var(--border2);line-height:1.7;">
+          ℹ️ <strong>Content Engine :</strong> Adapte un post nativement pour chaque plateforme (PAS du cross-posting). Chaque version est optimisée pour l'audience et l'algo de sa plateforme.
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALE : GÉNÉRATEUR VIDÉO VEO 3.1 -->
+    <div id="modal-generate-video" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.8);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+      <div style="background:var(--noir);border:1px solid var(--border2);border-radius:8px;padding:24px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto;color:var(--creme);font-family:'Montserrat', sans-serif;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--border2);padding-bottom:16px;">
+          <h2 style="margin:0;font-size:18px;font-weight:600;color:var(--or);">📹 Générer Prompt Vidéo Veo 3.1</h2>
+          <button onclick="closeVideoModal()" style="background:transparent;border:none;color:var(--gris);font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">×</button>
+        </div>
+
+        <!-- Idée vidéo -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">💡 Idée Vidéo</label>
+          <textarea id="video-idea-input" placeholder="Ex: Teaser de mariage avec cérémonie cocktails... ou tutoriel préparation mojito... ou showcase ambiance event..." style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;min-height:80px;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Type vidéo -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🎬 Type de Vidéo</label>
+          <select id="video-type-select" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;">
+            <option value="promo">📢 Promotionnelle / Promo</option>
+            <option value="event" selected>🎉 Teaser / Événement</option>
+            <option value="tutorial">📚 Tutoriel / How-to</option>
+            <option value="behind-scenes">🎥 Behind-the-scenes</option>
+            <option value="showcase">✨ Showcase / Showcase de produit</option>
+            <option value="testimonial">💬 Témoignage / Avis client</option>
+          </select>
+        </div>
+
+        <!-- Durée vidéo -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">⏱️ Durée</label>
+          <select id="video-duration-select" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;">
+            <option value="4">4 secondes (TikTok/Reels court)</option>
+            <option value="6" selected>6 secondes (optimal)</option>
+            <option value="8">8 secondes (storytelling complet)</option>
+          </select>
+        </div>
+
+        <!-- Style visuel -->
+        <div style="margin-bottom:24px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🎨 Style Visuel</label>
+          <select id="video-style-select" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,0.04);color:var(--creme);font-family:inherit;font-size:12px;">
+            <option value="cinematic">🎬 Cinématique professionnel</option>
+            <option value="luxury" selected>✨ Luxe / Sophistiqué</option>
+            <option value="tiktok">⚡ TikTok / Énergique</option>
+            <option value="documentary">📹 Documentaire / Naturel</option>
+            <option value="fun">🎉 Amusant / Playful</option>
+          </select>
+        </div>
+
+        <!-- Boutons action -->
+        <div style="display:flex;gap:10px;border-top:1px solid var(--border2);padding-top:16px;">
+          <button onclick="launchVideoPrompt()" style="flex:1;padding:12px 16px;background:var(--or);color:var(--noir);border:none;border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">📹 Générer Prompt</button>
+          <button onclick="closeVideoModal()" style="flex:1;padding:12px 16px;background:transparent;border:1px solid var(--border2);color:var(--gris);border-radius:4px;font-weight:600;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.2s;">Annuler</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--gris);margin-top:16px;padding-top:16px;border-top:1px solid var(--border2);line-height:1.7;">
+          ℹ️ <strong>Veo 3.1 Prompter :</strong> Génère un prompt professionnel pour Google Veo 3.1 avec cinématographie, audio direction, et timestamp choreography. Utilise le prompt dans Veo 3.1 pour créer ta vidéo.
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 

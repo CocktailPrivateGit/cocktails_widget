@@ -629,6 +629,478 @@ function qlaunch(prompt) {
 }
 
 // ═══════════════════════════════════════
+// UTILITAIRE — TOAST NOTIFICATION
+// ═══════════════════════════════════════
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(74, 222, 128, 0.9);
+    color: #0a0a0a;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ═══════════════════════════════════════
+// BANQUE DE POSTS — GÉNÉRATEUR (PostsRS Skill)
+// ═══════════════════════════════════════
+function generatePostsWithRS() {
+  const modal = document.getElementById('modal-generate-posts');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closePostModal() {
+  const modal = document.getElementById('modal-generate-posts');
+  if (modal) modal.style.display = 'none';
+}
+
+function launchPostGeneration() {
+  const subject = document.getElementById('post-subject-input').value.trim();
+  const style = document.getElementById('post-style-select').value;
+  const platforms = Array.from(document.querySelectorAll('input[name="post-platforms"]:checked'))
+    .map(el => el.value);
+
+  if (!subject) {
+    alert('Saisis un sujet ou une idée de post');
+    return;
+  }
+  if (platforms.length === 0) {
+    alert('Sélectionne au moins une plateforme');
+    return;
+  }
+
+  // Construire le prompt PostsRS
+  const prompt = buildPostsRSPrompt(subject, style, platforms);
+
+  // Lancer via qlaunch (copie le prompt)
+  qlaunch(prompt);
+
+  // Fermer la modale
+  closePostModal();
+}
+
+function buildPostsRSPrompt(subject, style, platforms) {
+  const platformsText = {
+    'threads': 'Threads',
+    'x': 'X (Twitter)',
+    'linkedin': 'LinkedIn'
+  };
+
+  const platformsList = platforms.map(p => platformsText[p] || p).join(', ');
+
+  const styleGuide = {
+    'short': '**Court & Punchy** — sous 280 caractères, directement engageant, style option 5 (emojis, CTAs clairs)',
+    'medium': '**Moyen** — 300-500 caractères, contexte + value propositions, conversation starter',
+    'long': '**Long-form** — 800-1500 caractères, histoire complète, sections structurées, story-telling'
+  };
+
+  const guide = styleGuide[style] || styleGuide['medium'];
+
+  return `Tu es un expert en Social Media Post Generation basé sur le skill PostsRS.
+
+Je veux créer des posts optimisés pour ${platformsList} pour @cocktail_prive60 (barman à domicile, Oise + Île-de-France).
+
+**Sujet / Idée du post:**
+"${subject}"
+
+**Style demandé:** ${guide}
+
+**Instructions PostsRS:**
+
+Pour chaque plateforme, génère 3 variantes (court, moyen, long) en suivant ces règles précises :
+
+### Threads
+- Max 500 caractères (post standard)
+- ✅ Conversationnel, authentique, pas corporate
+- ✅ Questions ouvertes pour lancer discussions
+- ✅ Emojis, bullet points, line breaks
+- ❌ PAS de hashtags (algorithme les ignore)
+- 🎯 Priorités algo : engagement (40%), recency (30%), relevance (20%), profile visits (10%)
+- 💡 Best practices : demande l'avis, mentionne les utilisateurs, partage des coulisses, posts 1-3x/jour
+
+### X (Twitter)
+- Max 280 caractères (ou 25k pour Premium)
+- ✅ Front-load l'info importante (premiers 100 chars)
+- ✅ 1-2 hashtags MAX (plus = spam)
+- ✅ Emojis, line breaks intentionnels
+- ✅ Ajoute visuels (images/videos = +150% engagement)
+- 🎯 Priorités algo : engagement rate, recency, media, authenticity
+- 💡 Best practices : tweets threads pour le détail, visuels obligatoires, mentions stratégiques
+
+### LinkedIn
+- Max 3000 caractères (show more après ~140 chars en feed)
+- ✅ Hook dans les 2 premières lignes
+- ✅ Tone professionnel mais authentique
+- ✅ Stories, data, statistics
+- ✅ Bullet points, numbered lists, line breaks
+- ❌ Évite promotionnel agressif
+- 🎯 Priorités algo : dwell time (combien de temps on lit), engagement, relevance, 1st-degree connections
+- 💡 Best practices : appelle à l'opinion, tags companies/people, poste 2-5x/semaine
+
+**Format de sortie (pour chaque plateforme):**
+
+\`\`\`
+**Platform: [Plateforme]**
+**Variant: [Court/Moyen/Long]**
+**Character Count: [X]/[limite]**
+**Engagement Score: [1-10]**
+
+[TEXTE DU POST]
+
+**Tags/Keywords:** [tags pertinents pour filtrage]
+**Hashtags (si applicables):** [max 2-3 pour X, aucun pour Threads]
+**Media Suggestion:** [description courte du visuel suggéré]
+**CTA (Call-to-Action):** [action suggérée]
+**Best Time to Post:** [créneau optimal]
+\`\`\`
+
+**Contexte @cocktail_prive60:**
+- Service : barman privé à domicile
+- Zones : Oise (60) + Île-de-France
+- Segments : couples, mariages, afterworks, events corporates, team buildings
+- USP : déplacement chez le client, cocktails personnalisés, professionnel
+
+Génère maintenant les posts optimisés. Chaque plateforme avec ses 3 variantes. Suis strictement les specs PostsRS et respecte les limites de caractères.`;
+}
+
+function addPostToBank(postData) {
+  // Cette fonction sera appelée une fois que l'utilisateur génère les posts
+  // Elle permettra d'ajouter les posts générés à la banque
+  const d = getData();
+  if (!d.posts) d.posts = [];
+
+  d.posts.push({
+    id: Date.now(),
+    platform: postData.platform,
+    content: postData.content,
+    tags: postData.tags || [],
+    evin: postData.evin || 'service',
+    variant: postData.variant || 'medium',
+    status: 'nouveau',
+    dateAdded: new Date().toISOString()
+  });
+
+  setData(d);
+  renderPostsBank(d.posts);
+  showToast('✅ Post ajouté à la banque');
+}
+
+function renderPostsBank(posts) {
+  const container = document.getElementById('contenu-cards');
+  if (!container || !posts || posts.length === 0) return;
+
+  // Les posts statiques restent, on ajoute les nouveaux dynamiquement
+  const dynamicPosts = posts.filter(p => p.id); // Posts avec ID = dynamiques
+
+  dynamicPosts.forEach(post => {
+    const existingCard = container.querySelector(`[data-post-id="${post.id}"]`);
+    if (!existingCard) {
+      const card = createPostCard(post);
+      container.appendChild(card);
+    }
+  });
+}
+
+function createPostCard(post) {
+  const card = document.createElement('div');
+  card.className = 'content-card';
+  card.setAttribute('data-tags', (post.tags || []).join(' '));
+  card.setAttribute('data-evin', post.evin || 'service');
+  card.setAttribute('data-post-id', post.id);
+
+  const platformEmojis = {
+    'threads': '🔵',
+    'x': '𝕏',
+    'linkedin': '💼',
+    'instagram': '📸',
+    'tiktok': '🎵',
+    'facebook': '👍'
+  };
+
+  const platformName = post.platform.charAt(0).toUpperCase() + post.platform.slice(1);
+  const emoji = platformEmojis[post.platform] || '📱';
+  const variantBadge = post.variant === 'short' ? '(Punchy)' : post.variant === 'long' ? '(Long-form)' : '(Medium)';
+
+  card.innerHTML = `
+    <div class="content-head">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span>${emoji}</span>
+        <span style="font-size:12px;font-weight:400;">${platformName} · ${variantBadge}</span>
+        <span class="badge badge-gold">PostsRS</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="evin-badge ${post.evin}">${post.evin === 'service' ? '🟢 Service' : post.evin === 'alcool' ? '🔴 Alcool' : '📋'}</span>
+        <span class="badge badge-grey">${post.status || 'nouveau'}</span>
+      </div>
+    </div>
+    <div class="content-body">${post.content}</div>
+    <div class="content-footer">
+      <div class="hashtag-text">${(post.tags || []).map(t => '#' + t).join(' ')}</div>
+      <button class="btn btn-dark btn-sm" onclick="qlaunch('Améliore et décline ce post PostsRS pour @cocktail_prive60 en variantes supplémentaires.')">Décliner ↗</button>
+    </div>
+  `;
+
+  return card;
+}
+
+// ═══════════════════════════════════════
+// CONTENT ENGINE — ADAPTER TOUS RÉSEAUX
+// ═══════════════════════════════════════
+function adaptMultiPlatform() {
+  const modal = document.getElementById('modal-adapt-multi');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeAdaptModal() {
+  const modal = document.getElementById('modal-adapt-multi');
+  if (modal) modal.style.display = 'none';
+}
+
+function launchMultiPlatformAdapt() {
+  const content = document.getElementById('adapt-content-input').value.trim();
+  const goal = document.getElementById('adapt-goal-select').value;
+  const platforms = Array.from(document.querySelectorAll('input[name="adapt-platforms"]:checked'))
+    .map(el => el.value);
+
+  if (!content) {
+    alert('Saisis le contenu à adapter');
+    return;
+  }
+  if (platforms.length === 0) {
+    alert('Sélectionne au moins une plateforme');
+    return;
+  }
+
+  const prompt = buildContentEnginePrompt(content, goal, platforms);
+  qlaunch(prompt);
+  closeAdaptModal();
+}
+
+function buildContentEnginePrompt(content, goal, platforms) {
+  const platformsText = {
+    'x': 'X (Twitter)',
+    'linkedin': 'LinkedIn',
+    'tiktok': 'TikTok',
+    'youtube': 'YouTube',
+    'threads': 'Threads',
+    'newsletter': 'Newsletter'
+  };
+
+  const platformsList = platforms.map(p => platformsText[p] || p).join(', ');
+
+  const goalGuide = {
+    'awareness': 'Objectif: Sensibiliser à la marque @cocktail_prive60',
+    'conversion': 'Objectif: Convertir en clients, inclure CTA clair',
+    'engagement': 'Objectif: Générer discussions et interactions',
+    'authority': 'Objectif: Établir expertise en bartending',
+    'recruitment': 'Objectif: Attirer nouveaux partenaires/clients'
+  };
+
+  const guide = goalGuide[goal] || goalGuide['engagement'];
+
+  return `Tu es un expert en Content Engine - adapter du contenu nativement pour chaque plateforme.
+
+**Contenu source:**
+"${content}"
+
+**Plateformes cibles:** ${platformsList}
+${guide}
+
+**Instructions Content Engine:**
+
+Adapte ce contenu NATIVEMENT pour chaque plateforme (PAS du cross-posting). Chaque version doit:
+✅ Suivre les best practices de sa plateforme
+✅ Avoir un "hook" spécifique adapté à l'audience
+✅ Respecter les limites techniques (caractères, format, durée)
+✅ Porter le même message core mais reformulé nativement
+
+**Spécifications par plateforme:**
+
+### X (Twitter)
+- Max 280 caractères
+- Front-load l'info importante
+- 1-2 hashtags MAX
+- Visuel fortement recommandé
+- Tone: Direct, conversationnel
+
+### LinkedIn
+- Max 3000 caractères
+- Hook puissant (2 premières lignes)
+- Story/data/statistiques
+- Tone: Professionnel mais authentique
+- CTA clair si conversion
+
+### Threads
+- Max 500 caractères
+- Conversationnel, authentique
+- PAS de hashtags
+- Questions pour engagement
+- Emojis & line breaks
+
+### TikTok/YouTube
+- Format vidéo: donne un script court (15-60s)
+- Hook immédiat (3 premières secondes)
+- Visuals + narration synchronisée
+- Trending sounds/musiques si applicable
+- CTA au final
+
+### Newsletter
+- Format article court
+- Section titrée claire
+- Tone: Informatif + personnel
+- Lien si applicable
+- Signature @cocktail_prive60
+
+**Context @cocktail_prive60:**
+Barman privé à domicile, Oise + Île-de-France, cocktails personnalisés, professionnel.
+
+**Format de sortie:**
+
+Pour chaque plateforme:
+
+## [Plateforme]
+[VERSION NATIVE DU CONTENU]
+
+**Character/Word Count:** [X/limite]
+**Hook:** [la première phrase clé]
+**Best Time to Post:** [créneau optimal]
+**Media Suggestion:** [description visuel suggéré si applicable]
+**CTA:** [action suggérée]
+
+---
+
+Génère maintenant les adaptations pour chaque plateforme. Suis strictement les specs et assure-toi que chaque version est NATIVE à sa plateforme.`;
+}
+
+// ═══════════════════════════════════════
+// VEO 3.1 VIDEO PROMPTER — GÉNÉRATION VIDÉO IA
+// ═══════════════════════════════════════
+function generateVideoPrompt() {
+  const modal = document.getElementById('modal-generate-video');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeVideoModal() {
+  const modal = document.getElementById('modal-generate-video');
+  if (modal) modal.style.display = 'none';
+}
+
+function launchVideoPrompt() {
+  const idea = document.getElementById('video-idea-input').value.trim();
+  const type = document.getElementById('video-type-select').value;
+  const duration = document.getElementById('video-duration-select').value;
+  const style = document.getElementById('video-style-select').value;
+
+  if (!idea) {
+    alert('Décris l\'idée vidéo');
+    return;
+  }
+
+  const prompt = buildVeo3Prompt(idea, type, duration, style);
+  qlaunch(prompt);
+  closeVideoModal();
+}
+
+function buildVeo3Prompt(idea, type, duration, style) {
+  const typeGuide = {
+    'promo': 'Vidéo promotionnelle courte pour réseaux sociaux',
+    'tutorial': 'Tutoriel / How-to vidéo pour apprendre une technique',
+    'event': 'Teaser ou aperçu d\'événement/party',
+    'behind-scenes': 'Behind-the-scenes / coulisses du service',
+    'testimonial': 'Témoignage client ou présentation service',
+    'showcase': 'Showcase de cocktails ou ambiance'
+  };
+
+  const styleGuide = {
+    'cinematic': 'Cinéma professionnel avec transitions fluides',
+    'tiktok': 'Style TikTok rapide, énergique, trending',
+    'documentary': 'Documentaire naturel, authentique',
+    'luxury': 'Haut de gamme, élégant, sophistiqué',
+    'fun': 'Amusant, playful, ludique'
+  };
+
+  const durationInfo = duration === '4' ? '4 secondes' : duration === '6' ? '6 secondes' : '8 secondes';
+  const typeDesc = typeGuide[type] || typeGuide['promo'];
+  const styleDesc = styleGuide[style] || styleGuide['cinematic'];
+
+  return `Tu es un expert Veo 3.1 Video Prompter - générateur de prompts vidéo pour Google Veo 3.1.
+
+**Idée vidéo:**
+"${idea}"
+
+**Type:** ${typeDesc}
+**Durée:** ${durationInfo}
+**Style:** ${styleDesc}
+
+**Instructions Veo 3.1 Prompter:**
+
+Génère un prompt professionnel pour Veo 3.1 qui:
+
+1. **Tier 1 — MUST INCLUDE:**
+   - Shot size (wide/medium/close-up)
+   - Subject identity (quoi/qui est en frame)
+   - Primary action (ce qui se passe)
+   - Mood/style dominant (1 mot clé)
+
+2. **Tier 2 — SHOULD INCLUDE:**
+   - Camera movement OU angle (un seul, pas les deux)
+   - Lighting quality (naturel/dramatique/soft)
+   - 1 couche audio (dialogue OU SFX OU ambient)
+   - Setting/environnement
+
+3. **Tier 3 — NICE TO HAVE:**
+   - Secondary audio
+   - Lens type
+   - Couleurs/palette
+   - Film grain/texture
+   - Background action
+
+**Audio Direction (Veo génère du son synchro):**
+- Dialogue: "Person says, 'text here'"
+- SFX: "SFX: description"
+- Ambient: "Ambient: description"
+- Music: "A [style] music plays"
+
+**Pour multi-shots (8s max), utilise timestamps:**
+[00:00-00:02] First shot description
+[00:02-00:04] Second shot
+etc.
+
+**Contexte @cocktail_prive60:**
+- Service: Barman privé à domicile
+- Zones: Oise + Île-de-France
+- Segments: Couples, mariages, afterworks, events corporates
+- USP: Déplacement client, cocktails perso, professionnel
+
+**Format de sortie:**
+
+## Veo 3.1 Prompt
+
+[PROMPT COMPLET - format optimisé Veo 3.1]
+
+**Duration:** ${durationInfo}
+**Shot Type:** [wide/medium/close-up/multi-shot]
+**Key Elements:** [principales composantes]
+**Audio Sync:** [description du son]
+**Visual Style:** [cinématographie]
+**Recommended Aspect Ratio:** [16:9 landscape / 9:16 portrait]
+
+---
+
+Crée maintenant un prompt Veo 3.1 professionnel prêt à être utilisé. Trouve l'équilibre parfait entre contrôle créatif et flexibilité du modèle.`;
+}
+
+// ═══════════════════════════════════════
 // BANQUE DE POSTS — FILTRES
 // ═══════════════════════════════════════
 function filterPosts(tag) {
@@ -709,26 +1181,37 @@ document.addEventListener('DOMContentLoaded', () => {
 // Les onclick="" du HTML ne voient pas les fonctions
 // de module. On les expose explicitement sur window.
 // ═══════════════════════════════════════
-window.nav             = nav;
-window.toggle          = toggle;
-window.autoSave        = autoSave;
-window.saveSituation   = saveSituation;
-window.saveSnapshot    = saveSnapshot;
-window.switchChart     = switchChart;
-window.exportData      = exportData;
-window.exportDrive     = exportDrive;
-window.importDrive     = importDrive;
-window.resetData       = resetData;
-window.copyJSON        = copyJSON;
-window.pasteJSON       = pasteJSON;
-window.loadFromPaste   = loadFromPaste;
-window.toggleCheck     = toggleCheck;
-window.addCustomAction = addCustomAction;
-window.addJournalEntry = addJournalEntry;
-window.setVeille       = setVeille;
-window.launchVeille    = launchVeille;
-window.qlaunch          = qlaunch;
-window.toggleEvinCheck  = toggleEvinCheck;
-window.resetEvinChecks  = resetEvinChecks;
-window.copyEvinTemplate = copyEvinTemplate;
-window.filterPosts     = filterPosts;
+window.showToast           = showToast;
+window.nav                 = nav;
+window.toggle              = toggle;
+window.autoSave            = autoSave;
+window.saveSituation       = saveSituation;
+window.saveSnapshot        = saveSnapshot;
+window.switchChart         = switchChart;
+window.exportData          = exportData;
+window.exportDrive         = exportDrive;
+window.importDrive         = importDrive;
+window.resetData           = resetData;
+window.copyJSON            = copyJSON;
+window.pasteJSON           = pasteJSON;
+window.loadFromPaste       = loadFromPaste;
+window.toggleCheck         = toggleCheck;
+window.addCustomAction     = addCustomAction;
+window.addJournalEntry     = addJournalEntry;
+window.setVeille           = setVeille;
+window.launchVeille        = launchVeille;
+window.qlaunch             = qlaunch;
+window.toggleEvinCheck     = toggleEvinCheck;
+window.resetEvinChecks     = resetEvinChecks;
+window.copyEvinTemplate    = copyEvinTemplate;
+window.filterPosts            = filterPosts;
+window.generatePostsWithRS    = generatePostsWithRS;
+window.closePostModal         = closePostModal;
+window.launchPostGeneration   = launchPostGeneration;
+window.addPostToBank          = addPostToBank;
+window.adaptMultiPlatform     = adaptMultiPlatform;
+window.closeAdaptModal        = closeAdaptModal;
+window.launchMultiPlatformAdapt = launchMultiPlatformAdapt;
+window.generateVideoPrompt    = generateVideoPrompt;
+window.closeVideoModal        = closeVideoModal;
+window.launchVideoPrompt      = launchVideoPrompt;
