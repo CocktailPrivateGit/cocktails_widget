@@ -38,8 +38,8 @@
   <div class="nav-tab" onclick="switchTab('personnel')" id="tab-personnel">
     <span class="tab-icon">◈</span> Personnel
   </div>
-  <div class="nav-tab nav-tab-soon" title="Disponible en Phase C">
-    <span class="tab-icon">◇</span> Planning <span class="badge-soon">Bientôt</span>
+  <div class="nav-tab" onclick="switchTab('planning')" id="tab-planning">
+    <span class="tab-icon">◇</span> Planning
   </div>
 </nav>
 
@@ -178,6 +178,37 @@ Marie,Martin,0687654321,marie@email.com,Barmaid,120</code>
 
   </section>
 
+  <!-- ══════════════════════════════════════
+       PLANNING — MATRICE
+  ══════════════════════════════════════ -->
+  <section id="section-planning" class="section">
+
+    <div class="cal-toolbar" style="margin-bottom:20px;">
+      <button class="btn btn-outline btn-sm" id="btn-plan-prev">← Préc.</button>
+      <h2 id="planning-title" class="cal-month-title">Avril 2026</h2>
+      <button class="btn btn-outline btn-sm" id="btn-plan-next">Suiv. →</button>
+      <div class="cal-legend" style="margin-left:auto;">
+        <span class="leg-dot" style="background:var(--orange);"></span><span>En attente</span>
+        <span class="leg-dot" style="background:var(--blue);"></span><span>Confirmé</span>
+        <span class="leg-dot" style="background:var(--green);"></span><span>Réalisé</span>
+        <span class="leg-dot" style="background:rgba(224,90,90,0.5);"></span><span>Indisponible</span>
+        <span class="leg-dot planning-conflict-dot"></span><span>Conflit</span>
+      </div>
+    </div>
+
+    <div class="planning-wrap card" style="padding:0;overflow:hidden;">
+      <div class="planning-scroll">
+        <table class="planning-table">
+          <thead id="planning-table-head"></thead>
+          <tbody id="planning-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="planning-hint">Cliquez sur une case affectée pour ouvrir la prestation.</p>
+
+  </section>
+
 </main>
 
 <!-- ══════════════════════════════════════
@@ -262,6 +293,7 @@ Marie,Martin,0687654321,marie@email.com,Barmaid,120</code>
 
       <div class="form-actions">
         <button type="button" class="btn btn-danger btn-sm" id="btn-delete-prestation" style="display:none;margin-right:auto;" onclick="deletePrestation()">Supprimer</button>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-export-bf" style="display:none;" onclick="exportToBarmanFinance()">→ Exporter vers BarmanFinance</button>
         <button type="button" class="btn btn-outline" onclick="closeModal()">Annuler</button>
         <button type="submit" class="btn btn-gold">Enregistrer</button>
       </div>

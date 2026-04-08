@@ -1,7 +1,8 @@
 // ═══════════════════════════════════════════════════════════════════
-// BarPlanning Pro v2 — Phase B
+// BarPlanning Pro v2 — Phase C
 // Dashboard · Calendrier · Prestations CRUD
 // Personnel (CSV + manuel) · Indisponibilités · Assignation équipe
+// Planning matrice · Export vers BarmanFinance
 // ═══════════════════════════════════════════════════════════════════
 
 const STORAGE_KEY    = 'barplanning_pro_v2';
@@ -16,10 +17,11 @@ let state = {
   meta: { version: '2.1', created: new Date().toISOString(), lastSave: null }
 };
 
-let calCurrentDate   = new Date();
-let editingId        = null;   // prestation en édition
-let editingPersoId   = null;   // personnel en édition
-let indispoPersoId   = null;   // personnel dont on gère les indispos
+let calCurrentDate      = new Date();
+let planningCurrentDate = new Date();
+let editingId           = null;   // prestation en édition
+let editingPersoId      = null;   // personnel en édition
+let indispoPersoId      = null;   // personnel dont on gère les indispos
 
 // ── CONSTANTES ────────────────────────────────────────────────────
 const STATUTS = {
@@ -98,6 +100,7 @@ function switchTab(tab) {
   if (tab === 'calendar')    renderCalendar();
   if (tab === 'prestations') { renderPrestations(); populateMonthFilter(); }
   if (tab === 'personnel')   renderPersonnel();
+  if (tab === 'planning')    renderPlanning();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -355,7 +358,10 @@ function renderPrestations() {
         ${equipeHtml ? `<div class="prest-equipe">${equipeHtml}</div>` : ''}
         <div class="prest-card-footer">
           <span class="prest-amount">${p.montant ? fmtMoney(parseFloat(p.montant)) : '—'}</span>
-          ${heures ? `<span class="prest-hours">${heures}</span>` : ''}
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${heures ? `<span class="prest-hours">${heures}</span>` : ''}
+            ${p.exportedToBF ? `<span class="bf-badge" title="Facture ${esc(p.bfFacture || '?')}">BF ✓</span>` : ''}
+          </div>
         </div>
       </div>`;
   }).join('');
@@ -385,11 +391,17 @@ function openModal(id) {
   const delBtn = document.getElementById('btn-delete-prestation');
   document.getElementById('prestation-form').reset();
 
+  const exportBtn = document.getElementById('btn-export-bf');
+
   if (editingId) {
     const p = state.prestations.find(x => x.id === editingId);
     if (!p) return;
     title.textContent        = 'Modifier la prestation';
     delBtn.style.display     = 'inline-flex';
+    // Bouton export BF : visible si confirmé ou réalisé, et pas encore exporté
+    const canExport = (p.statut === 'confirme' || p.statut === 'realise') && !p.exportedToBF;
+    exportBtn.style.display  = canExport ? 'inline-flex' : 'none';
+    if (p.exportedToBF) exportBtn.title = 'Déjà exporté (facture ' + (p.bfFacture || '?') + ')';
     document.getElementById('f-client').value      = p.client     || '';
     document.getElementById('f-date').value        = p.date       || '';
     document.getElementById('f-heure-debut').value = p.heureDebut || '';
@@ -402,8 +414,9 @@ function openModal(id) {
     document.getElementById('f-statut').value      = p.statut     || 'en_attente';
     renderEquipeSelection(p.date, p.equipe || [PRINCIPAL_ID]);
   } else {
-    title.textContent    = 'Nouvelle prestation';
-    delBtn.style.display = 'none';
+    title.textContent        = 'Nouvelle prestation';
+    delBtn.style.display     = 'none';
+    exportBtn.style.display  = 'none';
     document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
     renderEquipeSelection(document.getElementById('f-date').value, [PRINCIPAL_ID]);
   }
@@ -865,6 +878,180 @@ function parseCSV(text) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// PLANNING — MATRICE
+// ═══════════════════════════════════════════════════════════════════
+
+function renderPlanning() {
+  const year        = planningCurrentDate.getFullYear();
+  const month       = planningCurrentDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today       = new Date().toISOString().split('T')[0];
+
+  document.getElementById('planning-title').textContent = MOIS_FR[month] + ' ' + year;
+
+  // Index prestations par date
+  const byDate = {};
+  state.prestations.forEach(p => {
+    if (!p.date || !Array.isArray(p.equipe)) return;
+    const key = p.date.substring(0, 10);
+    if (!byDate[key]) byDate[key] = [];
+    byDate[key].push(p);
+  });
+
+  // Personnes : barman principal + membres actifs
+  const allPeople = [
+    { id: PRINCIPAL_ID, prenom: 'Barman', nom: 'Principal', role: 'Vous' },
+    ...state.personnel.filter(p => p.actif)
+  ];
+
+  const JOURS = ['D','L','M','M','J','V','S'];
+
+  // ── En-tête ──
+  let headHtml = '<tr><th class="plan-name-col">Membre</th>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key     = formatDateKey(year, month, d);
+    const dow     = new Date(key + 'T12:00:00').getDay();
+    const isToday = key === today;
+    const isWE    = dow === 0 || dow === 6;
+    headHtml += `<th class="plan-day-col${isToday ? ' plan-today-col' : ''}${isWE ? ' plan-we-col' : ''}">
+      <div class="plan-dow">${JOURS[dow]}</div>
+      <div class="plan-dnum">${d}</div>
+    </th>`;
+  }
+  headHtml += '</tr>';
+
+  // ── Corps ──
+  let bodyHtml = '';
+  allPeople.forEach(person => {
+    const initials = person.id === PRINCIPAL_ID ? 'CP' : initiales(person.prenom, person.nom);
+    bodyHtml += '<tr>';
+
+    // Cellule nom
+    bodyHtml += `<td class="plan-name-cell">
+      <div class="plan-person">
+        <div class="plan-avatar${person.id === PRINCIPAL_ID ? ' plan-avatar-principal' : ''}">${initials}</div>
+        <div class="plan-person-info">
+          <div class="plan-person-name">${esc(person.prenom)} ${person.id === PRINCIPAL_ID ? '' : esc(person.nom)}</div>
+          <div class="plan-person-role">${esc(person.role || '')}</div>
+        </div>
+      </div>
+    </td>`;
+
+    // Cellules jours
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key        = formatDateKey(year, month, d);
+      const isToday    = key === today;
+      const isIndispo  = !isDisponible(person.id, key);
+      const prests     = (byDate[key] || []).filter(p => p.equipe.includes(person.id));
+      const dow        = new Date(key + 'T12:00:00').getDay();
+      const isWE       = dow === 0 || dow === 6;
+      const hasConflict = isIndispo && prests.length > 0;
+
+      let cls     = 'plan-cell';
+      if (isToday)    cls += ' plan-today';
+      if (isWE)       cls += ' plan-we';
+      if (isIndispo && !prests.length) cls += ' plan-indispo';
+      if (prests.length) cls += ` plan-prest plan-prest-${prests[0].statut}`;
+      if (hasConflict)   cls += ' plan-conflict';
+
+      let content = '';
+      if (hasConflict) {
+        content = `<div class="plan-cell-label" title="⚠ Conflit : ${esc(prests[0].client)}">⚠</div>`;
+      } else if (prests.length) {
+        const label = prests[0].client.substring(0, 6);
+        content = `<div class="plan-cell-label" title="${esc(prests[0].client)}">${esc(label)}</div>`;
+      } else if (isIndispo) {
+        content = `<div class="plan-cell-x">✕</div>`;
+      }
+
+      const click = prests.length ? `onclick="openModal('${prests[0].id}')" style="cursor:pointer;"` : '';
+      bodyHtml += `<td class="${cls}" ${click}>${content}</td>`;
+    }
+
+    bodyHtml += '</tr>';
+  });
+
+  document.getElementById('planning-table-head').innerHTML = headHtml;
+  document.getElementById('planning-table-body').innerHTML = bodyHtml;
+
+  // Message si aucune personne
+  if (!allPeople.length) {
+    document.getElementById('planning-table-body').innerHTML =
+      '<tr><td colspan="33" class="empty-msg" style="padding:32px;">Aucun personnel configuré</td></tr>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT VERS BARMANFINANCE
+// ═══════════════════════════════════════════════════════════════════
+
+function exportToBarmanFinance() {
+  if (!editingId) return;
+  const p = state.prestations.find(x => x.id === editingId);
+  if (!p) return;
+
+  // Lire les données BarmanFinance actuelles
+  let bfData = { revenus: [], depenses: [], equipements: [], achats: [] };
+  try {
+    const raw = localStorage.getItem(BF_STORAGE_KEY);
+    if (raw) bfData = JSON.parse(raw);
+    if (!Array.isArray(bfData.revenus)) bfData.revenus = [];
+  } catch(e) {
+    showToast('Impossible de lire BarmanFinance', 'error');
+    return;
+  }
+
+  // Vérification doublon (même date + même client)
+  const doublon = bfData.revenus.find(r =>
+    r.date === p.date && r.client && r.client.toLowerCase() === p.client.toLowerCase()
+  );
+  if (doublon) {
+    if (!confirm(`Une prestation pour "${p.client}" le ${fmtDate(p.date)} existe déjà dans BarmanFinance (facture ${doublon.facture || '?'}).\n\nExporter quand même en doublon ?`)) return;
+  }
+
+  // Générer numéro de facture
+  const year    = new Date(p.date + 'T12:00:00').getFullYear();
+  const count   = bfData.revenus.filter(r => r.date && new Date(r.date + 'T12:00:00').getFullYear() === year).length + 1;
+  const facture = 'F-' + year + '-' + String(count).padStart(3, '0');
+
+  const revenu = {
+    id:        Date.now(),
+    date:      p.date,
+    facture:   facture,
+    client:    p.client,
+    type:      'Prestation',
+    formule:   p.formule    || '',
+    personnes: p.personnes  || null,
+    lieu:      p.lieu       || '',
+    montant:   parseFloat(p.montant) || 0,
+    notes:     (p.notes ? p.notes + '\n' : '') + '[Importé depuis BarPlanning Pro]',
+    paiement:  'en_attente'
+  };
+
+  bfData.revenus.unshift(revenu);
+
+  try {
+    localStorage.setItem(BF_STORAGE_KEY, JSON.stringify(bfData));
+  } catch(e) {
+    showToast('Erreur écriture BarmanFinance', 'error');
+    return;
+  }
+
+  // Marquer la prestation comme exportée
+  const idx = state.prestations.findIndex(x => x.id === editingId);
+  if (idx !== -1) {
+    state.prestations[idx].exportedToBF = true;
+    state.prestations[idx].bfFacture    = facture;
+    state.prestations[idx].bfExportedAt = new Date().toISOString();
+  }
+
+  saveState();
+  closeModal();
+  refreshCurrentSection();
+  showToast('Exporté vers BarmanFinance — Facture ' + facture, 'success');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // EXPORT / IMPORT JSON
 // ═══════════════════════════════════════════════════════════════════
 
@@ -982,6 +1169,14 @@ function init() {
     calCurrentDate = new Date(calCurrentDate.getFullYear(), calCurrentDate.getMonth() + 1, 1);
     renderCalendar();
   });
+  document.getElementById('btn-plan-prev').addEventListener('click', () => {
+    planningCurrentDate = new Date(planningCurrentDate.getFullYear(), planningCurrentDate.getMonth() - 1, 1);
+    renderPlanning();
+  });
+  document.getElementById('btn-plan-next').addEventListener('click', () => {
+    planningCurrentDate = new Date(planningCurrentDate.getFullYear(), planningCurrentDate.getMonth() + 1, 1);
+    renderPlanning();
+  });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
@@ -1014,10 +1209,11 @@ window.closeIndispoModal  = closeIndispoModal;
 window.onOverlayClickIndispo = onOverlayClickIndispo;
 window.addIndispo         = addIndispo;
 window.deleteIndispo      = deleteIndispo;
-window.importCSV          = importCSV;
-window.onImportCSV        = onImportCSV;
-window.exportData         = exportData;
-window.importData         = importData;
-window.onImportFile       = onImportFile;
+window.importCSV             = importCSV;
+window.onImportCSV           = onImportCSV;
+window.exportData            = exportData;
+window.importData            = importData;
+window.onImportFile          = onImportFile;
+window.exportToBarmanFinance = exportToBarmanFinance;
 
 init();

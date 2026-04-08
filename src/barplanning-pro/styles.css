@@ -648,6 +648,140 @@ textarea.form-control { resize: vertical; }
 }
 .alert-item:last-child { border-bottom: none; }
 
+/* ── BADGE BF EXPORTÉ ── */
+.bf-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: rgba(76,175,130,0.15);
+  color: var(--green);
+  border: 1px solid rgba(76,175,130,0.3);
+}
+
+/* ── PLANNING MATRICE ── */
+.planning-wrap {
+  background: var(--black2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.planning-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.planning-table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Colonnes */
+.plan-name-col {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: var(--black2);
+  border-right: 1px solid var(--border2);
+  min-width: 160px;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(218,171,45,0.6);
+  white-space: nowrap;
+}
+.plan-day-col {
+  min-width: 36px;
+  max-width: 44px;
+  padding: 6px 4px;
+  text-align: center;
+  border-right: 1px solid rgba(218,171,45,0.07);
+  font-size: 10px;
+  color: rgba(244,241,235,0.4);
+  white-space: nowrap;
+}
+.plan-today-col { background: rgba(218,171,45,0.08); color: var(--gold); }
+.plan-we-col    { background: rgba(255,255,255,0.015); }
+.plan-dow       { font-size: 8px; letter-spacing: 1px; margin-bottom: 2px; text-transform: uppercase; }
+.plan-dnum      { font-size: 13px; font-weight: bold; }
+
+/* Cellule nom */
+.plan-name-cell {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: var(--black2);
+  border-right: 1px solid var(--border2);
+  border-top: 1px solid rgba(218,171,45,0.07);
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+.plan-person       { display: flex; align-items: center; gap: 10px; }
+.plan-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(218,171,45,0.1);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: bold; color: var(--gold);
+  flex-shrink: 0;
+}
+.plan-avatar-principal { background: rgba(218,171,45,0.2); border-color: var(--border2); }
+.plan-person-name  { font-size: 12px; color: var(--alabaster); }
+.plan-person-role  { font-size: 9px; color: rgba(244,241,235,0.35); letter-spacing: 1px; margin-top: 1px; }
+
+/* Cellules jours */
+.plan-cell {
+  border-top: 1px solid rgba(218,171,45,0.07);
+  border-right: 1px solid rgba(218,171,45,0.05);
+  height: 44px;
+  min-width: 36px;
+  max-width: 44px;
+  vertical-align: middle;
+  text-align: center;
+  transition: background 0.1s;
+}
+.plan-cell.plan-today { background: rgba(218,171,45,0.06); }
+.plan-cell.plan-we    { background: rgba(255,255,255,0.01); }
+
+/* Indisponible */
+.plan-cell.plan-indispo { background: rgba(224,90,90,0.1); }
+.plan-cell-x { font-size: 10px; color: rgba(224,90,90,0.5); }
+
+/* Prestation par statut */
+.plan-cell.plan-prest { cursor: default; }
+.plan-cell.plan-prest-en_attente { background: rgba(224,146,74,0.25); }
+.plan-cell.plan-prest-confirme   { background: rgba(74,158,196,0.28); }
+.plan-cell.plan-prest-realise    { background: rgba(76,175,130,0.25); }
+.plan-cell.plan-prest-annule     { background: rgba(224,90,90,0.12); }
+
+/* Conflit : présta + indispo */
+.plan-cell.plan-conflict { background: rgba(224,90,90,0.4) !important; }
+.plan-cell-label {
+  font-size: 9px;
+  color: rgba(244,241,235,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40px;
+  display: block;
+  margin: 0 auto;
+  letter-spacing: 0.3px;
+}
+
+.planning-conflict-dot { background: rgba(224,90,90,0.6); }
+.planning-hint {
+  font-size: 11px;
+  color: rgba(244,241,235,0.25);
+  letter-spacing: 1px;
+  text-align: right;
+  margin-top: 6px;
+}
+
 @media (max-width: 768px) {
   .header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
   .header-title { display: none; }
