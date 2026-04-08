@@ -35,10 +35,10 @@
   <div class="nav-tab" onclick="switchTab('prestations')" id="tab-prestations">
     <span class="tab-icon">◇</span> Prestations
   </div>
-  <div class="nav-tab nav-tab-soon" title="Disponible en Phase B">
-    <span class="tab-icon">◈</span> Personnel <span class="badge-soon">Bientôt</span>
+  <div class="nav-tab" onclick="switchTab('personnel')" id="tab-personnel">
+    <span class="tab-icon">◈</span> Personnel
   </div>
-  <div class="nav-tab nav-tab-soon" title="Disponible en Phase B">
+  <div class="nav-tab nav-tab-soon" title="Disponible en Phase C">
     <span class="tab-icon">◇</span> Planning <span class="badge-soon">Bientôt</span>
   </div>
 </nav>
@@ -59,7 +59,7 @@
       <div class="kpi-card">
         <div class="kpi-label">CA prévisionnel</div>
         <div class="kpi-value" id="kpi-ca">0 €</div>
-        <div class="kpi-sub" id="kpi-ca-sub">prestations confirmées + réalisées</div>
+        <div class="kpi-sub">confirmées + réalisées</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">En attente</div>
@@ -67,11 +67,14 @@
         <div class="kpi-sub">confirmation client</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Confirmées</div>
-        <div class="kpi-value kpi-ok" id="kpi-confirmed">0</div>
-        <div class="kpi-sub">ce mois</div>
+        <div class="kpi-label">Personnel actif</div>
+        <div class="kpi-value kpi-ok" id="kpi-personnel">0</div>
+        <div class="kpi-sub">membres d'équipe</div>
       </div>
     </div>
+
+    <!-- Alertes conflits -->
+    <div id="dash-alerts"></div>
 
     <div class="card">
       <div class="card-title">Prochaines prestations
@@ -110,7 +113,6 @@
       <div class="cal-grid" id="cal-grid"></div>
     </div>
 
-    <!-- Panneau détail jour -->
     <div class="day-detail card" id="day-detail" style="display:none;">
       <div class="day-detail-header">
         <h3 id="day-detail-title">Prestations du —</h3>
@@ -148,10 +150,38 @@
 
   </section>
 
+  <!-- ══════════════════════════════════════
+       PERSONNEL
+  ══════════════════════════════════════ -->
+  <section id="section-personnel" class="section">
+
+    <div class="section-header">
+      <h2 class="section-title">Annuaire du personnel</h2>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="importCSV()">↓ Importer CSV</button>
+        <button class="btn btn-outline" onclick="openPersonnelModal()">+ Ajouter</button>
+      </div>
+    </div>
+
+    <!-- Format CSV attendu -->
+    <div class="csv-hint card" id="csv-hint" style="display:none;">
+      <div class="card-title">Format CSV attendu</div>
+      <code class="csv-code">prenom,nom,telephone,email,role,tarif_forfait<br>
+Jean,Dupont,0612345678,jean@email.com,Barman,150<br>
+Marie,Martin,0687654321,marie@email.com,Barmaid,120</code>
+      <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="document.getElementById('csv-hint').style.display='none'">Fermer</button>
+    </div>
+
+    <div id="personnel-grid" class="personnel-grid">
+      <p class="empty-msg">Aucun membre dans l'annuaire.<br>Importez un fichier CSV ou ajoutez manuellement.</p>
+    </div>
+
+  </section>
+
 </main>
 
 <!-- ══════════════════════════════════════
-     MODAL PRESTATION
+     MODAL — PRESTATION
 ══════════════════════════════════════ -->
 <div id="modal-prestation" class="modal" onclick="onOverlayClick(event)">
   <div class="modal-box">
@@ -181,7 +211,7 @@
       <div class="form-row-3">
         <div class="form-group">
           <label class="form-label">Date *</label>
-          <input class="form-control" type="date" id="f-date" required>
+          <input class="form-control" type="date" id="f-date" required onchange="refreshEquipeSection()">
         </div>
         <div class="form-group">
           <label class="form-label">Heure début</label>
@@ -221,11 +251,17 @@
 
       <div class="form-group">
         <label class="form-label">Notes</label>
-        <textarea class="form-control" id="f-notes" rows="3" placeholder="Informations complémentaires..."></textarea>
+        <textarea class="form-control" id="f-notes" rows="2" placeholder="Informations complémentaires..."></textarea>
+      </div>
+
+      <!-- Équipe (Phase B) -->
+      <div class="form-group" id="equipe-section">
+        <label class="form-label">Équipe affectée</label>
+        <div id="equipe-list" class="equipe-list"></div>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-ghost" id="btn-delete-prestation" style="display:none;margin-right:auto;" onclick="deletePrestation()">Supprimer</button>
+        <button type="button" class="btn btn-danger btn-sm" id="btn-delete-prestation" style="display:none;margin-right:auto;" onclick="deletePrestation()">Supprimer</button>
         <button type="button" class="btn btn-outline" onclick="closeModal()">Annuler</button>
         <button type="submit" class="btn btn-gold">Enregistrer</button>
       </div>
@@ -234,8 +270,102 @@
   </div>
 </div>
 
-<!-- INPUT IMPORT FICHIER (caché) -->
-<input type="file" id="import-input" accept=".json" style="display:none;" onchange="onImportFile(event)">
+<!-- ══════════════════════════════════════
+     MODAL — PERSONNEL (ajout / édition)
+══════════════════════════════════════ -->
+<div id="modal-personnel" class="modal" onclick="onOverlayClickPerso(event)">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-personnel-title">Nouveau membre</h2>
+      <button class="modal-close" onclick="closePersonnelModal()">×</button>
+    </div>
+    <form id="personnel-form" onsubmit="savePersonnel(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Prénom *</label>
+          <input class="form-control" type="text" id="pf-prenom" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom *</label>
+          <input class="form-control" type="text" id="pf-nom" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input class="form-control" type="tel" id="pf-telephone" placeholder="06XXXXXXXX">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-control" type="email" id="pf-email" placeholder="prenom@email.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Rôle</label>
+          <input class="form-control" type="text" id="pf-role" placeholder="Barman, Barmaid…">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tarif forfait (€)</label>
+          <input class="form-control" type="number" id="pf-tarif" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Statut</label>
+        <select class="form-control" id="pf-actif">
+          <option value="1">Actif</option>
+          <option value="0">Inactif</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-danger btn-sm" id="btn-delete-personnel" style="display:none;margin-right:auto;" onclick="deletePersonnel()">Supprimer</button>
+        <button type="button" class="btn btn-outline" onclick="closePersonnelModal()">Annuler</button>
+        <button type="submit" class="btn btn-gold">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL — INDISPONIBILITÉS
+══════════════════════════════════════ -->
+<div id="modal-indispo" class="modal" onclick="onOverlayClickIndispo(event)">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-indispo-title">Indisponibilités</h2>
+      <button class="modal-close" onclick="closeIndispoModal()">×</button>
+    </div>
+
+    <!-- Liste des indisponibilités existantes -->
+    <div id="indispo-list" style="margin-bottom:20px;"></div>
+
+    <!-- Formulaire ajout -->
+    <div class="card" style="padding:16px;margin-bottom:0;">
+      <div class="card-title">Ajouter une période</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Du *</label>
+          <input class="form-control" type="date" id="ind-debut" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Au *</label>
+          <input class="form-control" type="date" id="ind-fin" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motif</label>
+        <input class="form-control" type="text" id="ind-motif" placeholder="Congé, autre engagement…">
+      </div>
+      <div style="text-align:right;">
+        <button type="button" class="btn btn-gold btn-sm" onclick="addIndispo()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INPUTS CACHÉS -->
+<input type="file" id="import-json-input" accept=".json" style="display:none;" onchange="onImportFile(event)">
+<input type="file" id="import-csv-input"  accept=".csv,.txt" style="display:none;" onchange="onImportCSV(event)">
 
 <script src="../shared/utils.js"></script>
 <script type="module" src="app.js"></script>
