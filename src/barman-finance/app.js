@@ -20,6 +20,18 @@ const PLAFOND_MICROBIC = 77700;
 const PLAFOND_TVA = 37500;
 const URSSAF_RATE = 0.211;
 
+// Statuts de paiement
+const PAYMENT_STATUSES = {
+  'en_attente': '⏳ En attente',
+  'paye': '✅ Payé',
+  'impaye': '❌ Impayé'
+};
+const PAYMENT_COLORS = {
+  'en_attente': 'var(--gold)',
+  'paye': 'var(--green)',
+  'impaye': 'var(--red)'
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════
@@ -101,7 +113,8 @@ function saveRevenu() {
     personnes: parseInt(document.getElementById('rev-personnes').value) || null,
     lieu: document.getElementById('rev-lieu').value.trim(),
     montant,
-    notes: document.getElementById('rev-notes').value.trim()
+    notes: document.getElementById('rev-notes').value.trim(),
+    paiement: document.getElementById('rev-paiement')?.value || 'en_attente'
   };
   state.revenus.unshift(rev);
   saveToStorage();
@@ -128,9 +141,165 @@ function deleteRevenu(id) {
   toast('Revenu supprimé');
 }
 
+function updatePaymentStatus(id, status) {
+  const rev = state.revenus.find(r => r.id === id);
+  if(rev) {
+    rev.paiement = status;
+    saveToStorage();
+    renderRevenus();
+    renderRevSummary();
+    toast(`Statut changé en ${PAYMENT_STATUSES[status]}`, 'success');
+  }
+}
+
+function generateQuotePDF(id) {
+  const rev = state.revenus.find(r => r.id === id);
+  if(!rev) return;
+
+  const businessName = 'Cocktail Privé';
+  const businessInfo = 'Barman & Mixologue';
+  const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devis ${rev.facture}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; background: #fff; padding: 20px; }
+    .page { max-width: 900px; margin: 0 auto; background: #fff; padding: 40px; border: 1px solid #ddd; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #c8a96e; padding-bottom: 20px; margin-bottom: 30px; }
+    .logo { font-size: 24px; font-weight: bold; color: #c8a96e; }
+    .logo-sub { font-size: 12px; color: #999; }
+    .title { text-align: right; }
+    .title h1 { font-size: 32px; color: #080808; margin-bottom: 5px; }
+    .title .ref { font-size: 12px; color: #999; }
+
+    section { margin-bottom: 30px; }
+    .section-title { font-size: 14px; font-weight: bold; color: #080808; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #c8a96e; padding-bottom: 8px; margin-bottom: 15px; }
+
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+    .info-block { font-size: 13px; line-height: 1.8; }
+    .info-block strong { color: #080808; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { background: #f5f0e8; color: #080808; padding: 12px; text-align: left; font-size: 12px; font-weight: bold; border-bottom: 2px solid #c8a96e; }
+    td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+    tr:last-child td { border-bottom: 2px solid #c8a96e; }
+
+    .totals { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .totals-table { width: 300px; }
+    .totals-table tr td:first-child { text-align: right; padding-right: 30px; color: #999; }
+    .totals-table tr td:last-child { text-align: right; font-weight: bold; color: #080808; }
+    .totals-table tr.total td { border-top: 2px solid #c8a96e; padding-top: 15px; font-size: 16px; color: #c8a96e; }
+
+    .notes { background: #f5f0e8; padding: 15px; border-radius: 4px; font-size: 12px; color: #666; line-height: 1.6; }
+
+    footer { text-align: center; border-top: 1px solid #ddd; padding-top: 20px; margin-top: 40px; font-size: 11px; color: #999; }
+
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; margin: 0 0 15px 0; }
+    .status-pending { background: #FEF3C7; color: #92400E; }
+    .status-paid { background: #D1FAE5; color: #065F46; }
+    .status-unpaid { background: #FEE2E2; color: #991B1B; }
+
+    @media print {
+      body { padding: 0; }
+      .page { border: none; padding: 0; }
+      a { color: #c8a96e; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <div class="logo">${businessName}</div>
+        <div class="logo-sub">${businessInfo}</div>
+      </div>
+      <div class="title">
+        <h1>DEVIS</h1>
+        <div class="ref">Ref. ${rev.facture} • ${fmtDate(rev.date)}</div>
+      </div>
+    </header>
+
+    <div class="status-badge status-${rev.paiement || 'en_attente'}">${PAYMENT_STATUSES[rev.paiement] || '⏳ En attente'}</div>
+
+    <div class="two-cols">
+      <div class="info-block">
+        <strong>CLIENT</strong><br>
+        ${rev.client}<br>
+        ${rev.lieu ? rev.lieu + '<br>' : ''}
+      </div>
+      <div class="info-block" style="text-align:right;">
+        <strong>COORDONNÉES</strong><br>
+        www.cocktail-prive.com<br>
+        contact@cocktail-prive.com
+      </div>
+    </div>
+
+    <section>
+      <div class="section-title">Détails de la Prestation</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50%">Description</th>
+            <th style="width:15%">Quantité</th>
+            <th style="width:15%">Prix Unit.</th>
+            <th style="width:20%;text-align:right;">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>${rev.type || 'Prestation'}</strong><br><span style="color:#999;font-size:12px">${rev.formule ? rev.formule : 'Prestation personnalisée'}</span></td>
+            <td>${rev.personnes || '—'}</td>
+            <td>${rev.personnes ? fmt(rev.montant / rev.personnes) : '—'}</td>
+            <td style="text-align:right;"><strong>${fmt(rev.montant)}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="totals">
+      <table class="totals-table">
+        <tr>
+          <td>Montant HT</td>
+          <td>${fmt(rev.montant)}</td>
+        </tr>
+        <tr>
+          <td>TVA (franchise)</td>
+          <td>—</td>
+        </tr>
+        <tr class="total">
+          <td>TOTAL</td>
+          <td>${fmt(rev.montant)}</td>
+        </tr>
+      </table>
+    </div>
+
+    ${rev.notes ? `<section><div class="section-title">Notes</div><div class="notes">${rev.notes.replace(/\n/g, '<br>')}</div></section>` : ''}
+
+    <footer>
+      Document généré le ${fmtDate(new Date().toISOString().split('T')[0])} via BarMan Finance Pro<br>
+      Validité du devis : 30 jours • Pour toute question, contactez-nous directement
+    </footer>
+  </div>
+
+  <script>
+    window.onload = () => { window.print(); };
+  </script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
 function clearRevForm() {
   ['rev-client','rev-facture','rev-personnes','rev-lieu','rev-notes'].forEach(id => document.getElementById(id).value = '');
-  ['rev-type','rev-formule'].forEach(id => document.getElementById(id).value = '');
+  ['rev-type','rev-formule','rev-paiement'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('rev-montant').value = '';
   setDefaultDates();
 }
@@ -140,7 +309,7 @@ function renderRevenus() {
   const filtered = state.revenus.filter(r => r.date && new Date(r.date).getFullYear() === year);
   const tbody = document.getElementById('tbody-revenus');
   if(!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">◇</div>Aucun revenu pour ${year}</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">◇</div>Aucun revenu pour ${year}</div></td></tr>`;
     renderRevSummary();
     return;
   }
@@ -154,7 +323,8 @@ function renderRevenus() {
       <td class="td-muted">${r.personnes||'—'}</td>
       <td class="td-muted">${r.lieu||'—'}</td>
       <td class="td-gold">${fmt(r.montant)}</td>
-      <td><button class="btn btn-danger" onclick="deleteRevenu(${r.id})">✕</button></td>
+      <td><span class="badge" style="background:${PAYMENT_COLORS[r.paiement]||PAYMENT_COLORS['en_attente']};color:var(--black);font-size:10px;padding:4px 8px">${PAYMENT_STATUSES[r.paiement]||'⏳ En attente'}</span></td>
+      <td style="display:flex;gap:4px;align-items:center"><button class="btn btn-ghost btn-sm" title="Générer devis/facture PDF" onclick="generateQuotePDF(${r.id})" style="font-size:10px;padding:4px 8px">📄</button><button class="btn btn-danger" onclick="deleteRevenu(${r.id})">✕</button></td>
     </tr>`).join('');
   renderRevSummary();
 }
@@ -1084,3 +1254,5 @@ window.renderAchats       = renderAchats;
 window.updateFormulaPrice = updateFormulaPrice;
 window.deleteRevenu       = deleteRevenu;
 window.deleteDepense      = deleteDepense;
+window.updatePaymentStatus = updatePaymentStatus;
+window.generateQuotePDF   = generateQuotePDF;
