@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BarPlanning Pro — Cocktail Privé</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="logo-mark">CP</div>
+    <div class="brand-text">
+      <div class="brand-name">Cocktail Privé</div>
+      <div class="brand-sub">BarPlanning Pro</div>
+    </div>
+  </div>
+  <div class="header-title">Planning &amp; Prestations</div>
+  <div class="header-actions">
+    <button class="btn btn-outline btn-sm" onclick="exportData()">↑ Export</button>
+    <button class="btn btn-outline btn-sm" onclick="importData()">↓ Import</button>
+  </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="switchTab('dashboard')" id="tab-dashboard">
+    <span class="tab-icon">◈</span> Dashboard
+  </div>
+  <div class="nav-tab" onclick="switchTab('calendar')" id="tab-calendar">
+    <span class="tab-icon">◆</span> Calendrier
+  </div>
+  <div class="nav-tab" onclick="switchTab('prestations')" id="tab-prestations">
+    <span class="tab-icon">◇</span> Prestations
+  </div>
+  <div class="nav-tab nav-tab-soon" title="Disponible en Phase B">
+    <span class="tab-icon">◈</span> Personnel <span class="badge-soon">Bientôt</span>
+  </div>
+  <div class="nav-tab nav-tab-soon" title="Disponible en Phase B">
+    <span class="tab-icon">◇</span> Planning <span class="badge-soon">Bientôt</span>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- ══════════════════════════════════════
+       DASHBOARD
+  ══════════════════════════════════════ -->
+  <section id="section-dashboard" class="section active">
+
+    <div class="grid-4" style="margin-bottom:28px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Prestations ce mois</div>
+        <div class="kpi-value" id="kpi-total">0</div>
+        <div class="kpi-sub" id="kpi-total-sub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">CA prévisionnel</div>
+        <div class="kpi-value" id="kpi-ca">0 €</div>
+        <div class="kpi-sub" id="kpi-ca-sub">prestations confirmées + réalisées</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">En attente</div>
+        <div class="kpi-value kpi-warn" id="kpi-pending">0</div>
+        <div class="kpi-sub">confirmation client</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Confirmées</div>
+        <div class="kpi-value kpi-ok" id="kpi-confirmed">0</div>
+        <div class="kpi-sub">ce mois</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Prochaines prestations
+        <button class="btn btn-gold btn-sm" style="margin-left:auto;" onclick="openModal()">+ Nouvelle</button>
+      </div>
+      <div id="upcoming-list">
+        <p class="empty-msg">Aucune prestation à venir</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       CALENDRIER
+  ══════════════════════════════════════ -->
+  <section id="section-calendar" class="section">
+
+    <div class="cal-toolbar">
+      <button class="btn btn-outline btn-sm" id="btn-prev-month">← Préc.</button>
+      <h2 id="cal-title" class="cal-month-title">Avril 2026</h2>
+      <button class="btn btn-outline btn-sm" id="btn-next-month">Suiv. →</button>
+      <div class="cal-legend">
+        <span class="leg-dot leg-en_attente"></span><span>En attente</span>
+        <span class="leg-dot leg-confirme"></span><span>Confirmé</span>
+        <span class="leg-dot leg-realise"></span><span>Réalisé</span>
+        <span class="leg-dot leg-annule"></span><span>Annulé</span>
+        <span class="leg-dot leg-barmanfinance"></span><span>BarmanFinance</span>
+      </div>
+    </div>
+
+    <div class="card" style="padding:16px;">
+      <div class="cal-weekdays">
+        <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div>
+        <div>Ven</div><div>Sam</div><div>Dim</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <!-- Panneau détail jour -->
+    <div class="day-detail card" id="day-detail" style="display:none;">
+      <div class="day-detail-header">
+        <h3 id="day-detail-title">Prestations du —</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeDayDetail()">Fermer ×</button>
+      </div>
+      <div id="day-detail-list"></div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       PRESTATIONS
+  ══════════════════════════════════════ -->
+  <section id="section-prestations" class="section">
+
+    <div class="section-header">
+      <h2 class="section-title">Gestion des prestations</h2>
+      <button class="btn btn-gold" onclick="openModal()">+ Nouvelle prestation</button>
+    </div>
+
+    <div class="filters-bar">
+      <select class="form-control filter-sel" id="filter-statut" onchange="renderPrestations()">
+        <option value="">Tous les statuts</option>
+        <option value="en_attente">En attente</option>
+        <option value="confirme">Confirmé</option>
+        <option value="realise">Réalisé</option>
+        <option value="annule">Annulé</option>
+      </select>
+      <select class="form-control filter-sel" id="filter-month" onchange="renderPrestations()">
+        <option value="">Tous les mois</option>
+      </select>
+    </div>
+
+    <div id="prestations-list"></div>
+
+  </section>
+
+</main>
+
+<!-- ══════════════════════════════════════
+     MODAL PRESTATION
+══════════════════════════════════════ -->
+<div id="modal-prestation" class="modal" onclick="onOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Nouvelle prestation</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <form id="prestation-form" onsubmit="savePrestation(event)">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Client *</label>
+          <input class="form-control" type="text" id="f-client" required placeholder="Nom du client / entreprise">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select class="form-control" id="f-statut">
+            <option value="en_attente">En attente</option>
+            <option value="confirme">Confirmé</option>
+            <option value="realise">Réalisé</option>
+            <option value="annule">Annulé</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input class="form-control" type="date" id="f-date" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Heure début</label>
+          <input class="form-control" type="time" id="f-heure-debut" value="18:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Heure fin</label>
+          <input class="form-control" type="time" id="f-heure-fin" value="23:00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Lieu *</label>
+        <input class="form-control" type="text" id="f-lieu" required placeholder="Adresse complète">
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Formule</label>
+          <select class="form-control" id="f-formule">
+            <option value="">— Choisir —</option>
+            <option value="Découverte">Découverte</option>
+            <option value="Signature">Signature</option>
+            <option value="Prestige">Prestige</option>
+            <option value="Sur Mesure">Sur Mesure</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nb personnes</label>
+          <input class="form-control" type="number" id="f-personnes" min="1" placeholder="—">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Montant (€)</label>
+          <input class="form-control" type="number" id="f-montant" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="f-notes" rows="3" placeholder="Informations complémentaires..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="btn-delete-prestation" style="display:none;margin-right:auto;" onclick="deletePrestation()">Supprimer</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn-gold">Enregistrer</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- INPUT IMPORT FICHIER (caché) -->
+<input type="file" id="import-input" accept=".json" style="display:none;" onchange="onImportFile(event)">
+
+<script src="../shared/utils.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
