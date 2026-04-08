@@ -646,6 +646,67 @@ function renderAmortissement() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// PROJECTION FIN D'ANNÉE
+// ═══════════════════════════════════════════════════════════════════
+function calculateYearEndProjection(year) {
+  const today = new Date();
+  const currentMonth = today.getMonth(); // 0-11
+  const currentDay = today.getDate();
+  const currentYear = today.getFullYear();
+
+  // Données jusqu'à aujourd'hui
+  const revToday = state.revenus.filter(r => {
+    if(!r.date) return false;
+    const d = new Date(r.date);
+    if(d.getFullYear() !== year) return false;
+    return d < today;
+  });
+  const depListToday = state.depenses.filter(d => {
+    if(!d.date) return false;
+    const dt = new Date(d.date);
+    if(dt.getFullYear() !== year) return false;
+    return dt < today;
+  });
+
+  const caToday = revToday.reduce((s,r) => s+r.montant, 0);
+  const depToday = depListToday.reduce((s,d) => s+d.montant, 0);
+
+  // Moyenne mensuelle réalisée
+  const monthsElapsed = currentMonth + (currentDay > 0 ? 0.5 : 0); // approximation
+  const monthsRemaining = 12 - monthsElapsed;
+  const avgMonthlyRev = monthsElapsed > 0 ? caToday / monthsElapsed : 0;
+  const avgMonthlyDep = monthsElapsed > 0 ? depToday / monthsElapsed : 0;
+
+  // Projection fin d'année
+  const caProjected = caToday + (avgMonthlyRev * monthsRemaining);
+  const depProjected = depToday + (avgMonthlyDep * monthsRemaining);
+  const urssafProjected = caProjected * URSSAF_RATE;
+  const beneficeProjected = caProjected - depProjected - urssafProjected;
+
+  // Position vis-à-vis des seuils
+  const pctMicrobic = Math.min((caProjected/PLAFOND_MICROBIC)*100, 100);
+  const pctTVA = Math.min((caProjected/PLAFOND_TVA)*100, 100);
+  const microWarning = caProjected > PLAFOND_MICROBIC * 0.85;
+  const tvaWarning = caProjected > PLAFOND_TVA * 0.85;
+
+  return {
+    caToday,
+    caProjected,
+    depToday,
+    depProjected,
+    urssafProjected,
+    beneficeProjected,
+    pctMicrobic,
+    pctTVA,
+    monthsElapsed: Math.round(monthsElapsed*10)/10,
+    monthsRemaining: Math.round(monthsRemaining*10)/10,
+    avgMonthlyRev,
+    microWarning,
+    tvaWarning
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════════
 function renderDashboard() {
@@ -711,6 +772,9 @@ function renderDashboard() {
   // Type chart
   renderTypeChart(revFiltered);
 
+  // Year-end projection
+  renderYearEndProjection(year);
+
   // Recent ops
   renderRecent(year);
 }
@@ -754,6 +818,72 @@ function renderTypeChart(revs) {
       </div>
     </div>`;
   }).join('');
+}
+
+function renderYearEndProjection(year) {
+  const proj = calculateYearEndProjection(year);
+  const el = document.getElementById('projection-year-end');
+  if(!el) return;
+
+  const statusMicro = proj.caProjected > PLAFOND_MICROBIC ? '⚠️ Dépassement' : '✓ OK';
+  const statusTVA = proj.caProjected > PLAFOND_TVA ? '⚠️ TVA requise' : '✓ OK';
+  const benefColor = proj.beneficeProjected >= 0 ? 'var(--green)' : 'var(--red)';
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:11px;color:rgba(244,241,235,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Projection</div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid rgba(218,171,45,0.1)">
+            <span style="font-size:12px;color:rgba(244,241,235,0.7)">CA Fin ${year}</span>
+            <span style="font-size:20px;color:var(--gold);font-weight:bold">${fmt(proj.caProjected)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:11px;color:rgba(244,241,235,0.6)">Réalisé</span>
+            <span style="font-size:13px;color:var(--gold)">${fmt(proj.caToday)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:11px;color:rgba(244,241,235,0.6)">Moy. mensuelle</span>
+            <span style="font-size:13px;color:var(--blue)">${fmt(proj.avgMonthlyRev)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:11px;color:rgba(244,241,235,0.6)">Mois</span>
+            <span style="font-size:13px">${proj.monthsElapsed.toFixed(1)} / 12</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:rgba(244,241,235,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Charges & Bénéfice</div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid rgba(218,171,45,0.1)">
+            <span style="font-size:12px;color:rgba(244,241,235,0.7)">Bénéfice Net</span>
+            <span style="font-size:20px;color:${benefColor};font-weight:bold">${fmt(proj.beneficeProjected)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:11px;color:rgba(244,241,235,0.6)">Dépenses</span>
+            <span style="font-size:13px;color:var(--red)">−${fmt(proj.depProjected)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:11px;color:rgba(244,241,235,0.6)">URSSAF (21,1%)</span>
+            <span style="font-size:13px;color:var(--red)">−${fmt(proj.urssafProjected)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:11px;color:rgba(244,241,235,0.6)">Marge nette</span>
+            <span style="font-size:13px;color:${benefColor}">${proj.beneficeProjected>0?'+':''}${((proj.beneficeProjected/proj.caProjected)*100).toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(218,171,45,0.1);display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:rgba(244,241,235,0.7)">Plafond Micro-BIC (77 700 €)</span>
+        <span style="color:${proj.microWarning?'var(--red)':'var(--green)'};font-weight:bold">${statusMicro}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:rgba(244,241,235,0.7)">Franchise TVA (37 500 €)</span>
+        <span style="color:${proj.tvaWarning?'var(--red)':'var(--green)'};font-weight:bold">${statusTVA}</span>
+      </div>
+    </div>`;
 }
 
 function renderRecent(year) {
