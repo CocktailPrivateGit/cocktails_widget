@@ -792,3 +792,38 @@ textarea.form-control { resize: vertical; }
   .cal-legend { display: none; }
   .personnel-grid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 600px) {
+  /* Matrice planning : scroll horizontal forcé, colonnes réduites */
+  .planning-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .planning-table {
+    min-width: 600px;
+  }
+  .plan-name-col {
+    min-width: 100px;
+    padding: 8px 8px;
+    font-size: 9px;
+  }
+  .plan-day-col {
+    min-width: 28px;
+    max-width: 32px;
+    padding: 4px 2px;
+    font-size: 9px;
+  }
+  .plan-name-cell {
+    min-width: 100px;
+    padding: 8px 8px;
+    font-size: 11px;
+  }
+  .plan-cell-label {
+    max-width: 26px;
+    font-size: 8px;
+  }
+  /* Header : masquer username Firebase, garder boutons essentiels */
+  #firebase-username { display: none; }
+  .header-actions { gap: 6px; }
+  .btn-sm { padding: 4px 8px; font-size: 10px; }
+}
