@@ -104,13 +104,13 @@ function updateDashboard(d) {
   const ne = document.getElementById('next-event');
   if (ne) {
     ne.textContent = d.nextEvent || 'Aucun événement renseigné — va dans "Ma Situation" pour l\'ajouter';
-    ne.style.color = d.nextEvent ? 'var(--creme2)' : 'var(--gris)';
+    ne.style.color = d.nextEvent ? 'var(--alabaster2)' : 'var(--grey)';
   }
 
   // Barres de progression objectifs
-  updateObjectifBar('obj-ig', d.ig, d.objIg, 'var(--or)');
-  updateObjectifBar('obj-tt', d.tt, d.objTt, 'var(--bleu)');
-  updateObjectifBar('obj-li', d.li, d.objLi, 'var(--vert)');
+  updateObjectifBar('obj-ig', d.ig, d.objIg, 'var(--gold)');
+  updateObjectifBar('obj-tt', d.tt, d.objTt, 'var(--blue)');
+  updateObjectifBar('obj-li', d.li, d.objLi, 'var(--green)');
 }
 
 // ═══════════════════════════════════════
@@ -131,7 +131,7 @@ function updateObjectifBar(prefix, current, target, color) {
   txt.textContent = c.toLocaleString('fr-FR') + ' / ' + t.toLocaleString('fr-FR') + ' (' + pct + '%)';
   bar.style.width = pct + '%';
   bar.style.background = pct >= 100
-    ? 'linear-gradient(90deg,#15803d,var(--vert))'
+    ? 'linear-gradient(90deg,#15803d,var(--green))'
     : bar.style.background;
 }
 
@@ -144,9 +144,9 @@ function updateDelta(elId, snaps, field) {
   const last = parseInt(snaps[snaps.length - 1][field]) || 0;
   const prev = parseInt(snaps[snaps.length - 2][field]) || 0;
   const diff = last - prev;
-  if (diff === 0) { el.textContent = '→ stable'; el.style.color = 'var(--gris)'; return; }
+  if (diff === 0) { el.textContent = '→ stable'; el.style.color = 'var(--grey)'; return; }
   el.textContent = (diff > 0 ? '▲ +' : '▼ ') + diff + ' vs sem. préc.';
-  el.style.color = diff > 0 ? 'var(--vert)' : 'var(--rouge)';
+  el.style.color = diff > 0 ? 'var(--green)' : 'var(--red)';
 }
 
 // ═══════════════════════════════════════
@@ -207,15 +207,15 @@ function renderSnapshotList(snaps) {
   const el = document.getElementById('snapshot-list');
   if (!el) return;
   if (!snaps || snaps.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gris);font-size:12px;">Aucun historique enregistré — cliquez sur le bouton ci-dessus pour commencer.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--grey);font-size:12px;">Aucun historique enregistré — cliquez sur le bouton ci-dessus pour commencer.</div>';
     return;
   }
   const rows = [...snaps].reverse().map(s => {
     return `<div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:center;">
-      <span style="color:var(--or);font-weight:500;">Sem. ${s.label}</span>
-      <span style="color:var(--gris);">📸 ${(s.ig||0).toLocaleString('fr-FR')}</span>
-      <span style="color:var(--gris);">🎵 ${(s.tt||0).toLocaleString('fr-FR')}</span>
-      <span style="color:var(--gris);">💼 ${(s.li||0).toLocaleString('fr-FR')}</span>
+      <span style="color:var(--gold);font-weight:500;">Sem. ${s.label}</span>
+      <span style="color:var(--grey);">📸 ${(s.ig||0).toLocaleString('fr-FR')}</span>
+      <span style="color:var(--grey);">🎵 ${(s.tt||0).toLocaleString('fr-FR')}</span>
+      <span style="color:var(--grey);">💼 ${(s.li||0).toLocaleString('fr-FR')}</span>
     </div>`;
   }).join('');
   el.innerHTML = rows;
@@ -365,7 +365,7 @@ function importDrive(input) {
       const s = document.getElementById('import-status');
       if (s) {
         s.style.display = 'block';
-        s.style.color = 'var(--vert)';
+        s.style.color = 'var(--green)';
         s.textContent = '✅ Données importées ! Dashboard mis à jour.';
         setTimeout(() => s.style.display = 'none', 5000);
       }
@@ -373,7 +373,7 @@ function importDrive(input) {
       const s = document.getElementById('import-status');
       if (s) {
         s.style.display = 'block';
-        s.style.color = 'var(--rouge)';
+        s.style.color = 'var(--red)';
         s.textContent = '❌ Fichier invalide. Sélectionne un barcomm_data.json valide.';
       }
     }
@@ -498,9 +498,9 @@ function updateEvinScore() {
   const pct = Math.round((done.length / items.length) * 100);
   scoreEl.textContent = done.length + '/' + items.length + ' critères validés (' + pct + '%)';
   barEl.style.width   = pct + '%';
-  barEl.style.background = pct === 100 ? 'var(--vert)' : pct >= 60 ? 'var(--or)' : 'var(--rouge)';
+  barEl.style.background = pct === 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : 'var(--red)';
   msgEl.textContent   = pct === 100 ? '✅ Conforme — publie en confiance !' : pct >= 60 ? '⚠️ Vérification incomplète' : '❌ Non conforme — ne pas publier';
-  msgEl.style.color   = pct === 100 ? 'var(--vert)' : pct >= 60 ? 'var(--or)' : 'var(--rouge)';
+  msgEl.style.color   = pct === 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : 'var(--red)';
 }
 
 function copyEvinTemplate(id) {
@@ -586,7 +586,7 @@ function renderJournalEntry(entry) {
 function loadJournal() {
   const d = getData();
   if (!d.journal || d.journal.length === 0) {
-    document.getElementById('journal-list').innerHTML = '<div data-empty style="text-align:center;padding:2rem;color:var(--gris);font-size:13px;font-weight:300;">Ton journal est vide pour l\'instant.<br>Commence à tracer ton parcours ! 🚀</div>';
+    document.getElementById('journal-list').innerHTML = '<div data-empty style="text-align:center;padding:2rem;color:var(--grey);font-size:13px;font-weight:300;">Ton journal est vide pour l\'instant.<br>Commence à tracer ton parcours ! 🚀</div>';
     return;
   }
   document.getElementById('journal-list').innerHTML = '';
@@ -1126,7 +1126,7 @@ function filterPosts(tag) {
   if (visible === 0) {
     const msg = document.createElement('div');
     msg.className = 'contenu-empty';
-    msg.style.cssText = 'text-align:center;padding:2rem;color:var(--gris);font-size:13px;font-weight:300;';
+    msg.style.cssText = 'text-align:center;padding:2rem;color:var(--grey);font-size:13px;font-weight:300;';
     msg.textContent = 'Aucun post pour ce filtre. Génère-en via le bouton "Générer banque IA" ci-dessus.';
     container.appendChild(msg);
   }
