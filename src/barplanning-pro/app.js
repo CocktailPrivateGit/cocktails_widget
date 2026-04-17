@@ -1,4 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════
+// FIREBASE SYNC
+// ═══════════════════════════════════════════════════════════════════
+import { loginWithGoogle, logout, initAuth, saveToCloud } from '../shared/firebase-sync.js';
+
+const COLLECTION = 'barplanning';
+
+// ═══════════════════════════════════════════════════════════════════
 // BarPlanning Pro v2 — Phase C
 // Dashboard · Calendrier · Prestations CRUD
 // Personnel (CSV + manuel) · Indisponibilités · Assignation équipe
@@ -59,6 +66,7 @@ function saveState() {
   state.meta.lastSave = new Date().toISOString();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    saveToCloud(state, COLLECTION);
   } catch(e) {
     console.error('BarPlanning: erreur écriture localStorage', e);
     showToast('Erreur de sauvegarde', 'error');
@@ -1161,6 +1169,20 @@ function formatDateKey(year, month, day) {
 function init() {
   loadState();
 
+  // Firebase auth
+  document.getElementById('btn-firebase-login')?.addEventListener('click', loginWithGoogle);
+  document.getElementById('btn-firebase-logout')?.addEventListener('click', logout);
+  initAuth(STORAGE_KEY, (cloudData) => {
+    if (cloudData && typeof cloudData === 'object') {
+      if (Array.isArray(cloudData.prestations))      state.prestations      = cloudData.prestations;
+      if (Array.isArray(cloudData.personnel))        state.personnel        = cloudData.personnel;
+      if (Array.isArray(cloudData.indisponibilites)) state.indisponibilites = cloudData.indisponibilites;
+      if (cloudData.meta)                            state.meta             = cloudData.meta;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      refreshCurrentSection();
+    }
+  }, COLLECTION);
+
   document.getElementById('btn-prev-month').addEventListener('click', () => {
     calCurrentDate = new Date(calCurrentDate.getFullYear(), calCurrentDate.getMonth() - 1, 1);
     renderCalendar();
@@ -1215,5 +1237,7 @@ window.exportData            = exportData;
 window.importData            = importData;
 window.onImportFile          = onImportFile;
 window.exportToBarmanFinance = exportToBarmanFinance;
+window.loginWithGoogle       = loginWithGoogle;
+window.logout                = logout;
 
 init();
