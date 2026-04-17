@@ -4,196 +4,192 @@ Documentation des fonctions JavaScript principales des widgets Cocktail Privé.
 
 ---
 
-## 🗃️ Gestion des Données (Storage)
-
-### `getData()`
-
-Récupère toutes les données sauvegardées dans le navigateur (localStorage).
-
-```javascript
-const data = getData();
-console.log(data);
-// Retourne : { ig: 5000, tt: 3000, li: 800, ... }
-```
-
-**Retourne :** `Object` — Les données de l'application, ou `{}` si aucune donnée.
-
----
-
-### `setData(data)`
-
-Sauvegarde les données dans le navigateur (localStorage).
-
-```javascript
-const nouvellesDonnees = {
-  ig: 5200,
-  tt: 3100,
-  li: 850
-};
-setData(nouvellesDonnees);
-```
-
-**Paramètres :**
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `data` | `Object` | L'objet de données à sauvegarder |
-
----
-
-### `exportData()`
-
-Télécharge toutes les données actuelles dans un fichier JSON.
-
-```javascript
-exportData();
-// Télécharge automatiquement : "cocktail-data-2026-04-04.json"
-```
-
-> 💡 **Usage courant** : Faire une sauvegarde avant de changer de navigateur ou d'ordinateur.
-
----
-
-### `importData(file)`
-
-Importe des données depuis un fichier JSON précédemment exporté.
-
-```javascript
-// Cette fonction est déclenchée via l'interface du widget
-// (bouton "Importer")
-// Exemple d'utilisation programmatique :
-const fichier = document.getElementById('input-file').files[0];
-importData(fichier);
-```
-
-**Paramètres :**
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `file` | `File` | Fichier JSON sélectionné par l'utilisateur |
-
----
-
-## 📊 Fonctions Dashboard (BarComm Pro)
-
-### `loadSituation()`
-
-Charge et affiche les métriques de la situation commerciale actuelle.
-
-```javascript
-loadSituation();
-// Met à jour les compteurs Instagram, TikTok, LinkedIn
-// Met à jour les graphiques de performance
-```
-
----
-
-### `updateMetrics(section, valeurs)`
-
-Met à jour une section spécifique des métriques.
-
-```javascript
-updateMetrics('reseaux', {
-  ig: 5500,
-  tt: 3200
-});
-```
-
-**Paramètres :**
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `section` | `String` | Section à mettre à jour (`'reseaux'`, `'devis'`, `'contrats'`) |
-| `valeurs` | `Object` | Nouvelles valeurs pour cette section |
-
----
-
-## 💰 Fonctions Dashboard (BarMan Finance)
-
-### `loadFinances()`
-
-Charge et affiche toutes les données financières.
-
-```javascript
-loadFinances();
-// Met à jour revenus, dépenses, bénéfice net
-// Redessine les graphiques
-```
-
----
-
-### `addTransaction(type, montant, description)`
-
-Ajoute une nouvelle transaction (revenu ou dépense).
-
-```javascript
-// Ajouter un revenu
-addTransaction('revenu', 1500, 'Prestation bar mariage');
-
-// Ajouter une dépense
-addTransaction('depense', 200, 'Achat alcools');
-```
-
-**Paramètres :**
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `type` | `String` | `'revenu'` ou `'depense'` |
-| `montant` | `Number` | Montant en euros |
-| `description` | `String` | Description de la transaction |
-
----
-
-## 📡 Événements JavaScript
-
-Les widgets émettent des événements personnalisés que vous pouvez écouter :
-
-### `dataUpdated`
-
-Déclenché chaque fois que les données sont modifiées.
-
-```javascript
-document.addEventListener('dataUpdated', (event) => {
-  console.log('Données mises à jour :', event.detail);
-  // event.detail contient les nouvelles données
-});
-```
-
-### `exportComplete`
-
-Déclenché quand un export JSON est terminé.
-
-```javascript
-document.addEventListener('exportComplete', () => {
-  console.log('Export terminé avec succès !');
-});
-```
-
----
-
 ## 🔑 Clés localStorage
 
-Les widgets utilisent ces clés pour stocker les données :
+Les widgets utilisent ces clés pour stocker leurs données :
 
 | Widget | Clé localStorage |
 |--------|-----------------|
-| BarComm Pro | `barcomm_data` |
+| BarComm Pro | `barcomm_pro_v3` |
 | BarMan Finance | `barmanfinance_data` |
+| BarPlanning Pro | `barplanning_pro_v2` |
 
 > ⚠️ **Attention** : Effacer les données de navigation dans votre navigateur supprime également ces données.
 
 ---
 
-## 📦 Variables CSS Globales
+## ☁️ Firebase Sync (module partagé)
 
-Les deux widgets partagent ces variables de style :
+Le module `src/shared/firebase-sync.js` gère l'authentification Google et la synchronisation Firestore pour les 3 widgets.
+
+### Collections Firestore
+
+| Widget | Collection |
+|--------|-----------|
+| BarComm Pro | `barcomm` |
+| BarMan Finance | `barmanfinance` |
+| BarPlanning Pro | `barplanning` |
+
+### Fonctions exportées
+
+#### `loginWithGoogle()`
+Ouvre une popup d'authentification Google.
+
+#### `logout()`
+Déconnecte l'utilisateur et arrête la synchronisation temps réel.
+
+#### `initAuth(localStorageKey, onData, collectionName)`
+Initialise l'écoute de l'état de connexion. À la connexion :
+- migre les données localStorage vers Firestore (première connexion uniquement)
+- démarre la synchronisation temps réel via `onSnapshot`
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `localStorageKey` | `String` | Clé localStorage du widget |
+| `onData` | `Function` | Callback appelé quand les données Firestore arrivent |
+| `collectionName` | `String` | Nom de la collection Firestore |
+
+#### `saveToCloud(data, collectionName)`
+Sauvegarde les données dans Firestore (silencieux si non connecté).
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `data` | `Object` | Données à sauvegarder |
+| `collectionName` | `String` | Nom de la collection Firestore |
+
+---
+
+## 🗃️ Gestion des Données
+
+### BarComm Pro — `getData()` / `setData(data)`
+
+```javascript
+const data = getData();
+// Retourne : { ig, tt, li, posts, devis, contrats, snapshots, ... }
+
+setData({ ...data, ig: 5200 });
+// Sauvegarde localStorage + sync Firebase
+```
+
+### BarMan Finance — `loadFromStorage()` / `saveToStorage()`
+
+L'état est géré via l'objet global `state` :
+```javascript
+state = {
+  revenus:     [],   // { id, date, facture, client, montant, paiement, ... }
+  depenses:    [],   // { id, date, categorie, montant, notes }
+  equipements: [],   // { id, nom, valeur, dateAchat, dureeAmort }
+  achats:      []    // { id, nom, prix, quantite, categorie }
+}
+```
+
+### BarPlanning Pro — `loadState()` / `saveState()`
+
+```javascript
+state = {
+  prestations:      [],  // { id, date, client, lieu, montant, statut, equipe, exportedToBF }
+  personnel:        [],  // { id, prenom, nom, role, tel, indispos }
+  indisponibilites: []   // { id, persoId, dateDebut, dateFin, motif }
+}
+```
+
+---
+
+## 📊 Fonctions principales — BarComm Pro
+
+### `loadSituation()`
+Charge les métriques depuis localStorage et met à jour le dashboard.
+
+### `saveSituation()`
+Lit les champs du formulaire et sauvegarde via `setData()`.
+
+### `renderSnapshotList(snapshots)`
+Affiche l'historique des snapshots hebdomadaires.
+
+### `renderGrowthChart(snapshots, metric)`
+Dessine le graphique de croissance pour `'ig'`, `'tt'` ou `'li'`.
+
+---
+
+## 💰 Fonctions principales — BarMan Finance
+
+### `saveRevenu()`
+Valide et enregistre un nouveau revenu dans `state.revenus`.
+
+### `saveDepense()`
+Valide et enregistre une nouvelle dépense dans `state.depenses`.
+
+### `renderDashboard()`
+Recalcule et affiche CA, dépenses, bénéfice net, taux URSSAF, progression plafonds.
+
+**Constantes métier :**
+```javascript
+const PLAFOND_MICROBIC = 77700;   // Plafond micro-entrepreneur
+const PLAFOND_TVA      = 37500;   // Seuil de franchise TVA
+const URSSAF_RATE      = 0.211;   // Taux cotisations sociales (21,1%)
+```
+
+### `exportData()` / `importData()`
+Export et import JSON de l'ensemble des données financières.
+
+---
+
+## 🗓️ Fonctions principales — BarPlanning Pro
+
+### `savePrestation()`
+Crée ou met à jour une prestation dans `state.prestations`.
+
+### `exportToBarmanFinance()`
+Exporte la prestation en cours d'édition vers BarMan Finance :
+- génère un numéro de facture `F-YYYY-NNN`
+- détecte les doublons (même date + même client)
+- marque la prestation `exportedToBF: true`
+
+### `renderCalendar()`
+Affiche le calendrier mensuel avec les prestations et événements BarMan Finance.
+
+### `renderPlanning()`
+Affiche la matrice planning (personnel × jours du mois) avec assignations.
+
+### `savePersonnel()`
+Crée ou met à jour un membre du personnel.
+
+### `addIndispo(persoId, dateDebut, dateFin, motif)`
+Ajoute une indisponibilité pour un membre du personnel.
+
+---
+
+## 📦 Variables CSS
+
+### BarMan Finance & BarPlanning Pro
 
 ```css
 :root {
-  --noir:      #080808;   /* Fond principal */
-  --noir2:     #111111;   /* Fond secondaire */
-  --or:        #c8a96e;   /* Couleur accent principale */
-  --or-light:  #e2c98a;   /* Accent clair */
-  --or-dark:   #a07840;   /* Accent foncé */
-  --creme:     #f5f0e8;   /* Texte principal */
-  --vert:      #4ade80;   /* Indicateur positif */
-  --rouge:     #f87171;   /* Indicateur négatif */
-  --bleu:      #60a5fa;   /* Indicateur neutre */
+  --black:    #020B13;  /* Fond principal */
+  --black2:   #060F19;  /* Fond secondaire */
+  --black3:   #0A1520;  /* Fond tertiaire */
+  --gold:     #DAAB2D;  /* Accent principal */
+  --gold2:    #B8901F;  /* Accent foncé */
+  --gold3:    #F0C84A;  /* Accent clair */
+  --alabaster: #F4F1EB; /* Texte principal */
+  --green:    #4CAF82;  /* Indicateur positif */
+  --red:      #E05A5A;  /* Indicateur négatif */
+  --blue:     #4A9EC4;  /* Indicateur neutre */
+}
+```
+
+### BarComm Pro
+
+```css
+:root {
+  --noir:     #080808;  /* Fond principal */
+  --noir2:    #111111;  /* Fond secondaire */
+  --or:       #c8a96e;  /* Accent principal */
+  --or-light: #e2c98a;  /* Accent clair */
+  --or-dark:  #a07840;  /* Accent foncé */
+  --creme:    #f5f0e8;  /* Texte principal */
+  --vert:     #4ade80;  /* Indicateur positif */
+  --rouge:    #f87171;  /* Indicateur négatif */
+  --bleu:     #60a5fa;  /* Indicateur neutre */
 }
 ```
