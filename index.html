@@ -78,7 +78,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
-      max-width: 720px;
+      max-width: 1080px;
       width: 100%;
       margin-bottom: 3rem;
     }
@@ -97,6 +97,7 @@
     }
 
     .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.2s; }
 
     .card::before {
       content: '';
@@ -285,16 +286,37 @@
       </div>
     </a>
 
+    <!-- BarPlanning Pro -->
+    <a class="card" href="./src/barplanning-pro/index.html">
+      <div class="status-dot"><div class="dot"></div>Live</div>
+      <span class="card-emoji">🗓️</span>
+      <div class="card-title">BarPlanning Pro</div>
+      <p class="card-desc">
+        Planning événementiel complet — gestion des prestations,
+        personnel, disponibilités et export vers BarMan Finance.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Calendrier</span>
+        <span class="tag">Personnel</span>
+        <span class="tag">Équipes</span>
+        <span class="tag">Facturation</span>
+      </div>
+      <div class="card-cta">
+        Ouvrir le widget
+        <span class="card-cta-arrow">→</span>
+      </div>
+    </a>
+
   </div>
 
   <div class="footer">
     <p>
-      Hébergé sur <a href="https://github.com/cocktailprivategit/widgets" target="_blank">GitHub Pages</a>
+      Hébergé sur <a href="https://github.com/CocktailPrivateGit/cocktails_widget" target="_blank">GitHub Pages</a>
       · Données stockées localement dans votre navigateur
       · <a href="./docs/README.md" target="_blank">Documentation</a>
     </p>
     <p style="margin-top: 8px; font-size: 10px; color: #333;">
-      v1.0.0 · MIT License · 2026
+      v2.1.0 · MIT License · 2026
     </p>
   </div>
 
