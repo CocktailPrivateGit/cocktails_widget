@@ -37,6 +37,7 @@ jobs:
         run: |
           npm install -g jshint
           jshint src/shared/utils.js --esversion=6 || echo "⚠️ Avertissements JS détectés (non bloquant)"
+          jshint src/barplanning-pro/app.js --esversion=11 --esmodule || echo "⚠️ Avertissements BarPlanning JS détectés (non bloquant)"
 
       # 5. Résumé final
       - name: 📋 Résumé
