@@ -60,6 +60,9 @@
   <div class="nav-tab" onclick="switchTab(&#39;charges&#39;)" id="tab-charges">
     <span class="tab-icon">↺</span> Charges Récurrentes
   </div>
+  <div class="nav-tab" onclick="switchTab(&#39;campagnes&#39;)" id="tab-campagnes">
+    <span class="tab-icon">📣</span> Campagnes
+  </div>
 </nav>
 
 <!-- MAIN -->
@@ -737,6 +740,32 @@
 
     <!-- Liste groupée -->
     <div id="cr-list" style="display:flex;flex-direction:column;gap:0"></div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CAMPAGNES                                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-campagnes" class="section">
+
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 class="section-title">Campagnes Publicitaires</h2>
+        <p class="section-sub">Rentabilité des campagnes Instagram — données depuis BarComm Pro</p>
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="refreshCampagnesFinance()">↺ Actualiser depuis BarComm</button>
+    </div>
+
+    <!-- KPIs globaux -->
+    <div id="camp-fin-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px;"></div>
+
+    <!-- Message si non connecté -->
+    <div id="camp-fin-msg" style="display:none;padding:16px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:8px;font-size:12px;color:rgba(245,240,232,0.6);margin-bottom:16px;">
+      Connecte-toi au cloud (☁️ Sync Google) pour charger les campagnes depuis BarComm Pro.
+    </div>
+
+    <!-- Tableau des campagnes -->
+    <div id="camp-fin-list"></div>
 
   </section>
 

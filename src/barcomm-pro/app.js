@@ -1148,9 +1148,11 @@ function toggle(header) {
 // ═══════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   loadSituation();
+  loadMetaConfig();
   loadChecks();
   loadCustomActions();
   loadJournal();
+  renderCampagnes();
   refreshJSONPreview();
   const d = getData();
   if (d.ig || d.tt) updateSaveTime();
@@ -1164,6 +1166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCustomActions();
     loadJournal();
     loadEvinChecks();
+    renderCampagnes();
     refreshJSONPreview();
     updateSaveTime();
   }, COLLECTION);
@@ -1384,6 +1387,339 @@ function buildBrandDesignPrompt(brandRequest, brandType) {
 }
 
 // ═══════════════════════════════════════
+// API META — INSTAGRAM GRAPH API
+// ═══════════════════════════════════════
+const META_GRAPH = 'https://graph.facebook.com/v19.0';
+
+let metaConfigTimer;
+function autoSaveMetaConfig() {
+  clearTimeout(metaConfigTimer);
+  metaConfigTimer = setTimeout(saveMetaConfig, 600);
+}
+
+function saveMetaConfig() {
+  const d = getData();
+  const tokenEl = document.getElementById('meta-token-input');
+  const igIdEl  = document.getElementById('meta-ig-id-input');
+  if (tokenEl) d.metaToken = tokenEl.value.trim();
+  if (igIdEl)  d.metaIgId  = igIdEl.value.trim();
+  setData(d);
+}
+
+function loadMetaConfig() {
+  const d = getData();
+  const tokenEl = document.getElementById('meta-token-input');
+  const igIdEl  = document.getElementById('meta-ig-id-input');
+  const lastEl  = document.getElementById('meta-last-sync');
+  if (tokenEl && d.metaToken) tokenEl.value = d.metaToken;
+  if (igIdEl  && d.metaIgId)  igIdEl.value  = d.metaIgId;
+  if (lastEl  && d.metaLastSync) {
+    const dt = new Date(d.metaLastSync);
+    lastEl.textContent = dt.toLocaleString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  }
+  if (d.metaFollowers !== undefined) renderMetaKpis(d);
+  // Show sync button on dashboard if configured
+  const dashBtn = document.getElementById('btn-ig-sync');
+  if (dashBtn && d.metaToken && d.metaIgId) dashBtn.style.display = 'block';
+}
+
+function renderMetaKpis(d) {
+  const fmt = v => (v !== null && v !== undefined) ? Number(v).toLocaleString('fr-FR') : '—';
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = fmt(val); };
+  set('meta-followers', d.metaFollowers);
+  set('meta-posts', d.metaMediaCount);
+  set('meta-reach', d.metaReach);
+  set('meta-impressions', d.metaImpressions);
+}
+
+function setMetaStatus(msg, type) {
+  const el = document.getElementById('meta-status-bar');
+  if (!el) return;
+  el.style.display = 'block';
+  const styles = {
+    ok:    { bg: 'rgba(74,222,128,0.08)',  border: '1px solid rgba(74,222,128,0.25)',   color: 'var(--vert)' },
+    error: { bg: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)', color: 'var(--rouge)' },
+    info:  { bg: 'rgba(200,169,110,0.07)', border: '1px solid rgba(200,169,110,0.2)',  color: 'var(--or)' }
+  };
+  const s = styles[type] || styles.info;
+  el.style.background = s.bg;
+  el.style.border = s.border;
+  el.style.color = s.color;
+  el.textContent = msg;
+}
+
+async function detectIgAccount() {
+  const token = document.getElementById('meta-token-input')?.value.trim();
+  if (!token) { showToast('Entre ton Access Token d\'abord.'); return; }
+  setMetaStatus('🔍 Recherche du compte Instagram associé…', 'info');
+  try {
+    const resp = await fetch(`${META_GRAPH}/me/accounts?fields=name,instagram_business_account&access_token=${encodeURIComponent(token)}`);
+    const json = await resp.json();
+    if (json.error) { setMetaStatus('❌ ' + json.error.message, 'error'); return; }
+    const page = (json.data || []).find(p => p.instagram_business_account);
+    if (!page) {
+      setMetaStatus('⚠️ Aucun compte Instagram Pro trouvé. Assure-toi que ton compte IG est lié à une Page Facebook professionnelle.', 'error');
+      return;
+    }
+    const igId = page.instagram_business_account.id;
+    const idInput = document.getElementById('meta-ig-id-input');
+    if (idInput) idInput.value = igId;
+    saveMetaConfig();
+    setMetaStatus(`✅ Compte trouvé — Page : ${page.name} · ID Instagram : ${igId}`, 'ok');
+    showToast('Compte Instagram détecté !');
+  } catch(e) {
+    setMetaStatus('❌ Erreur réseau : ' + e.message, 'error');
+  }
+}
+
+async function syncMetaIG() {
+  const d = getData();
+  const token = d.metaToken || document.getElementById('meta-token-input')?.value.trim();
+  const igId  = d.metaIgId  || document.getElementById('meta-ig-id-input')?.value.trim();
+  if (!token || !igId) {
+    showToast('Configure ton token Meta d\'abord.');
+    nav('meta');
+    return;
+  }
+  setMetaStatus('⟳ Synchronisation en cours…', 'info');
+  ['btn-meta-sync','btn-meta-sync2','btn-ig-sync'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  });
+  try {
+    const infoResp = await fetch(
+      `${META_GRAPH}/${igId}?fields=followers_count,media_count,name&access_token=${encodeURIComponent(token)}`
+    );
+    const info = await infoResp.json();
+    if (info.error) {
+      setMetaStatus('❌ ' + info.error.message, 'error');
+      showToast('Erreur Meta : ' + info.error.message);
+      return;
+    }
+    // Insights optionnels (nécessite instagram_manage_insights)
+    let reach = null, impressions = null;
+    try {
+      const insResp = await fetch(
+        `${META_GRAPH}/${igId}/insights?metric=reach,impressions&period=week&access_token=${encodeURIComponent(token)}`
+      );
+      const ins = await insResp.json();
+      if (!ins.error && ins.data) {
+        const rData = ins.data.find(m => m.name === 'reach');
+        const iData = ins.data.find(m => m.name === 'impressions');
+        if (rData?.values?.length) reach = rData.values[rData.values.length - 1].value;
+        if (iData?.values?.length) impressions = iData.values[iData.values.length - 1].value;
+      }
+    } catch(_) { /* insights non disponibles */ }
+
+    const now = new Date().toISOString();
+    d.ig              = String(info.followers_count);
+    d.posts           = String(info.media_count);
+    d.metaFollowers   = info.followers_count;
+    d.metaMediaCount  = info.media_count;
+    d.metaReach       = reach;
+    d.metaImpressions = impressions;
+    d.metaLastSync    = now;
+    setData(d);
+
+    // Mettre à jour les champs de "Ma Situation"
+    const igInput    = document.getElementById('s-ig');
+    const postsInput = document.getElementById('s-posts');
+    if (igInput)    igInput.value    = info.followers_count;
+    if (postsInput) postsInput.value = info.media_count;
+
+    updateDashboard(d);
+    renderMetaKpis(d);
+
+    const lastEl = document.getElementById('meta-last-sync');
+    if (lastEl) {
+      const dt = new Date(now);
+      lastEl.textContent = dt.toLocaleString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    }
+
+    const reachTxt = reach !== null ? ` · Reach : ${reach.toLocaleString('fr-FR')}` : '';
+    setMetaStatus(`✅ Synchronisé — ${info.followers_count.toLocaleString('fr-FR')} abonnés · ${info.media_count} posts${reachTxt}`, 'ok');
+    showToast(`✅ Instagram sync — ${info.followers_count.toLocaleString('fr-FR')} abonnés`);
+
+    const dashBtn = document.getElementById('btn-ig-sync');
+    if (dashBtn) dashBtn.style.display = 'block';
+  } catch(e) {
+    setMetaStatus('❌ Erreur réseau : ' + e.message, 'error');
+    showToast('Erreur connexion Meta');
+  } finally {
+    ['btn-meta-sync','btn-meta-sync2','btn-ig-sync'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    });
+  }
+}
+
+// ═══════════════════════════════════════
+// CAMPAGNES PUBLICITAIRES
+// ═══════════════════════════════════════
+
+let editingCampagneId = null;
+
+function getCampagnes() {
+  return getData().campagnes || [];
+}
+
+function saveCampagne() {
+  const nom        = document.getElementById('camp-nom').value.trim();
+  const type       = document.getElementById('camp-type').value;
+  const statut     = document.getElementById('camp-statut').value;
+  const dateDebut  = document.getElementById('camp-date-debut').value;
+  const dateFin    = document.getElementById('camp-date-fin').value;
+  const budget     = parseFloat(document.getElementById('camp-budget').value) || 0;
+  const depense    = parseFloat(document.getElementById('camp-depense').value) || 0;
+  const impressions= parseInt(document.getElementById('camp-impressions').value) || 0;
+  const reach      = parseInt(document.getElementById('camp-reach').value) || 0;
+  const clics      = parseInt(document.getElementById('camp-clics').value) || 0;
+  const devis      = parseInt(document.getElementById('camp-devis').value) || 0;
+  const valDevis   = parseFloat(document.getElementById('camp-valeur-devis').value) || 0;
+  const contrats   = parseInt(document.getElementById('camp-contrats').value) || 0;
+  const ca         = parseFloat(document.getElementById('camp-ca').value) || 0;
+  const notes      = document.getElementById('camp-notes').value.trim();
+
+  if (!nom) { showToast('Le nom de la campagne est requis', 'error'); return; }
+
+  const d = getData();
+  if (!d.campagnes) d.campagnes = [];
+
+  if (editingCampagneId) {
+    const idx = d.campagnes.findIndex(c => c.id === editingCampagneId);
+    if (idx !== -1) {
+      d.campagnes[idx] = { ...d.campagnes[idx], nom, type, statut, dateDebut, dateFin, budget, depense, impressions, reach, clics, devisGeneres: devis, valeurDevis: valDevis, contratsSignes: contrats, caGenere: ca, notes };
+    }
+    editingCampagneId = null;
+  } else {
+    d.campagnes.push({ id: Date.now(), nom, type, statut, dateDebut, dateFin, budget, depense, impressions, reach, clics, devisGeneres: devis, valeurDevis: valDevis, contratsSignes: contrats, caGenere: ca, notes });
+  }
+
+  setData(d);
+  clearCampagneForm();
+  renderCampagnes();
+  showToast('Campagne enregistrée', 'success');
+}
+
+function editCampagne(id) {
+  const c = getCampagnes().find(x => x.id === id);
+  if (!c) return;
+  editingCampagneId = id;
+  document.getElementById('camp-nom').value            = c.nom || '';
+  document.getElementById('camp-type').value           = c.type || 'boost_post';
+  document.getElementById('camp-statut').value         = c.statut || 'active';
+  document.getElementById('camp-date-debut').value     = c.dateDebut || '';
+  document.getElementById('camp-date-fin').value       = c.dateFin || '';
+  document.getElementById('camp-budget').value         = c.budget || '';
+  document.getElementById('camp-depense').value        = c.depense || '';
+  document.getElementById('camp-impressions').value    = c.impressions || '';
+  document.getElementById('camp-reach').value          = c.reach || '';
+  document.getElementById('camp-clics').value          = c.clics || '';
+  document.getElementById('camp-devis').value          = c.devisGeneres || '';
+  document.getElementById('camp-valeur-devis').value   = c.valeurDevis || '';
+  document.getElementById('camp-contrats').value       = c.contratsSignes || '';
+  document.getElementById('camp-ca').value             = c.caGenere || '';
+  document.getElementById('camp-notes').value          = c.notes || '';
+  document.getElementById('camp-form-title').textContent = 'Modifier la campagne';
+  document.getElementById('camp-submit-btn').textContent = 'Mettre à jour';
+  document.getElementById('camp-cancel-edit').style.display = 'inline-block';
+  document.getElementById('camp-nom').focus();
+}
+
+function deleteCampagne(id) {
+  if (!confirm('Supprimer cette campagne ?')) return;
+  const d = getData();
+  d.campagnes = (d.campagnes || []).filter(c => c.id !== id);
+  setData(d);
+  renderCampagnes();
+  showToast('Campagne supprimée', 'success');
+}
+
+function clearCampagneForm() {
+  ['camp-nom','camp-budget','camp-depense','camp-impressions','camp-reach','camp-clics',
+   'camp-devis','camp-valeur-devis','camp-contrats','camp-ca','camp-notes',
+   'camp-date-debut','camp-date-fin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const typeEl = document.getElementById('camp-type');
+  if (typeEl) typeEl.value = 'boost_post';
+  const statutEl = document.getElementById('camp-statut');
+  if (statutEl) statutEl.value = 'active';
+  const title = document.getElementById('camp-form-title');
+  if (title) title.textContent = 'Nouvelle campagne Instagram';
+  const btn = document.getElementById('camp-submit-btn');
+  if (btn) btn.textContent = 'Enregistrer';
+  const cancel = document.getElementById('camp-cancel-edit');
+  if (cancel) cancel.style.display = 'none';
+  editingCampagneId = null;
+}
+
+function renderCampagnes() {
+  const campagnes = getCampagnes();
+  const list = document.getElementById('camp-list');
+  if (!list) return;
+
+  // Résumé global
+  const totalBudget  = campagnes.reduce((s, c) => s + (c.budget || 0), 0);
+  const totalDepense = campagnes.reduce((s, c) => s + (c.depense || 0), 0);
+  const totalDevis   = campagnes.reduce((s, c) => s + (c.devisGeneres || 0), 0);
+  const totalCA      = campagnes.reduce((s, c) => s + (c.caGenere || 0), 0);
+  const roi          = totalDepense > 0 ? ((totalCA - totalDepense) / totalDepense * 100).toFixed(0) : '—';
+
+  const sumEl = document.getElementById('camp-summary');
+  if (sumEl) {
+    sumEl.innerHTML = `
+      <div class="kpi-card"><div class="kpi-val">${formatCurrency(totalDepense)}</div><div class="kpi-label">Dépensé</div></div>
+      <div class="kpi-card"><div class="kpi-val">${formatCurrency(totalBudget)}</div><div class="kpi-label">Budget total</div></div>
+      <div class="kpi-card"><div class="kpi-val">${totalDevis}</div><div class="kpi-label">Devis générés</div></div>
+      <div class="kpi-card"><div class="kpi-val">${formatCurrency(totalCA)}</div><div class="kpi-label">CA généré</div></div>
+      <div class="kpi-card"><div class="kpi-val" style="color:${roi !== '—' && Number(roi) >= 0 ? 'var(--vert)' : 'var(--rouge)'}">${roi !== '—' ? roi + '%' : '—'}</div><div class="kpi-label">ROI global</div></div>
+    `;
+  }
+
+  if (!campagnes.length) {
+    list.innerHTML = '<p style="color:rgba(245,240,232,0.4);text-align:center;padding:32px 0;">Aucune campagne — créez votre première campagne ci-dessus.</p>';
+    return;
+  }
+
+  const STATUT_LABEL = { active: '🟢 Active', terminee: '⚫ Terminée', pause: '🟡 Pause' };
+  const TYPE_LABEL   = { boost_post: 'Boost Post', story: 'Story Ad', reel: 'Reel Ad', carousel: 'Carousel Ad', autre: 'Autre' };
+
+  list.innerHTML = campagnes.slice().reverse().map(c => {
+    const depenseAff  = c.depense || c.budget || 0;
+    const roiC        = depenseAff > 0 && c.caGenere > 0 ? ((c.caGenere - depenseAff) / depenseAff * 100).toFixed(0) + '%' : '—';
+    const coutDevis   = c.devisGeneres > 0 ? formatCurrency(depenseAff / c.devisGeneres) + '/devis' : '—';
+    const dateRange   = c.dateDebut ? `${c.dateDebut}${c.dateFin ? ' → ' + c.dateFin : ''}` : '—';
+    return `
+      <div class="camp-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--creme);margin-bottom:4px;">${c.nom}</div>
+            <div style="font-size:11px;color:rgba(245,240,232,0.5);">${TYPE_LABEL[c.type]||c.type} · ${dateRange}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.06);">${STATUT_LABEL[c.statut]||c.statut}</span>
+            <button onclick="editCampagne(${c.id})" style="background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);color:var(--or);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">Modifier</button>
+            <button onclick="deleteCampagne(${c.id})" style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:var(--rouge);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">✕</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:12px;">
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--or);">${formatCurrency(depenseAff)}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Dépensé</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${(c.impressions||0).toLocaleString('fr-FR')}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Impressions</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${(c.reach||0).toLocaleString('fr-FR')}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Reach</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${c.clics||0}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Clics</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--bleu);">${c.devisGeneres||0}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Devis</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--vert);">${formatCurrency(c.caGenere||0)}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">CA généré</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:${roiC !== '—' && Number(roiC) >= 0 ? 'var(--vert)' : 'var(--rouge)'}">${roiC}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">ROI</div></div>
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${coutDevis}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Coût/devis</div></div>
+        </div>
+        ${c.notes ? `<div style="margin-top:10px;font-size:11px;color:rgba(245,240,232,0.5);font-style:italic;">${c.notes}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
 // EXPOSITION GLOBALE — requis pour type="module"
 // Les onclick="" du HTML ne voient pas les fonctions
 // de module. On les expose explicitement sur window.
@@ -1428,3 +1764,12 @@ window.launchCompetitiveAnalysis = launchCompetitiveAnalysis;
 window.openBrandDesigner      = openBrandDesigner;
 window.closeBrandModal        = closeBrandModal;
 window.launchBrandDesign      = launchBrandDesign;
+window.syncMetaIG             = syncMetaIG;
+window.detectIgAccount        = detectIgAccount;
+window.autoSaveMetaConfig     = autoSaveMetaConfig;
+
+// ── Campagnes ──
+window.saveCampagne           = saveCampagne;
+window.deleteCampagne         = deleteCampagne;
+window.editCampagne           = editCampagne;
+window.clearCampagneForm      = clearCampagneForm;

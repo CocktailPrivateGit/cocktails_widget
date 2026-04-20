@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // FIREBASE SYNC
 // ═══════════════════════════════════════════════════════════════════
-import { loginWithGoogle, logout, initAuth, saveToCloud } from '../shared/firebase-sync.js';
+import { loginWithGoogle, logout, initAuth, saveToCloud, readFromCollection } from '../shared/firebase-sync.js';
 
 const COLLECTION = 'barmanfinance';
 
@@ -83,6 +83,7 @@ function switchTab(tab) {
   if(tab === 'amortissement') renderAmortissement();
   if(tab === 'lancement') { renderAchats(); renderLaunchSummary(); }
   if(tab === 'charges') renderChargesRecurrentes();
+  if(tab === 'campagnes') refreshCampagnesFinance();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1503,6 +1504,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ═══════════════════════════════════════════════════════════════════
+// CAMPAGNES — LECTURE CROSS-WIDGET DEPUIS BARCOMM PRO
+// ═══════════════════════════════════════════════════════════════════
+
+async function refreshCampagnesFinance() {
+  const msgEl = document.getElementById('camp-fin-msg');
+  const btn = document.querySelector('[onclick="refreshCampagnesFinance()"]');
+  if (btn) btn.textContent = '↻ Chargement...';
+
+  const barcommData = await readFromCollection('barcomm');
+
+  if (btn) btn.textContent = '↺ Actualiser depuis BarComm';
+
+  if (!barcommData) {
+    if (msgEl) msgEl.style.display = 'block';
+    renderCampagnesFinance([]);
+    return;
+  }
+  if (msgEl) msgEl.style.display = 'none';
+  renderCampagnesFinance(barcommData.campagnes || []);
+}
+
+function renderCampagnesFinance(campagnes) {
+  const sumEl  = document.getElementById('camp-fin-summary');
+  const listEl = document.getElementById('camp-fin-list');
+  if (!sumEl || !listEl) return;
+
+  const totalDepense = campagnes.reduce((s, c) => s + (c.depense || c.budget || 0), 0);
+  const totalDevis   = campagnes.reduce((s, c) => s + (c.devisGeneres || 0), 0);
+  const totalCA      = campagnes.reduce((s, c) => s + (c.caGenere || 0), 0);
+  const totalContrats= campagnes.reduce((s, c) => s + (c.contratsSignes || 0), 0);
+  const roiGlobal    = totalDepense > 0 ? ((totalCA - totalDepense) / totalDepense * 100).toFixed(0) : null;
+
+  const fmt = v => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+
+  sumEl.innerHTML = `
+    <div class="kpi-card"><div class="kpi-value">${fmt(totalDepense)}</div><div class="kpi-label">Dépensé total</div></div>
+    <div class="kpi-card"><div class="kpi-value">${totalDevis}</div><div class="kpi-label">Devis générés</div></div>
+    <div class="kpi-card"><div class="kpi-value">${totalContrats}</div><div class="kpi-label">Contrats signés</div></div>
+    <div class="kpi-card"><div class="kpi-value">${fmt(totalCA)}</div><div class="kpi-label">CA généré</div></div>
+    <div class="kpi-card"><div class="kpi-value" style="color:${roiGlobal !== null && Number(roiGlobal) >= 0 ? 'var(--green)' : 'var(--red)'}">${roiGlobal !== null ? roiGlobal + '%' : '—'}</div><div class="kpi-label">ROI global</div></div>
+  `;
+
+  if (!campagnes.length) {
+    listEl.innerHTML = '<p style="color:rgba(244,241,235,0.4);text-align:center;padding:32px 0;">Aucune campagne dans BarComm Pro. Crée-en une dans l\'onglet Campagnes de BarComm Pro.</p>';
+    return;
+  }
+
+  const STATUT = { active: '🟢 Active', terminee: '⚫ Terminée', pause: '🟡 Pause' };
+  const TYPE   = { boost_post: 'Boost Post', story: 'Story Ad', reel: 'Reel Ad', carousel: 'Carousel Ad', autre: 'Autre' };
+
+  listEl.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.08);color:rgba(244,241,235,0.5);text-transform:uppercase;font-size:10px;letter-spacing:0.5px;">
+            <th style="padding:8px 12px;text-align:left;">Campagne</th>
+            <th style="padding:8px 12px;text-align:right;">Dépense</th>
+            <th style="padding:8px 12px;text-align:right;">Devis</th>
+            <th style="padding:8px 12px;text-align:right;">Contrats</th>
+            <th style="padding:8px 12px;text-align:right;">CA généré</th>
+            <th style="padding:8px 12px;text-align:right;">Coût/devis</th>
+            <th style="padding:8px 12px;text-align:right;">ROI</th>
+            <th style="padding:8px 12px;text-align:center;">Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${campagnes.slice().reverse().map(c => {
+            const dep     = c.depense || c.budget || 0;
+            const roi     = dep > 0 && c.caGenere > 0 ? ((c.caGenere - dep) / dep * 100).toFixed(0) : null;
+            const coutDev = c.devisGeneres > 0 ? fmt(dep / c.devisGeneres) : '—';
+            const roiCol  = roi !== null ? (Number(roi) >= 0 ? 'var(--green)' : 'var(--red)') : 'rgba(244,241,235,0.4)';
+            return `
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:10px 12px;">
+                  <div style="font-weight:600;color:var(--cream);">${c.nom}</div>
+                  <div style="font-size:10px;color:rgba(244,241,235,0.4);">${TYPE[c.type]||c.type}${c.dateDebut ? ' · ' + c.dateDebut : ''}</div>
+                </td>
+                <td style="padding:10px 12px;text-align:right;color:var(--gold);">${fmt(dep)}</td>
+                <td style="padding:10px 12px;text-align:right;">${c.devisGeneres || 0}</td>
+                <td style="padding:10px 12px;text-align:right;">${c.contratsSignes || 0}</td>
+                <td style="padding:10px 12px;text-align:right;color:var(--green);">${fmt(c.caGenere || 0)}</td>
+                <td style="padding:10px 12px;text-align:right;">${coutDev}</td>
+                <td style="padding:10px 12px;text-align:right;font-weight:600;color:${roiCol};">${roi !== null ? roi + '%' : '—'}</td>
+                <td style="padding:10px 12px;text-align:center;font-size:10px;">${STATUT[c.statut]||c.statut}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // EXPOSITION GLOBALE — requis pour type="module"
 // Les onclick="" et onchange="" du HTML ne voient pas
 // les fonctions de module. On les expose sur window.
@@ -1538,3 +1631,4 @@ window.saveChargeRecurrente     = saveChargeRecurrente;
 window.deleteChargeRecurrente   = deleteChargeRecurrente;
 window.toggleChargeRecurrente   = toggleChargeRecurrente;
 window.clearCrForm              = clearCrForm;
+window.refreshCampagnesFinance  = refreshCampagnesFinance;

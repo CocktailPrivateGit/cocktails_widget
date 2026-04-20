@@ -172,5 +172,23 @@ function showSyncStatus(message, type) {
   el.className   = 'sync-status sync-' + type;
 }
 
+/**
+ * Lire les données d'une autre collection (cross-widget)
+ * @param {string} collectionName  Nom de la collection à lire (ex: 'barcomm')
+ * @returns {Object|null}
+ */
+async function readFromCollection(collectionName) {
+  if (!currentUser) return null;
+  try {
+    const ref  = doc(db, 'users', currentUser.uid, collectionName, 'data');
+    const snap = await getDoc(ref);
+    if (snap.exists()) return JSON.parse(snap.data().payload);
+    return null;
+  } catch (e) {
+    console.error('[Firebase] Erreur lecture cross-widget :', e);
+    return null;
+  }
+}
+
 // ── Exports ──
-export { loginWithGoogle, logout, initAuth, saveToCloud, showSyncStatus };
+export { loginWithGoogle, logout, initAuth, saveToCloud, showSyncStatus, readFromCollection };

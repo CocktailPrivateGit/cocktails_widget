@@ -139,9 +139,15 @@
       <div class="nav-item" onclick="nav(&#39;bios&#39;)" data-p="bios">
         <span class="nav-icon">👤</span><span>Bios Rédigées</span>
       </div>
+      <div class="nav-item" onclick="nav(&#39;campagnes&#39;)" data-p="campagnes">
+        <span class="nav-icon">📣</span><span>Campagnes</span>
+      </div>
       <div class="nav-divider"></div>
+      <div class="nav-item" onclick="nav(&#39;meta&#39;)" data-p="meta">
+        <span class="nav-icon">📱</span><span>API Meta</span><span class="nav-badge" style="background:#e1306c;color:#fff;">IG</span>
+      </div>
       <div class="nav-item" onclick="nav(&#39;sync&#39;)" data-p="sync">
-        <span class="nav-icon">☁️</span><span>Sync Drive</span><span class="nav-badge" style="background:#4ade80;color:#0a0a0a;">New</span>
+        <span class="nav-icon">☁️</span><span>Sync Drive</span>
       </div>
     </nav>
 
@@ -157,10 +163,11 @@
 
         <div class="label">Métriques en direct</div>
         <div class="grid-4" style="margin-bottom:1.25rem;">
-          <div class="kpi-card">
+          <div class="kpi-card" style="position:relative;">
             <div class="kpi-val" id="kpi-ig">—</div>
             <div class="kpi-label">Abonnés Instagram</div>
             <div class="kpi-delta" id="d-ig"></div>
+            <button onclick="syncMetaIG()" id="btn-ig-sync" title="Synchroniser via API Meta" style="position:absolute;top:8px;right:8px;background:rgba(225,48,108,0.12);border:1px solid rgba(225,48,108,0.3);color:#e1306c;border-radius:12px;padding:2px 8px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:0.4px;display:none;">⟳ SYNC</button>
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-tt">—</div>
@@ -335,6 +342,88 @@
           <button class="btn btn-gold" onclick="saveSituation()">💾 Sauvegarder tout</button>
           <button class="btn btn-outline btn-sm" onclick="exportData()">📤 Exporter JSON</button>
           <button class="btn btn-outline btn-sm" onclick="resetData()">🗑 Réinitialiser</button>
+        </div>
+      </div>
+
+      <!-- ═══ API META — INSTAGRAM ═══ -->
+      <div class="panel" id="panel-meta">
+        <div class="section-header">
+          <div><div class="section-title">API Meta — Instagram</div><div class="section-sub">Synchronisation automatique de tes métriques depuis l'API officielle</div></div>
+          <button class="btn btn-gold" onclick="syncMetaIG()" id="btn-meta-sync">⟳ Synchroniser</button>
+        </div>
+
+        <div id="meta-status-bar" style="display:none;padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:1rem;line-height:1.5;"></div>
+
+        <!-- KPIs live -->
+        <div class="label">Métriques Instagram en direct</div>
+        <div class="grid-4" style="margin-bottom:1.25rem;" id="meta-kpis">
+          <div class="kpi-card">
+            <div class="kpi-val" id="meta-followers">—</div>
+            <div class="kpi-label">Abonnés</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="meta-posts">—</div>
+            <div class="kpi-label">Posts publiés</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="meta-reach">—</div>
+            <div class="kpi-label">Reach (7 jours)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="meta-impressions">—</div>
+            <div class="kpi-label">Impressions (7j)</div>
+          </div>
+        </div>
+
+        <!-- Configuration token -->
+        <div class="label">Configuration du token</div>
+        <div class="card">
+          <div style="font-size:11px;color:var(--gris);margin-bottom:14px;line-height:1.8;">
+            Il te faut un <strong style="color:var(--or);">User Access Token</strong> depuis l'Explorateur Meta API.<br>
+            Permissions requises : <code style="color:var(--vert);">instagram_basic</code> · <code style="color:var(--vert);">instagram_manage_insights</code> · <code style="color:var(--vert);">pages_read_engagement</code>
+          </div>
+          <div class="metric-row">
+            <span class="metric-icon">🔑</span>
+            <span class="metric-label">Access Token</span>
+            <input class="metric-input" id="meta-token-input" type="password" placeholder="EAABx..." style="flex:1;min-width:180px;font-family:monospace;font-size:11px;" oninput="autoSaveMetaConfig()">
+          </div>
+          <div class="metric-row" style="margin-top:8px;gap:8px;flex-wrap:wrap;">
+            <span class="metric-icon">🆔</span>
+            <span class="metric-label">ID Compte IG</span>
+            <input class="metric-input" id="meta-ig-id-input" type="text" placeholder="17841400..." style="font-family:monospace;font-size:11px;" oninput="autoSaveMetaConfig()">
+            <button class="btn btn-outline btn-sm" onclick="detectIgAccount()">🔍 Auto-détecter</button>
+          </div>
+          <div style="font-size:10px;color:var(--gris2);margin-top:10px;">
+            Token et ID stockés uniquement en local sur ton appareil — jamais transmis à des serveurs tiers.
+          </div>
+        </div>
+
+        <!-- Sync status -->
+        <div class="label">Synchronisation</div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-size:12px;color:var(--creme2);">Dernière sync : <span id="meta-last-sync" style="color:var(--or);">Jamais</span></div>
+              <div style="font-size:11px;color:var(--gris);margin-top:4px;">La sync met à jour automatiquement "Ma Situation" (abonnés + posts).</div>
+            </div>
+            <button class="btn btn-gold" onclick="syncMetaIG()" id="btn-meta-sync2">⟳ Synchroniser maintenant</button>
+          </div>
+        </div>
+
+        <!-- Guide -->
+        <div class="label">Guide — Obtenir un token Meta</div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--creme2);line-height:2;">
+            <strong style="color:var(--or);">1.</strong> Rends-toi sur <strong>developers.facebook.com</strong> → "Mes applications"<br>
+            <strong style="color:var(--or);">2.</strong> Crée une app de type "Business" (si pas encore fait)<br>
+            <strong style="color:var(--or);">3.</strong> Dans l'app → <strong>Outils</strong> → <strong>Explorateur de l'API Graph</strong><br>
+            <strong style="color:var(--or);">4.</strong> Sélectionne ton app, clique <strong>"Générer un token"</strong> avec les 3 permissions ci-dessus<br>
+            <strong style="color:var(--or);">5.</strong> Colle le token ici puis clique <strong>"🔍 Auto-détecter"</strong><br>
+            <strong style="color:var(--or);">6.</strong> Lance la sync !
+          </div>
+          <div style="margin-top:12px;padding:8px 12px;background:rgba(248,113,113,0.07);border-left:3px solid var(--rouge);border-radius:0 4px 4px 0;font-size:11px;color:var(--gris);">
+            ⚠️ Les tokens de l'Explorateur expirent en <strong>1h</strong>. Pour un usage permanent, génère un <strong>token longue durée (60 jours)</strong> via l'endpoint <code>/oauth/access_token?grant_type=fb_exchange_token</code> — voir la doc Meta.
+          </div>
         </div>
       </div>
 
@@ -1005,6 +1094,111 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
           <textarea class="input" id="paste-input" placeholder="Colle ton JSON ici..." style="height:100px;font-size:11px;font-family:monospace"></textarea>
           <div class="btn-row"><button class="btn btn-gold btn-sm" onclick="loadFromPaste()">✅ Charger ce JSON</button><button class="btn btn-outline btn-sm" onclick="document.getElementById(&#39;paste-area&#39;).style.display=&#39;none&#39;">Annuler</button></div>
         </div>
+      </div>
+
+      <!-- ═══ CAMPAGNES ═══ -->
+      <div class="panel" id="panel-campagnes">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Campagnes Publicitaires Instagram</div>
+            <div class="section-sub">Suivi des performances et rentabilité de tes campagnes</div>
+          </div>
+        </div>
+
+        <!-- Résumé global -->
+        <div id="camp-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:24px;"></div>
+
+        <!-- Formulaire -->
+        <div class="card" style="margin-bottom:24px;">
+          <div id="camp-form-title" style="font-size:13px;font-weight:600;color:var(--or);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;">Nouvelle campagne Instagram</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="grid-column:1/-1;">
+              <label class="label">Nom de la campagne *</label>
+              <input id="camp-nom" type="text" class="input" placeholder="ex: Boost Été 2026 — Formule Privé">
+            </div>
+            <div>
+              <label class="label">Type d'annonce</label>
+              <select id="camp-type" class="input">
+                <option value="boost_post">Boost Post</option>
+                <option value="story">Story Ad</option>
+                <option value="reel">Reel Ad</option>
+                <option value="carousel">Carousel Ad</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Statut</label>
+              <select id="camp-statut" class="input">
+                <option value="active">🟢 Active</option>
+                <option value="pause">🟡 En pause</option>
+                <option value="terminee">⚫ Terminée</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Date de début</label>
+              <input id="camp-date-debut" type="date" class="input">
+            </div>
+            <div>
+              <label class="label">Date de fin</label>
+              <input id="camp-date-fin" type="date" class="input">
+            </div>
+            <div>
+              <label class="label">Budget prévu (€)</label>
+              <input id="camp-budget" type="number" class="input" placeholder="0" min="0" step="0.01">
+            </div>
+            <div>
+              <label class="label">Dépense réelle (€)</label>
+              <input id="camp-depense" type="number" class="input" placeholder="0" min="0" step="0.01">
+            </div>
+          </div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(245,240,232,0.4);margin:14px 0 10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">Métriques</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div>
+              <label class="label">Impressions</label>
+              <input id="camp-impressions" type="number" class="input" placeholder="0" min="0">
+            </div>
+            <div>
+              <label class="label">Reach</label>
+              <input id="camp-reach" type="number" class="input" placeholder="0" min="0">
+            </div>
+            <div>
+              <label class="label">Clics</label>
+              <input id="camp-clics" type="number" class="input" placeholder="0" min="0">
+            </div>
+          </div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(245,240,232,0.4);margin:14px 0 10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">Résultats commerciaux</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            <div>
+              <label class="label">Devis générés</label>
+              <input id="camp-devis" type="number" class="input" placeholder="0" min="0">
+            </div>
+            <div>
+              <label class="label">Valeur totale devis (€)</label>
+              <input id="camp-valeur-devis" type="number" class="input" placeholder="0" min="0" step="0.01">
+            </div>
+            <div>
+              <label class="label">Contrats signés</label>
+              <input id="camp-contrats" type="number" class="input" placeholder="0" min="0">
+            </div>
+            <div>
+              <label class="label">CA encaissé (€)</label>
+              <input id="camp-ca" type="number" class="input" placeholder="0" min="0" step="0.01">
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <label class="label">Notes</label>
+            <textarea id="camp-notes" class="input" rows="2" placeholder="Contexte, objectifs, apprentissages..."></textarea>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+            <button id="camp-submit-btn" class="btn btn-gold" onclick="saveCampagne()">Enregistrer</button>
+            <button class="btn btn-outline" onclick="clearCampagneForm()">Réinitialiser</button>
+            <button id="camp-cancel-edit" class="btn btn-outline" style="display:none;color:var(--rouge);border-color:rgba(248,113,113,0.3);" onclick="clearCampagneForm()">✕ Annuler la modification</button>
+          </div>
+        </div>
+
+        <!-- Liste des campagnes -->
+        <div class="label">Historique des campagnes</div>
+        <div id="camp-list"></div>
       </div>
 
     </main>
