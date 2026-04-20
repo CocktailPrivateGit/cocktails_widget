@@ -13,6 +13,7 @@ let state = {
   depenses: [],
   equipements: [],
   achats: [],
+  chargesRecurrentes: [],
   meta: { version: '1.0', lastSave: null, created: new Date().toISOString() }
 };
 
@@ -45,7 +46,7 @@ function init() {
 
 function setDefaultDates() {
   const today = new Date().toISOString().split('T')[0];
-  ['rev-date','dep-date','am-date'].forEach(id => {
+  ['rev-date','dep-date','am-date','cr-dateDebut'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = today;
   });
@@ -81,6 +82,7 @@ function switchTab(tab) {
   if(tab === 'depenses') { populateYearFilters(); renderDepenses(); renderDepSummary(); }
   if(tab === 'amortissement') renderAmortissement();
   if(tab === 'lancement') { renderAchats(); renderLaunchSummary(); }
+  if(tab === 'charges') renderChargesRecurrentes();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -724,7 +726,9 @@ function renderDashboard() {
   const caTotal = revFiltered.reduce((s,r) => s+r.montant, 0);
   const depTotal = depFiltered.reduce((s,d) => s+d.montant, 0);
   const urssaf = caTotal * URSSAF_RATE;
-  const benefice = caTotal - depTotal - urssaf;
+  const chargesFixesMensuel = getChargesRecurrentesMonthly();
+  const chargesFixesPeriode = month === 'all' ? chargesFixesMensuel * 12 : chargesFixesMensuel;
+  const benefice = caTotal - depTotal - urssaf - chargesFixesPeriode;
   const nbPrestations = revFiltered.length;
   const panier = nbPrestations ? caTotal/nbPrestations : 0;
 
@@ -745,7 +749,7 @@ function renderDashboard() {
     <div class="kpi-card">
       <div class="kpi-label">Bénéfice Net Est.</div>
       <div class="kpi-value" style="color:${benefice>=0?'var(--green)':'var(--red)'}">${fmt(benefice)}</div>
-      <div class="kpi-sub">après charges & URSSAF</div>
+      <div class="kpi-sub">charges, fixes & URSSAF</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">URSSAF Estimé (21,1%)</div>
@@ -753,9 +757,9 @@ function renderDashboard() {
       <div class="kpi-sub">à provisionner</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Panier Moyen</div>
-      <div class="kpi-value">${fmt(panier)}</div>
-      <div class="kpi-sub">par prestation</div>
+      <div class="kpi-label">Charges Fixes / Mois</div>
+      <div class="kpi-value" style="color:var(--red)">${fmt(chargesFixesMensuel)}</div>
+      <div class="kpi-sub">${state.chargesRecurrentes.filter(c=>c.actif).length} abonnement${state.chargesRecurrentes.filter(c=>c.actif).length>1?'s':''} actif${state.chargesRecurrentes.filter(c=>c.actif).length>1?'s':''}</div>
     </div>`;
 
   // Seuils
@@ -917,6 +921,148 @@ function renderRecent(year) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// CHARGES RÉCURRENTES
+// ═══════════════════════════════════════════════════════════════════
+function getChargesRecurrentesMonthly() {
+  return (state.chargesRecurrentes || []).filter(c => c.actif).reduce((sum, c) => {
+    const mult = c.periodicite === 'mensuel' ? 1 : c.periodicite === 'trimestriel' ? 1/3 : 1/12;
+    return sum + c.montant * mult;
+  }, 0);
+}
+
+function saveChargeRecurrente() {
+  const nom = document.getElementById('cr-nom').value.trim();
+  const montant = parseFloat(document.getElementById('cr-montant').value);
+  if(!nom || isNaN(montant) || montant <= 0) {
+    toast('Veuillez remplir le nom et le montant', 'error'); return;
+  }
+  const charge = {
+    id: Date.now(),
+    nom,
+    categorie: document.getElementById('cr-categorie').value,
+    fournisseur: document.getElementById('cr-fournisseur').value.trim(),
+    montant,
+    periodicite: document.getElementById('cr-periodicite').value,
+    dateDebut: document.getElementById('cr-dateDebut').value || new Date().toISOString().split('T')[0],
+    actif: true,
+    notes: document.getElementById('cr-notes').value.trim()
+  };
+  state.chargesRecurrentes.push(charge);
+  saveToStorage();
+  renderChargesRecurrentes();
+  clearCrForm();
+  toast(`Charge "${nom}" ajoutée`, 'success');
+}
+
+function deleteChargeRecurrente(id) {
+  if(!confirm('Supprimer cette charge récurrente ?')) return;
+  state.chargesRecurrentes = state.chargesRecurrentes.filter(c => c.id !== id);
+  saveToStorage();
+  renderChargesRecurrentes();
+  toast('Charge supprimée');
+}
+
+function toggleChargeRecurrente(id) {
+  const c = state.chargesRecurrentes.find(c => c.id === id);
+  if(c) {
+    c.actif = !c.actif;
+    saveToStorage();
+    renderChargesRecurrentes();
+    toast(c.actif ? 'Charge activée' : 'Charge suspendue');
+  }
+}
+
+function clearCrForm() {
+  ['cr-nom','cr-fournisseur','cr-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cr-montant').value = '';
+  document.getElementById('cr-periodicite').value = 'mensuel';
+  document.getElementById('cr-categorie').value = 'Abonnement numérique';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('cr-dateDebut').value = today;
+}
+
+function renderChargesRecurrentes() {
+  if(!state.chargesRecurrentes) state.chargesRecurrentes = [];
+  const charges = state.chargesRecurrentes;
+  const actives = charges.filter(c => c.actif);
+  const mensuel = getChargesRecurrentesMonthly();
+  const annuel = mensuel * 12;
+
+  const sumEl = document.getElementById('cr-summary');
+  if(sumEl) sumEl.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:11px;color:rgba(244,241,235,0.5)">Coût mensuel</span>
+        <span style="font-size:20px;color:var(--red)">${fmt(mensuel)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">Coût annuel estimé</span>
+        <span style="color:var(--red)">${fmt(annuel)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:rgba(244,241,235,0.5)">Charges actives</span>
+        <span>${actives.length} / ${charges.length}</span>
+      </div>
+    </div>`;
+
+  const byCat = {};
+  actives.forEach(c => {
+    const mult = c.periodicite === 'mensuel' ? 1 : c.periodicite === 'trimestriel' ? 1/3 : 1/12;
+    byCat[c.categorie] = (byCat[c.categorie] || 0) + c.montant * mult;
+  });
+  const catEl = document.getElementById('cr-by-cat');
+  if(catEl) catEl.innerHTML = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(218,171,45,0.06);font-size:12px">
+      <span style="color:rgba(244,241,235,0.6)">${k}</span>
+      <span style="color:var(--red)">${fmt(v)}/mois</span>
+    </div>`).join('') || '<div class="empty-state" style="padding:20px">Aucune charge active</div>';
+
+  const listEl = document.getElementById('cr-list');
+  if(!listEl) return;
+  if(!charges.length) {
+    listEl.innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-icon">◇</div>Aucune charge récurrente enregistrée</div>`;
+    return;
+  }
+
+  const grouped = {};
+  charges.forEach(c => { (grouped[c.categorie] = grouped[c.categorie] || []).push(c); });
+  const periodLabel = { mensuel:'Mensuel', trimestriel:'Trimestriel', annuel:'Annuel' };
+
+  listEl.innerHTML = Object.entries(grouped).map(([cat, items]) => `
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title" style="font-size:11px;text-transform:uppercase;letter-spacing:1px">${cat}</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Désignation</th><th>Fournisseur</th>
+            <th>Montant</th><th>Périodicité</th><th>Équiv. mois</th><th>Statut</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${items.map(c => {
+              const mult = c.periodicite === 'mensuel' ? 1 : c.periodicite === 'trimestriel' ? 1/3 : 1/12;
+              const mensuelEq = c.montant * mult;
+              return `<tr style="${c.actif ? '' : 'opacity:0.45'}">
+                <td>
+                  <div style="font-weight:500">${c.nom}</div>
+                  ${c.notes ? `<div style="font-size:10px;color:rgba(244,241,235,0.4)">${c.notes}</div>` : ''}
+                </td>
+                <td class="td-muted">${c.fournisseur || '—'}</td>
+                <td class="td-red">${fmt(c.montant)}</td>
+                <td><span class="badge badge-blue" style="font-size:9px">${periodLabel[c.periodicite] || c.periodicite}</span></td>
+                <td class="td-muted" style="font-size:11px">${fmt(mensuelEq)}</td>
+                <td>
+                  <button class="btn btn-sm" style="font-size:10px;padding:3px 8px;background:${c.actif ? 'rgba(74,222,128,0.1)' : 'rgba(255,255,255,0.05)'};border:1px solid ${c.actif ? 'rgba(74,222,128,0.3)' : 'rgba(255,255,255,0.1)'};color:${c.actif ? 'var(--green)' : 'rgba(244,241,235,0.4)'}" onclick="toggleChargeRecurrente(${c.id})">${c.actif ? '✓ Actif' : '⏸ Inactif'}</button>
+                </td>
+                <td><button class="btn btn-danger" onclick="deleteChargeRecurrente(${c.id})">✕</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════════════════════════
 function saveToStorage() {
@@ -934,6 +1080,7 @@ function loadFromStorage() {
     if(raw) {
       const parsed = JSON.parse(raw);
       state = { ...state, ...parsed };
+      if(!state.chargesRecurrentes) state.chargesRecurrentes = [];
       // Recalculate amort schedules on load
       state.equipements = state.equipements.map(eq => ({
         ...eq,
@@ -1004,6 +1151,7 @@ function renderAll() {
   renderAmortissement();
   renderAchats();
   renderLaunchSummary();
+  renderChargesRecurrentes();
 }
 
 // ═══════════════════════════════════════════════════════════════════

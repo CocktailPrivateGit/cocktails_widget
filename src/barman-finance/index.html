@@ -57,6 +57,9 @@
   <div class="nav-tab" onclick="switchTab(&#39;lancement&#39;)" id="tab-lancement">
     <span class="tab-icon">✦</span> Plan de Lancement
   </div>
+  <div class="nav-tab" onclick="switchTab(&#39;charges&#39;)" id="tab-charges">
+    <span class="tab-icon">↺</span> Charges Récurrentes
+  </div>
 </nav>
 
 <!-- MAIN -->
@@ -653,6 +656,87 @@
 
     <!-- Liste -->
     <div id="launch-list"></div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CHARGES RÉCURRENTES                                     -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="section-charges" class="section">
+
+    <div class="grid-2">
+      <!-- Formulaire -->
+      <div class="card">
+        <div class="card-title">Ajouter une Charge Récurrente</div>
+        <div class="form-group">
+          <label class="form-label">Désignation *</label>
+          <input type="text" id="cr-nom" class="form-control" placeholder="Ex : Location utilitaire, Adobe CC, Canva Pro…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Catégorie</label>
+            <select id="cr-categorie" class="form-control">
+              <option>Abonnement numérique</option>
+              <option>Location &amp; Utilitaires</option>
+              <option>Assurance</option>
+              <option>Téléphonie &amp; Internet</option>
+              <option>Stockage &amp; Entrepôt</option>
+              <option>Plateforme &amp; Marketplace</option>
+              <option>Autre charge fixe</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Périodicité</label>
+            <select id="cr-periodicite" class="form-control">
+              <option value="mensuel">Mensuel</option>
+              <option value="trimestriel">Trimestriel</option>
+              <option value="annuel">Annuel</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Montant (€) *</label>
+            <input type="number" id="cr-montant" class="form-control" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date de début</label>
+            <input type="date" id="cr-dateDebut" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fournisseur / Plateforme</label>
+          <input type="text" id="cr-fournisseur" class="form-control" placeholder="Ex : Adobe, Canva, Hertz, MAIF…">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input type="text" id="cr-notes" class="form-control" placeholder="Remarques, lien, référence…">
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost btn-sm" onclick="clearCrForm()">Effacer</button>
+          <button class="btn btn-gold" onclick="saveChargeRecurrente()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- Résumé -->
+      <div>
+        <div class="card">
+          <div class="card-title">Résumé des Charges</div>
+          <div id="cr-summary">
+            <div class="empty-state" style="padding:20px">Aucune donnée</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div class="card-title">Par Catégorie (mensuel)</div>
+          <div id="cr-by-cat">
+            <div class="empty-state" style="padding:20px">Aucune donnée</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste groupée -->
+    <div id="cr-list" style="display:flex;flex-direction:column;gap:0"></div>
 
   </section>
 
