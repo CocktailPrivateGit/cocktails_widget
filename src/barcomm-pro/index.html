@@ -400,7 +400,9 @@
           <div class="metric-row">
             <span class="metric-icon">🔑</span>
             <span class="metric-label">Access Token</span>
-            <input class="metric-input" id="meta-token-input" type="password" placeholder="EAABx..." style="flex:1;min-width:180px;font-family:monospace;font-size:11px;" oninput="autoSaveMetaConfig()">
+            <form onsubmit="return false;" style="flex:1;min-width:180px;">
+              <input class="metric-input" id="meta-token-input" type="password" placeholder="EAABx..." style="width:100%;font-family:monospace;font-size:11px;" oninput="autoSaveMetaConfig()">
+            </form>
           </div>
           <div class="metric-row" style="margin-top:8px;gap:8px;flex-wrap:wrap;">
             <span class="metric-icon">🆔</span>
@@ -1605,6 +1607,7 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
 </div>
 
 
+<script src="../shared/utils.js"></script>
 <!-- Phase 4 : JS en module ES6 avec Firebase -->
 <script type="module" src="app.js"></script>
 
