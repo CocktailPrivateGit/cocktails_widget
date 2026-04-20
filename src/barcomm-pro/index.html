@@ -1100,7 +1100,7 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
       <div class="panel" id="panel-campagnes">
         <div class="section-header">
           <div>
-            <div class="section-title">Campagnes Publicitaires Instagram</div>
+            <div class="section-title">Campagnes Publicitaires</div>
             <div class="section-sub">Suivi des performances et rentabilité de tes campagnes</div>
           </div>
         </div>
@@ -1110,11 +1110,20 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
 
         <!-- Formulaire -->
         <div class="card" style="margin-bottom:24px;">
-          <div id="camp-form-title" style="font-size:13px;font-weight:600;color:var(--or);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;">Nouvelle campagne Instagram</div>
+          <div id="camp-form-title" style="font-size:13px;font-weight:600;color:var(--or);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;">Nouvelle campagne</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div style="grid-column:1/-1;">
               <label class="label">Nom de la campagne *</label>
               <input id="camp-nom" type="text" class="input" placeholder="ex: Boost Été 2026 — Formule Privé">
+            </div>
+            <div>
+              <label class="label">Plateforme</label>
+              <select id="camp-plateforme" class="input">
+                <option value="instagram">📸 Instagram</option>
+                <option value="tiktok">🎵 TikTok</option>
+                <option value="linkedin">💼 LinkedIn</option>
+                <option value="autre">📱 Autre</option>
+              </select>
             </div>
             <div>
               <label class="label">Type d'annonce</label>
@@ -1196,8 +1205,26 @@ Slide 6 (CTA) : « Inclusivité = service premium · Réserve ton événement »
           </div>
         </div>
 
+        <!-- Filtres -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center;">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(245,240,232,0.3);margin-right:2px;">Statut</span>
+          <button data-camp-filter="statut" data-val="tous"     onclick="filterCampagnes('statut','tous')"     style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(200,169,110,0.4);background:rgba(200,169,110,0.15);color:var(--or);">Tous</button>
+          <button data-camp-filter="statut" data-val="active"   onclick="filterCampagnes('statut','active')"   style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">🟢 Actives</button>
+          <button data-camp-filter="statut" data-val="pause"    onclick="filterCampagnes('statut','pause')"    style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">🟡 Pause</button>
+          <button data-camp-filter="statut" data-val="terminee" onclick="filterCampagnes('statut','terminee')" style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">⚫ Terminées</button>
+          <span style="flex:1;min-width:8px;"></span>
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(245,240,232,0.3);margin-right:2px;">Plateforme</span>
+          <button data-camp-filter="plateforme" data-val="toutes"    onclick="filterCampagnes('plateforme','toutes')"    style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(200,169,110,0.4);background:rgba(200,169,110,0.15);color:var(--or);">Toutes</button>
+          <button data-camp-filter="plateforme" data-val="instagram"  onclick="filterCampagnes('plateforme','instagram')"  style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">📸 IG</button>
+          <button data-camp-filter="plateforme" data-val="tiktok"     onclick="filterCampagnes('plateforme','tiktok')"     style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">🎵 TT</button>
+          <button data-camp-filter="plateforme" data-val="linkedin"   onclick="filterCampagnes('plateforme','linkedin')"   style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">💼 LI</button>
+          <span style="flex:1;min-width:8px;"></span>
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(245,240,232,0.3);margin-right:2px;">Tri</span>
+          <button data-camp-filter="tri" data-val="date" onclick="filterCampagnes('tri','date')" style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(200,169,110,0.4);background:rgba(200,169,110,0.15);color:var(--or);">Par date</button>
+          <button data-camp-filter="tri" data-val="roi"  onclick="filterCampagnes('tri','roi')"  style="font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(245,240,232,0.45);">Par ROI</button>
+        </div>
+
         <!-- Liste des campagnes -->
-        <div class="label">Historique des campagnes</div>
         <div id="camp-list"></div>
       </div>
 

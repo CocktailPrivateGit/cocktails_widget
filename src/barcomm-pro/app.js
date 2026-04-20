@@ -1565,6 +1565,7 @@ function getCampagnes() {
 
 function saveCampagne() {
   const nom        = document.getElementById('camp-nom').value.trim();
+  const plateforme = document.getElementById('camp-plateforme').value;
   const type       = document.getElementById('camp-type').value;
   const statut     = document.getElementById('camp-statut').value;
   const dateDebut  = document.getElementById('camp-date-debut').value;
@@ -1588,11 +1589,11 @@ function saveCampagne() {
   if (editingCampagneId) {
     const idx = d.campagnes.findIndex(c => c.id === editingCampagneId);
     if (idx !== -1) {
-      d.campagnes[idx] = { ...d.campagnes[idx], nom, type, statut, dateDebut, dateFin, budget, depense, impressions, reach, clics, devisGeneres: devis, valeurDevis: valDevis, contratsSignes: contrats, caGenere: ca, notes };
+      d.campagnes[idx] = { ...d.campagnes[idx], nom, plateforme, type, statut, dateDebut, dateFin, budget, depense, impressions, reach, clics, devisGeneres: devis, valeurDevis: valDevis, contratsSignes: contrats, caGenere: ca, notes };
     }
     editingCampagneId = null;
   } else {
-    d.campagnes.push({ id: Date.now(), nom, type, statut, dateDebut, dateFin, budget, depense, impressions, reach, clics, devisGeneres: devis, valeurDevis: valDevis, contratsSignes: contrats, caGenere: ca, notes });
+    d.campagnes.push({ id: Date.now(), nom, plateforme, type, statut, dateDebut, dateFin, budget, depense, impressions, reach, clics, devisGeneres: devis, valeurDevis: valDevis, contratsSignes: contrats, caGenere: ca, notes });
   }
 
   setData(d);
@@ -1608,6 +1609,7 @@ function editCampagne(id) {
   document.getElementById('camp-nom').value            = c.nom || '';
   document.getElementById('camp-type').value           = c.type || 'boost_post';
   document.getElementById('camp-statut').value         = c.statut || 'active';
+  document.getElementById('camp-plateforme').value     = c.plateforme || 'instagram';
   document.getElementById('camp-date-debut').value     = c.dateDebut || '';
   document.getElementById('camp-date-fin').value       = c.dateFin || '';
   document.getElementById('camp-budget').value         = c.budget || '';
@@ -1642,12 +1644,14 @@ function clearCampagneForm() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  const platEl = document.getElementById('camp-plateforme');
+  if (platEl) platEl.value = 'instagram';
   const typeEl = document.getElementById('camp-type');
   if (typeEl) typeEl.value = 'boost_post';
   const statutEl = document.getElementById('camp-statut');
   if (statutEl) statutEl.value = 'active';
   const title = document.getElementById('camp-form-title');
-  if (title) title.textContent = 'Nouvelle campagne Instagram';
+  if (title) title.textContent = 'Nouvelle campagne';
   const btn = document.getElementById('camp-submit-btn');
   if (btn) btn.textContent = 'Enregistrer';
   const cancel = document.getElementById('camp-cancel-edit');
@@ -1655,48 +1659,117 @@ function clearCampagneForm() {
   editingCampagneId = null;
 }
 
+// ═══════════════════════════════════════
+// CAMPAGNES — FILTRES (Axe 3)
+// ═══════════════════════════════════════
+let campFilter = { statut: 'tous', plateforme: 'toutes', tri: 'date' };
+
+function filterCampagnes(type, value) {
+  campFilter[type] = value;
+  document.querySelectorAll('[data-camp-filter]').forEach(btn => {
+    if (btn.getAttribute('data-camp-filter') === type) {
+      const active = btn.getAttribute('data-val') === value;
+      btn.style.background  = active ? 'rgba(200,169,110,0.15)' : 'rgba(255,255,255,0.04)';
+      btn.style.borderColor = active ? 'rgba(200,169,110,0.4)'  : 'rgba(255,255,255,0.08)';
+      btn.style.color       = active ? 'var(--or)'              : 'rgba(245,240,232,0.45)';
+    }
+  });
+  renderCampagnes();
+}
+
 function renderCampagnes() {
-  const campagnes = getCampagnes();
+  const all  = getCampagnes();
   const list = document.getElementById('camp-list');
   if (!list) return;
 
-  // Résumé global
-  const totalBudget  = campagnes.reduce((s, c) => s + (c.budget || 0), 0);
-  const totalDepense = campagnes.reduce((s, c) => s + (c.depense || 0), 0);
-  const totalDevis   = campagnes.reduce((s, c) => s + (c.devisGeneres || 0), 0);
-  const totalCA      = campagnes.reduce((s, c) => s + (c.caGenere || 0), 0);
-  const roi          = totalDepense > 0 ? ((totalCA - totalDepense) / totalDepense * 100).toFixed(0) : '—';
+  // ── Axe 2 : résumé global enrichi ─────────────────────────────
+  const totalDepense  = all.reduce((s, c) => s + (c.depense  || 0), 0);
+  const totalBudget   = all.reduce((s, c) => s + (c.budget   || 0), 0);
+  const totalCA       = all.reduce((s, c) => s + (c.caGenere || 0), 0);
+  const totalDevis    = all.reduce((s, c) => s + (c.devisGeneres  || 0), 0);
+  const totalContrats = all.reduce((s, c) => s + (c.contratsSignes|| 0), 0);
+  const roiGlobal     = totalDepense > 0 ? ((totalCA - totalDepense) / totalDepense * 100).toFixed(0) : null;
+  const rasGlobal     = totalDepense > 0 ? (totalCA / totalDepense).toFixed(2) : null;
+  const withRoi = all.filter(c => (c.depense||0) > 0 && (c.caGenere||0) > 0)
+    .map(c => ({ ...c, _roi: (c.caGenere - c.depense) / c.depense * 100 }));
+  const best = withRoi.length ? withRoi.reduce((a, b) => a._roi > b._roi ? a : b) : null;
+  const roiColor = roiGlobal === null ? 'var(--grey)' : Number(roiGlobal) >= 0 ? 'var(--vert)' : 'var(--rouge)';
 
   const sumEl = document.getElementById('camp-summary');
   if (sumEl) {
     sumEl.innerHTML = `
       <div class="kpi-card"><div class="kpi-val">${formatCurrency(totalDepense)}</div><div class="kpi-label">Dépensé</div></div>
-      <div class="kpi-card"><div class="kpi-val">${formatCurrency(totalBudget)}</div><div class="kpi-label">Budget total</div></div>
-      <div class="kpi-card"><div class="kpi-val">${totalDevis}</div><div class="kpi-label">Devis générés</div></div>
       <div class="kpi-card"><div class="kpi-val">${formatCurrency(totalCA)}</div><div class="kpi-label">CA généré</div></div>
-      <div class="kpi-card"><div class="kpi-val" style="color:${roi !== '—' && Number(roi) >= 0 ? 'var(--vert)' : 'var(--rouge)'}">${roi !== '—' ? roi + '%' : '—'}</div><div class="kpi-label">ROI global</div></div>
+      <div class="kpi-card"><div class="kpi-val" style="color:${roiColor}">${roiGlobal !== null ? roiGlobal + '%' : '—'}</div><div class="kpi-label">ROI global</div></div>
+      <div class="kpi-card"><div class="kpi-val">${rasGlobal !== null ? rasGlobal + 'x' : '—'}</div><div class="kpi-label">ROAS global</div></div>
+      <div class="kpi-card"><div class="kpi-val">${totalDevis}</div><div class="kpi-label">Devis générés</div></div>
+      <div class="kpi-card"><div class="kpi-val">${totalContrats}</div><div class="kpi-label">Contrats signés</div></div>
+      ${best ? `<div class="kpi-card"><div class="kpi-val" style="font-size:11px;color:var(--vert);" title="${best.nom}">🏆 ${best.nom.length > 16 ? best.nom.substring(0,15) + '…' : best.nom}</div><div class="kpi-label">Meilleure (${best._roi.toFixed(0)}% ROI)</div></div>` : ''}
     `;
   }
 
-  if (!campagnes.length) {
-    list.innerHTML = '<p style="color:rgba(245,240,232,0.4);text-align:center;padding:32px 0;">Aucune campagne — créez votre première campagne ci-dessus.</p>';
+  // ── Axe 3 : filtre + tri ───────────────────────────────────────
+  let filtered = [...all];
+  if (campFilter.statut    !== 'tous')    filtered = filtered.filter(c => c.statut === campFilter.statut);
+  if (campFilter.plateforme !== 'toutes') filtered = filtered.filter(c => (c.plateforme || 'instagram') === campFilter.plateforme);
+  if (campFilter.tri === 'roi') {
+    filtered.sort((a, b) => {
+      const ra = (a.depense||0) > 0 ? (a.caGenere - a.depense) / a.depense : -Infinity;
+      const rb = (b.depense||0) > 0 ? (b.caGenere - b.depense) / b.depense : -Infinity;
+      return rb - ra;
+    });
+  } else {
+    filtered.reverse();
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = '<p style="color:rgba(245,240,232,0.4);text-align:center;padding:32px 0;">Aucune campagne correspondant aux filtres.</p>';
     return;
   }
 
   const STATUT_LABEL = { active: '🟢 Active', terminee: '⚫ Terminée', pause: '🟡 Pause' };
   const TYPE_LABEL   = { boost_post: 'Boost Post', story: 'Story Ad', reel: 'Reel Ad', carousel: 'Carousel Ad', autre: 'Autre' };
+  const PLAT_ICON    = { instagram: '📸', tiktok: '🎵', linkedin: '💼', autre: '📱' };
+  const PLAT_LABEL   = { instagram: 'Instagram', tiktok: 'TikTok', linkedin: 'LinkedIn', autre: 'Autre' };
 
-  list.innerHTML = campagnes.slice().reverse().map(c => {
-    const depenseAff  = c.depense || c.budget || 0;
-    const roiC        = depenseAff > 0 && c.caGenere > 0 ? ((c.caGenere - depenseAff) / depenseAff * 100).toFixed(0) + '%' : '—';
-    const coutDevis   = c.devisGeneres > 0 ? formatCurrency(depenseAff / c.devisGeneres) + '/devis' : '—';
-    const dateRange   = c.dateDebut ? `${c.dateDebut}${c.dateFin ? ' → ' + c.dateFin : ''}` : '—';
+  list.innerHTML = filtered.map(c => {
+    const dep = c.depense || 0;
+    const bud = c.budget  || 0;
+    const plat = c.plateforme || 'instagram';
+
+    // ── Axe 1 : métriques calculées ───────────────────────────────
+    const roi            = dep > 0 && (c.caGenere||0) > 0 ? ((c.caGenere - dep) / dep * 100).toFixed(0) : null;
+    const roas           = dep > 0 && (c.caGenere||0) > 0 ? (c.caGenere / dep).toFixed(2) : null;
+    const cpm            = dep > 0 && (c.impressions||0) > 0 ? (dep / c.impressions * 1000).toFixed(2) : null;
+    const cpc            = dep > 0 && (c.clics||0) > 0 ? (dep / c.clics).toFixed(2) : null;
+    const coutDevis      = dep > 0 && (c.devisGeneres||0) > 0 ? (dep / c.devisGeneres).toFixed(2) : null;
+    const convClicsDevis = (c.clics||0) > 0 && (c.devisGeneres||0) > 0 ? (c.devisGeneres / c.clics * 100).toFixed(1) : null;
+    const tauxClosing    = (c.devisGeneres||0) > 0 && (c.contratsSignes||0) > 0 ? (c.contratsSignes / c.devisGeneres * 100).toFixed(0) : null;
+
+    const roiN = roi !== null ? Number(roi) : null;
+    const roiColor  = roiN === null ? 'rgba(245,240,232,0.5)' : roiN >= 200 ? 'var(--vert)' : roiN >= 0 ? 'var(--or)' : 'var(--rouge)';
+    const cardBorder = roiN === null ? 'rgba(255,255,255,0.07)' : roiN >= 200 ? 'rgba(74,222,128,0.2)' : roiN >= 0 ? 'rgba(200,169,110,0.2)' : 'rgba(248,113,113,0.2)';
+
+    // Budget bar
+    const budPct = bud > 0 ? Math.min(Math.round(dep / bud * 100), 100) : 0;
+    const budBarCol = budPct >= 100 ? 'var(--rouge)' : budPct >= 80 ? 'var(--or)' : 'var(--vert)';
+
+    // ── Axe 2 : funnel ────────────────────────────────────────────
+    const reachRate = (c.impressions||0) > 0 && (c.reach||0) > 0 ? (c.reach / c.impressions * 100).toFixed(0) : null;
+    const ctrRate   = (c.reach||0) > 0 && (c.clics||0) > 0 ? (c.clics / c.reach * 100).toFixed(1) : null;
+    const devisRate = (c.clics||0) > 0 && (c.devisGeneres||0) > 0 ? (c.devisGeneres / c.clics * 100).toFixed(1) : null;
+    const closRate  = (c.devisGeneres||0) > 0 && (c.contratsSignes||0) > 0 ? (c.contratsSignes / c.devisGeneres * 100).toFixed(0) : null;
+    const hasFunnel = (c.impressions||0) > 0;
+
+    const dateRange = c.dateDebut ? `${c.dateDebut}${c.dateFin ? ' → ' + c.dateFin : ''}` : null;
+
     return `
-      <div class="camp-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:16px;margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,0.02);border:1px solid ${cardBorder};border-radius:8px;padding:16px;margin-bottom:10px;">
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
           <div>
-            <div style="font-size:13px;font-weight:600;color:var(--creme);margin-bottom:4px;">${c.nom}</div>
-            <div style="font-size:11px;color:rgba(245,240,232,0.5);">${TYPE_LABEL[c.type]||c.type} · ${dateRange}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--creme);margin-bottom:4px;">${PLAT_ICON[plat] || '📱'} ${c.nom}</div>
+            <div style="font-size:11px;color:rgba(245,240,232,0.4);">${PLAT_LABEL[plat] || plat} · ${TYPE_LABEL[c.type]||c.type}${dateRange ? ' · ' + dateRange : ''}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
             <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.06);">${STATUT_LABEL[c.statut]||c.statut}</span>
@@ -1704,17 +1777,52 @@ function renderCampagnes() {
             <button onclick="deleteCampagne(${c.id})" style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:var(--rouge);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">✕</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:12px;">
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--or);">${formatCurrency(depenseAff)}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Dépensé</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${(c.impressions||0).toLocaleString('fr-FR')}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Impressions</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${(c.reach||0).toLocaleString('fr-FR')}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Reach</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${c.clics||0}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Clics</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--bleu);">${c.devisGeneres||0}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Devis</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--vert);">${formatCurrency(c.caGenere||0)}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">CA généré</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;color:${roiC !== '—' && Number(roiC) >= 0 ? 'var(--vert)' : 'var(--rouge)'}">${roiC}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">ROI</div></div>
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">${coutDevis}</div><div style="font-size:10px;color:rgba(245,240,232,0.4);">Coût/devis</div></div>
+
+        ${bud > 0 ? `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(245,240,232,0.35);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">
+            <span>Budget consommé</span><span>${formatCurrency(dep)} / ${formatCurrency(bud)} (${budPct}%)</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;">
+            <div style="height:100%;width:${budPct}%;background:${budBarCol};border-radius:2px;"></div>
+          </div>
+        </div>` : ''}
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div style="text-align:center;"><div style="font-size:12px;font-weight:600;color:var(--or);">${formatCurrency(dep)}</div><div style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Dépensé</div></div>
+          <div style="text-align:center;"><div style="font-size:12px;font-weight:600;">${(c.impressions||0).toLocaleString('fr-FR')}</div><div style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Impressions</div></div>
+          <div style="text-align:center;"><div style="font-size:12px;font-weight:600;">${(c.reach||0).toLocaleString('fr-FR')}</div><div style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Reach</div></div>
+          <div style="text-align:center;"><div style="font-size:12px;font-weight:600;">${c.clics||0}</div><div style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Clics</div></div>
+          <div style="text-align:center;"><div style="font-size:12px;font-weight:600;color:var(--bleu);">${c.devisGeneres||0}</div><div style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Devis</div></div>
+          <div style="text-align:center;"><div style="font-size:12px;font-weight:600;color:var(--vert);">${formatCurrency(c.caGenere||0)}</div><div style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">CA</div></div>
         </div>
-        ${c.notes ? `<div style="margin-top:10px;font-size:11px;color:rgba(245,240,232,0.5);font-style:italic;">${c.notes}</div>` : ''}
+
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:${hasFunnel ? '10px' : '0'};">
+          <div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">
+            <span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">ROI </span>
+            <span style="font-size:11px;font-weight:600;color:${roiColor};">${roi !== null ? roi + '%' : '—'}</span>
+          </div>
+          <div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">
+            <span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">ROAS </span>
+            <span style="font-size:11px;font-weight:600;">${roas !== null ? roas + 'x' : '—'}</span>
+          </div>
+          ${cpm !== null ? `<div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);"><span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">CPM </span><span style="font-size:11px;font-weight:600;">${formatCurrency(parseFloat(cpm))}</span></div>` : ''}
+          ${cpc !== null ? `<div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);"><span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">CPC </span><span style="font-size:11px;font-weight:600;">${formatCurrency(parseFloat(cpc))}</span></div>` : ''}
+          ${coutDevis !== null ? `<div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);"><span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Coût/devis </span><span style="font-size:11px;font-weight:600;">${formatCurrency(parseFloat(coutDevis))}</span></div>` : ''}
+          ${convClicsDevis !== null ? `<div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);"><span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Conv. </span><span style="font-size:11px;font-weight:600;color:var(--bleu);">${convClicsDevis}%</span></div>` : ''}
+          ${tauxClosing !== null ? `<div style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);"><span style="font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;">Closing </span><span style="font-size:11px;font-weight:600;color:var(--vert);">${tauxClosing}%</span></div>` : ''}
+        </div>
+
+        ${hasFunnel ? `
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:7px 10px;background:rgba(255,255,255,0.02);border-radius:5px;border:1px solid rgba(255,255,255,0.04);font-size:10px;">
+          <div style="text-align:center;min-width:46px;"><div style="color:rgba(245,240,232,0.6);font-weight:500;">${(c.impressions||0).toLocaleString('fr-FR')}</div><div style="color:rgba(245,240,232,0.3);">IMP</div></div>
+          ${reachRate !== null ? `<div style="color:rgba(245,240,232,0.25);">→ <span style="color:var(--or);">${reachRate}%</span></div><div style="text-align:center;min-width:46px;"><div style="color:rgba(245,240,232,0.6);font-weight:500;">${(c.reach||0).toLocaleString('fr-FR')}</div><div style="color:rgba(245,240,232,0.3);">REACH</div></div>` : ''}
+          ${ctrRate !== null ? `<div style="color:rgba(245,240,232,0.25);">→ <span style="color:var(--or);">${ctrRate}%</span></div><div style="text-align:center;min-width:34px;"><div style="color:rgba(245,240,232,0.6);font-weight:500;">${c.clics||0}</div><div style="color:rgba(245,240,232,0.3);">CLICS</div></div>` : ''}
+          ${devisRate !== null ? `<div style="color:rgba(245,240,232,0.25);">→ <span style="color:var(--bleu);">${devisRate}%</span></div><div style="text-align:center;min-width:34px;"><div style="color:var(--bleu);font-weight:500;">${c.devisGeneres||0}</div><div style="color:rgba(245,240,232,0.3);">DEVIS</div></div>` : ''}
+          ${closRate !== null ? `<div style="color:rgba(245,240,232,0.25);">→ <span style="color:var(--vert);">${closRate}%</span></div><div style="text-align:center;min-width:46px;"><div style="color:var(--vert);font-weight:500;">${c.contratsSignes||0}</div><div style="color:rgba(245,240,232,0.3);">CONTRATS</div></div>` : ''}
+        </div>` : ''}
+
+        ${c.notes ? `<div style="margin-top:9px;font-size:11px;color:rgba(245,240,232,0.45);font-style:italic;">${c.notes}</div>` : ''}
       </div>`;
   }).join('');
 }
@@ -1773,3 +1881,4 @@ window.saveCampagne           = saveCampagne;
 window.deleteCampagne         = deleteCampagne;
 window.editCampagne           = editCampagne;
 window.clearCampagneForm      = clearCampagneForm;
+window.filterCampagnes        = filterCampagnes;
