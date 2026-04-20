@@ -62,6 +62,8 @@ function saveSituation() {
   d.objIg = document.getElementById('s-obj-ig').value;
   d.objTt = document.getElementById('s-obj-tt').value;
   d.objLi = document.getElementById('s-obj-li').value;
+  d.fb    = document.getElementById('s-fb').value;
+  d.objFb = document.getElementById('s-obj-fb').value;
   setData(d);
   updateDashboard(d);
 }
@@ -79,6 +81,8 @@ function loadSituation() {
   set('s-obj-ig', d.objIg);
   set('s-obj-tt', d.objTt);
   set('s-obj-li', d.objLi);
+  set('s-fb', d.fb);
+  set('s-obj-fb', d.objFb);
   updateDashboard(d);
   renderSnapshotList(d.snapshots || []);
   renderGrowthChart(d.snapshots || [], 'ig');
@@ -90,9 +94,11 @@ function updateDashboard(d) {
   set('kpi-ig', d.ig || '—');
   set('kpi-tt', d.tt || '—');
   set('kpi-li', d.li || '—');
+  set('kpi-fb', d.fb || '—');
   set('kpi-devis', d.devis || '—');
   set('kpi-contrats', d.contrats || '—');
   set('kpi-posts', d.posts || '—');
+  set('kpi-events', d.events || '—');
 
   // Deltas semaine/semaine
   const snaps = d.snapshots || [];
@@ -1149,6 +1155,7 @@ function toggle(header) {
 document.addEventListener('DOMContentLoaded', () => {
   loadSituation();
   loadMetaConfig();
+  loadFacebookConfig();
   loadChecks();
   loadCustomActions();
   loadJournal();
@@ -1162,6 +1169,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initAuth(KEY, (cloudData) => {
     localStorage.setItem(KEY, JSON.stringify(cloudData));
     loadSituation();
+    loadMetaConfig();
+    loadFacebookConfig();
     loadChecks();
     loadCustomActions();
     loadJournal();
@@ -1554,6 +1563,190 @@ async function syncMetaIG() {
 }
 
 // ═══════════════════════════════════════
+// API META — FACEBOOK PAGE
+// ═══════════════════════════════════════
+let fbConfigTimer;
+function autoSaveFbConfig() {
+  clearTimeout(fbConfigTimer);
+  fbConfigTimer = setTimeout(saveFbConfig, 600);
+}
+
+function saveFbConfig() {
+  const d = getData();
+  const el = document.getElementById('fb-page-id-input');
+  if (el) d.fbPageId = el.value.trim();
+  setData(d);
+}
+
+function loadFacebookConfig() {
+  const d = getData();
+  const idEl   = document.getElementById('fb-page-id-input');
+  const lastEl = document.getElementById('fb-last-sync');
+  if (idEl   && d.fbPageId)     idEl.value = d.fbPageId;
+  if (lastEl && d.fbLastSync) {
+    const dt = new Date(d.fbLastSync);
+    lastEl.textContent = dt.toLocaleString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  }
+  if (d.fbFans !== undefined) renderFacebookKpis(d);
+  const dashBtn = document.getElementById('btn-fb-dash-sync');
+  if (dashBtn && d.metaToken && d.fbPageId) dashBtn.style.display = 'block';
+}
+
+function renderFacebookKpis(d) {
+  const fmt = v => (v !== null && v !== undefined) ? Number(v).toLocaleString('fr-FR') : '—';
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = fmt(val); };
+  set('fb-fans', d.fbFans);
+  set('fb-followers', d.fbFollowers);
+  set('fb-reach', d.fbReach);
+  set('fb-impressions', d.fbImpressions);
+}
+
+function setFacebookStatus(msg, type) {
+  const el = document.getElementById('fb-status-bar');
+  if (!el) return;
+  el.style.display = 'block';
+  const styles = {
+    ok:    { bg: 'rgba(74,222,128,0.08)',  border: '1px solid rgba(74,222,128,0.25)',   color: 'var(--vert)' },
+    error: { bg: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)', color: 'var(--rouge)' },
+    info:  { bg: 'rgba(24,119,242,0.07)',  border: '1px solid rgba(24,119,242,0.25)',  color: '#60a5fa' }
+  };
+  const s = styles[type] || styles.info;
+  el.style.background = s.bg;
+  el.style.border = s.border;
+  el.style.color = s.color;
+  el.textContent = msg;
+}
+
+async function detectFacebookPage() {
+  const d = getData();
+  const token = d.metaToken || document.getElementById('meta-token-input')?.value.trim();
+  if (!token) {
+    showToast('Configure ton Access Token dans API Meta — IG d\'abord.');
+    nav('meta');
+    return;
+  }
+  setFacebookStatus('🔍 Recherche des pages Facebook associées…', 'info');
+  try {
+    const resp = await fetch(`${META_GRAPH}/me/accounts?fields=id,name,category,picture&access_token=${encodeURIComponent(token)}`);
+    const json = await resp.json();
+    if (json.error) { setFacebookStatus('❌ ' + json.error.message, 'error'); return; }
+    const pages = json.data || [];
+    if (!pages.length) {
+      setFacebookStatus('⚠️ Aucune page Facebook trouvée. Assure-toi d\'être admin de la page et d\'avoir la permission pages_show_list.', 'error');
+      return;
+    }
+    const page = pages[0];
+    const idEl = document.getElementById('fb-page-id-input');
+    if (idEl) idEl.value = page.id;
+    saveFbConfig();
+    setFacebookStatus(`✅ Page trouvée — "${page.name}" · ID : ${page.id}${pages.length > 1 ? ' ('+pages.length+' pages, première sélectionnée)' : ''}`, 'ok');
+    showToast('Page Facebook détectée : ' + page.name);
+  } catch(e) {
+    setFacebookStatus('❌ Erreur réseau : ' + e.message, 'error');
+  }
+}
+
+async function syncFacebookPage() {
+  const d = getData();
+  const token  = d.metaToken || document.getElementById('meta-token-input')?.value.trim();
+  const pageId = d.fbPageId  || document.getElementById('fb-page-id-input')?.value.trim();
+  if (!token) {
+    showToast('Configure ton Access Token dans API Meta — IG d\'abord.');
+    nav('meta');
+    return;
+  }
+  if (!pageId) {
+    showToast('Détecte ou renseigne l\'ID de ta page Facebook.');
+    nav('facebook');
+    return;
+  }
+  setFacebookStatus('⟳ Synchronisation en cours…', 'info');
+  ['btn-fb-sync','btn-fb-sync2','btn-fb-dash-sync'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  });
+  try {
+    // Infos de base de la page
+    const pageResp = await fetch(
+      `${META_GRAPH}/${pageId}?fields=fan_count,followers_count,name,category,picture&access_token=${encodeURIComponent(token)}`
+    );
+    const page = await pageResp.json();
+    if (page.error) {
+      setFacebookStatus('❌ ' + page.error.message, 'error');
+      showToast('Erreur Meta : ' + page.error.message);
+      return;
+    }
+
+    // Insights optionnels (nécessite read_insights)
+    let reach = null, impressions = null;
+    try {
+      const insResp = await fetch(
+        `${META_GRAPH}/${pageId}/insights?metric=page_impressions,page_impressions_unique&period=week&access_token=${encodeURIComponent(token)}`
+      );
+      const ins = await insResp.json();
+      if (!ins.error && ins.data) {
+        const rData = ins.data.find(m => m.name === 'page_impressions_unique');
+        const iData = ins.data.find(m => m.name === 'page_impressions');
+        if (rData?.values?.length) reach = rData.values[rData.values.length - 1].value;
+        if (iData?.values?.length) impressions = iData.values[iData.values.length - 1].value;
+      }
+    } catch(_) { /* insights non disponibles */ }
+
+    const now = new Date().toISOString();
+    d.fb            = String(page.fan_count);
+    d.fbFans        = page.fan_count;
+    d.fbFollowers   = page.followers_count;
+    d.fbReach       = reach;
+    d.fbImpressions = impressions;
+    d.fbLastSync    = now;
+    d.fbPageName    = page.name;
+    d.fbPageCat     = page.category;
+    d.fbPagePic     = page.picture?.data?.url || null;
+    setData(d);
+
+    // Mettre à jour "Ma Situation"
+    const fbInput = document.getElementById('s-fb');
+    if (fbInput) fbInput.value = page.fan_count;
+
+    updateDashboard(d);
+    renderFacebookKpis(d);
+
+    // Afficher infos page
+    const infoBox = document.getElementById('fb-page-info');
+    const nameEl  = document.getElementById('fb-page-name');
+    const catEl   = document.getElementById('fb-page-category');
+    const idEl    = document.getElementById('fb-page-id-display');
+    const picEl   = document.getElementById('fb-page-picture');
+    if (infoBox) infoBox.style.display = 'block';
+    if (nameEl)  nameEl.textContent  = page.name;
+    if (catEl)   catEl.textContent   = page.category || '';
+    if (idEl)    idEl.textContent    = 'ID : ' + pageId;
+    if (picEl && d.fbPagePic) { picEl.src = d.fbPagePic; picEl.style.display = 'block'; }
+
+    const lastEl = document.getElementById('fb-last-sync');
+    if (lastEl) {
+      const dt = new Date(now);
+      lastEl.textContent = dt.toLocaleString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    }
+
+    const reachTxt = reach !== null ? ` · Portée : ${Number(reach).toLocaleString('fr-FR')}` : '';
+    setFacebookStatus(`✅ Synchronisé — ${Number(page.fan_count).toLocaleString('fr-FR')} fans · ${Number(page.followers_count).toLocaleString('fr-FR')} abonnés${reachTxt}`, 'ok');
+    showToast(`✅ Facebook sync — ${Number(page.fan_count).toLocaleString('fr-FR')} fans`);
+
+    const dashBtn = document.getElementById('btn-fb-dash-sync');
+    if (dashBtn) dashBtn.style.display = 'block';
+  } catch(e) {
+    setFacebookStatus('❌ Erreur réseau : ' + e.message, 'error');
+    showToast('Erreur connexion Facebook');
+  } finally {
+    ['btn-fb-sync','btn-fb-sync2','btn-fb-dash-sync'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    });
+  }
+}
+
+// ═══════════════════════════════════════
 // CAMPAGNES PUBLICITAIRES
 // ═══════════════════════════════════════
 
@@ -1875,6 +2068,9 @@ window.launchBrandDesign      = launchBrandDesign;
 window.syncMetaIG             = syncMetaIG;
 window.detectIgAccount        = detectIgAccount;
 window.autoSaveMetaConfig     = autoSaveMetaConfig;
+window.syncFacebookPage       = syncFacebookPage;
+window.detectFacebookPage     = detectFacebookPage;
+window.autoSaveFbConfig       = autoSaveFbConfig;
 
 // ── Campagnes ──
 window.saveCampagne           = saveCampagne;

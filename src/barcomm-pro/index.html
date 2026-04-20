@@ -144,7 +144,10 @@
       </div>
       <div class="nav-divider"></div>
       <div class="nav-item" onclick="nav(&#39;meta&#39;)" data-p="meta">
-        <span class="nav-icon">📱</span><span>API Meta</span><span class="nav-badge" style="background:#e1306c;color:#fff;">IG</span>
+        <span class="nav-icon">📱</span><span>API Meta — IG</span><span class="nav-badge" style="background:#e1306c;color:#fff;">IG</span>
+      </div>
+      <div class="nav-item" onclick="nav(&#39;facebook&#39;)" data-p="facebook">
+        <span class="nav-icon">🔵</span><span>Facebook Page</span><span class="nav-badge" style="background:#1877f2;color:#fff;">FB</span>
       </div>
       <div class="nav-item" onclick="nav(&#39;sync&#39;)" data-p="sync">
         <span class="nav-icon">☁️</span><span>Sync Drive</span>
@@ -185,7 +188,7 @@
             <div class="kpi-delta" id="d-devis"></div>
           </div>
         </div>
-        <div class="grid-2" style="margin-bottom:1.25rem;">
+        <div class="grid-4" style="margin-bottom:1.25rem;">
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-contrats">—</div>
             <div class="kpi-label">Contrats signés</div>
@@ -193,6 +196,16 @@
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-posts">—</div>
             <div class="kpi-label">Posts publiés (total)</div>
+          </div>
+          <div class="kpi-card" style="position:relative;">
+            <div class="kpi-val" id="kpi-fb">—</div>
+            <div class="kpi-label">Fans Facebook</div>
+            <div class="kpi-delta" id="d-fb"></div>
+            <button onclick="syncFacebookPage()" id="btn-fb-dash-sync" title="Synchroniser via API Meta" style="position:absolute;top:8px;right:8px;background:rgba(24,119,242,0.12);border:1px solid rgba(24,119,242,0.3);color:#1877f2;border-radius:12px;padding:2px 8px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:0.4px;display:none;">⟳ SYNC</button>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-events">—</div>
+            <div class="kpi-label">Événements réalisés</div>
           </div>
         </div>
 
@@ -287,6 +300,7 @@
           <div class="metric-row"><span class="metric-icon">📸</span><span class="metric-label">Abonnés Instagram</span><input class="metric-input" id="s-ig" type="number" placeholder="0" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">🎵</span><span class="metric-label">Abonnés TikTok</span><input class="metric-input" id="s-tt" type="number" placeholder="0" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">💼</span><span class="metric-label">Relations LinkedIn</span><input class="metric-input" id="s-li" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">🔵</span><span class="metric-label">Fans Facebook</span><input class="metric-input" id="s-fb" type="number" placeholder="0" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">📝</span><span class="metric-label">Posts publiés (total)</span><input class="metric-input" id="s-posts" type="number" placeholder="0" oninput="autoSave()"></div>
         </div>
 
@@ -297,6 +311,7 @@
           <div class="metric-row"><span class="metric-icon">📸</span><span class="metric-label">Objectif Instagram</span><input class="metric-input" id="s-obj-ig" type="number" placeholder="ex: 500" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">🎵</span><span class="metric-label">Objectif TikTok</span><input class="metric-input" id="s-obj-tt" type="number" placeholder="ex: 1000" oninput="autoSave()"></div>
           <div class="metric-row"><span class="metric-icon">💼</span><span class="metric-label">Objectif LinkedIn</span><input class="metric-input" id="s-obj-li" type="number" placeholder="ex: 300" oninput="autoSave()"></div>
+          <div class="metric-row"><span class="metric-icon">🔵</span><span class="metric-label">Objectif Facebook</span><input class="metric-input" id="s-obj-fb" type="number" placeholder="ex: 200" oninput="autoSave()"></div>
         </div>
 
         <!-- ── SNAPSHOT HEBDOMADAIRE ── -->
@@ -423,6 +438,95 @@
           </div>
           <div style="margin-top:12px;padding:8px 12px;background:rgba(248,113,113,0.07);border-left:3px solid var(--rouge);border-radius:0 4px 4px 0;font-size:11px;color:var(--gris);">
             ⚠️ Les tokens de l'Explorateur expirent en <strong>1h</strong>. Pour un usage permanent, génère un <strong>token longue durée (60 jours)</strong> via l'endpoint <code>/oauth/access_token?grant_type=fb_exchange_token</code> — voir la doc Meta.
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FACEBOOK PAGE ═══ -->
+      <div class="panel" id="panel-facebook">
+        <div class="section-header">
+          <div><div class="section-title">Facebook Page — Cocktail Privé</div><div class="section-sub">Métriques en direct depuis l'API Meta Graph</div></div>
+          <button class="btn btn-gold" onclick="syncFacebookPage()" id="btn-fb-sync">⟳ Synchroniser</button>
+        </div>
+
+        <div id="fb-status-bar" style="display:none;padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:1rem;line-height:1.5;"></div>
+
+        <!-- KPIs -->
+        <div class="label">Métriques de la page Facebook</div>
+        <div class="grid-4" style="margin-bottom:1.25rem;">
+          <div class="kpi-card">
+            <div class="kpi-val" id="fb-fans">—</div>
+            <div class="kpi-label">Fans (J'aime)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="fb-followers">—</div>
+            <div class="kpi-label">Abonnés page</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="fb-reach">—</div>
+            <div class="kpi-label">Portée (7 jours)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="fb-impressions">—</div>
+            <div class="kpi-label">Impressions (7j)</div>
+          </div>
+        </div>
+
+        <!-- Infos page -->
+        <div class="label">Informations de la page</div>
+        <div class="card" id="fb-page-info" style="display:none;">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <img id="fb-page-picture" src="" alt="page" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--or);display:none;">
+            <div>
+              <div id="fb-page-name" style="font-size:14px;font-weight:600;color:var(--or);margin-bottom:2px;">—</div>
+              <div id="fb-page-category" style="font-size:11px;color:var(--gris);">—</div>
+              <div id="fb-page-id-display" style="font-size:10px;color:var(--gris2);font-family:monospace;margin-top:2px;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="label">Configuration</div>
+        <div class="card">
+          <div style="font-size:11px;color:var(--gris);margin-bottom:14px;line-height:1.8;">
+            Utilise le même <strong style="color:var(--or);">User Access Token</strong> que pour Instagram (configuré dans <span style="color:var(--or);cursor:pointer;" onclick="nav('meta')">API Meta — IG</span>).<br>
+            Permissions requises : <code style="color:var(--vert);">pages_read_engagement</code> · <code style="color:var(--vert);">read_insights</code> · <code style="color:var(--vert);">pages_show_list</code>
+          </div>
+          <div class="metric-row" style="gap:8px;flex-wrap:wrap;">
+            <span class="metric-icon">🆔</span>
+            <span class="metric-label">ID Page Facebook</span>
+            <input class="metric-input" id="fb-page-id-input" type="text" placeholder="ex: 100063..." style="font-family:monospace;font-size:11px;flex:1;min-width:160px;" oninput="autoSaveFbConfig()">
+            <button class="btn btn-outline btn-sm" onclick="detectFacebookPage()">🔍 Auto-détecter</button>
+          </div>
+          <div style="font-size:10px;color:var(--gris2);margin-top:10px;">
+            Token partagé avec Instagram — stocké uniquement en local sur ton appareil.
+          </div>
+        </div>
+
+        <!-- Sync status -->
+        <div class="label">Synchronisation</div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-size:12px;color:var(--creme2);">Dernière sync : <span id="fb-last-sync" style="color:var(--or);">Jamais</span></div>
+              <div style="font-size:11px;color:var(--gris);margin-top:4px;">La sync met à jour "Ma Situation" (Fans Facebook).</div>
+            </div>
+            <button class="btn btn-gold" onclick="syncFacebookPage()" id="btn-fb-sync2">⟳ Synchroniser maintenant</button>
+          </div>
+        </div>
+
+        <!-- Guide -->
+        <div class="label">Permissions requises — Guide rapide</div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--creme2);line-height:2;">
+            <strong style="color:var(--or);">1.</strong> Dans l'Explorateur Meta API, génère un token avec :<br>
+            &nbsp;&nbsp;&nbsp;<code style="color:var(--vert);">pages_read_engagement</code> · <code style="color:var(--vert);">read_insights</code> · <code style="color:var(--vert);">pages_show_list</code> · <code style="color:var(--vert);">instagram_basic</code><br>
+            <strong style="color:var(--or);">2.</strong> Configure ce token dans <span style="color:var(--or);cursor:pointer;" onclick="nav('meta')">API Meta — IG</span> (il est partagé)<br>
+            <strong style="color:var(--or);">3.</strong> Ici, clique <strong>"🔍 Auto-détecter"</strong> pour trouver ta page Facebook<br>
+            <strong style="color:var(--or);">4.</strong> Lance la sync !
+          </div>
+          <div style="margin-top:12px;padding:8px 12px;background:rgba(96,165,250,0.07);border-left:3px solid var(--bleu);border-radius:0 4px 4px 0;font-size:11px;color:var(--gris);">
+            💡 <strong>read_insights</strong> est nécessaire pour la portée et les impressions. Sans cette permission, seuls les fans/abonnés seront récupérés.
           </div>
         </div>
       </div>
